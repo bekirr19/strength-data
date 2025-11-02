@@ -1,0 +1,18 @@
+import { Routes, Route } from 'react-router-dom';
+import MainPage from './pages/MainPage';
+import ExercisesPage from './pages/ExercisesPage';
+import ExerciseDetailPage from './pages/ExerciseDetailPage';
+import WorkoutDetailPage from './pages/WorkoutDetailPage';
+
+function App() {
+  return (
+    <Routes>
+      <Route path="/" element={<MainPage />} />
+      <Route path="/exercises" element={<ExercisesPage />} />
+      <Route path="/exercise/:exerciseName" element={<ExerciseDetailPage />} />
+      <Route path="/workout/:date" element={<WorkoutDetailPage />} />
+    </Routes>
+  );
+}
+
+export default App;
