@@ -1,10 +1,9 @@
-import { useState, useRef } from 'react';
-import { saveWorkout, toISODate, ensureExercise, resolveWeightValue, importAllData } from '../utils/storage';
+import { useState } from 'react';
+import { saveWorkout, toISODate, ensureExercise, resolveWeightValue, saveExercises, saveBodyWeight } from '../utils/storage';
 
 export default function ImportWorkoutModal({ isOpen, onClose, selectedDate, onSuccess }) {
   const [jsonText, setJsonText] = useState('');
   const [error, setError] = useState('');
-  const fileInputRef = useRef(null);
 
   if (!isOpen) return null;
 
@@ -36,13 +35,68 @@ export default function ImportWorkoutModal({ isOpen, onClose, selectedDate, onSu
       const data = JSON.parse(jsonText);
 
       if (data && typeof data === 'object' && data.version && data.workouts) {
-        const confirmed = confirm('Bu işlem mevcut tüm kayıtlarınızı bu dosyadaki verilerle değiştirecek. Devam etmek istiyor musunuz?');
+        if (!data.workouts || typeof data.workouts !== 'object') {
+          throw new Error('Geçersiz workouts yapısı.');
+        }
+
+        const entries = Object.entries(data.workouts).filter(([dateISO, workoutPayload]) => {
+          return typeof dateISO === 'string' && dateISO && workoutPayload && typeof workoutPayload === 'object';
+        });
+
+        if (entries.length === 0) {
+          setError('Aktarılacak antrenman bulunamadı.');
+          return;
+        }
+
+        const confirmed = confirm('Bu işlem içe aktarılan günlerdeki mevcut antrenmanları siler ve yerlerine yeni verileri ekler. Egzersiz listesi ve varsa vücut ağırlığı kayıtları da güncellenecek. Devam edilsin mi?');
         if (!confirmed) {
           return;
         }
 
-        importAllData(data);
-        alert('✅ Veriler başarıyla içeri aktarıldı!');
+        if (Array.isArray(data.exercises)) {
+          saveExercises(data.exercises);
+        }
+
+        if (data.bodyWeight && typeof data.bodyWeight === 'object') {
+          Object.entries(data.bodyWeight).forEach(([dateISO, value]) => {
+            if (!dateISO) return;
+            saveBodyWeight(dateISO, value);
+          });
+        }
+
+        let workoutCount = 0;
+        let setCount = 0;
+
+        entries.forEach(([dateISO, workoutPayload]) => {
+          const mergedWorkout = {
+            ...workoutPayload,
+            dateISO,
+          };
+
+          if (Array.isArray(mergedWorkout.items)) {
+            setCount += mergedWorkout.items.reduce((total, item) => {
+              if (!item || !Array.isArray(item.sets)) return total;
+              return total + item.sets.length;
+            }, 0);
+          }
+
+          saveWorkout(mergedWorkout);
+          workoutCount += 1;
+        });
+
+        const extraMessages = [];
+        if (Array.isArray(data.exercises)) {
+          extraMessages.push(`${data.exercises.length} egzersiz kaydı güncellendi`);
+        }
+        if (data.bodyWeight && typeof data.bodyWeight === 'object') {
+          const bwCount = Object.keys(data.bodyWeight).length;
+          if (bwCount > 0) {
+            extraMessages.push(`${bwCount} gün için vücut ağırlığı kaydı güncellendi`);
+          }
+        }
+
+        const extraText = extraMessages.length > 0 ? `\n${extraMessages.join('\n')}` : '';
+        alert(`✅ ${workoutCount} gün güncellendi. Toplam ${setCount} set içe aktarıldı.${extraText}`);
         if (onSuccess) {
           onSuccess();
         }
@@ -133,27 +187,6 @@ export default function ImportWorkoutModal({ isOpen, onClose, selectedDate, onSu
     }
   };
 
-  const handleFileSelect = (event) => {
-    const file = event.target.files?.[0];
-    if (!file) return;
-
-    const reader = new FileReader();
-    reader.onload = () => {
-      if (typeof reader.result === 'string') {
-        setJsonText(reader.result);
-        setError('');
-      }
-    };
-    reader.onerror = () => {
-      setError('Dosya okunamadı. Lütfen tekrar deneyin.');
-    };
-    reader.readAsText(file, 'utf-8');
-  };
-
-  const triggerFilePicker = () => {
-    fileInputRef.current?.click();
-  };
-
   const exampleJSON = `{
   "tarih": "2 Kasım 2025",
   "antrenman_adi": "Push 2",
@@ -196,23 +229,6 @@ export default function ImportWorkoutModal({ isOpen, onClose, selectedDate, onSu
           <label className="block text-sm font-medium text-gray-300 mb-2">
             JSON Verisi
           </label>
-          <div className="flex justify-end mb-2">
-            <button
-              type="button"
-              onClick={triggerFilePicker}
-              className="inline-flex items-center gap-1 rounded-lg bg-primary/20 text-primary px-3 py-1.5 text-xs md:text-sm font-semibold hover:bg-primary/30 active:bg-primary/40 transition"
-            >
-              <span className="material-symbols-outlined text-sm">upload_file</span>
-              Dosyadan Yükle
-            </button>
-            <input
-              ref={fileInputRef}
-              type="file"
-              accept="application/json,.json"
-              className="hidden"
-              onChange={handleFileSelect}
-            />
-          </div>
           <textarea
             value={jsonText}
             onChange={(e) => setJsonText(e.target.value)}
@@ -231,7 +247,7 @@ export default function ImportWorkoutModal({ isOpen, onClose, selectedDate, onSu
           <p className="text-xs md:text-sm text-primary font-semibold mb-2">💡 İpuçları:</p>
           <ul className="text-xs text-gray-300 space-y-1 list-disc list-inside">
             <li>JSON formatına dikkat edin (tırnak işaretleri, virgüller)</li>
-            <li>Export dosyalarını doğrudan yükleyip tüm verileri güncelleyebilirsiniz</li>
+            <li>Export dosyalarını buraya yapıştırdığınızda ilgili günler güncellenir</li>
             <li>tarih: "2 Kasım 2025" formatında olmalı (manuel giriş için)</li>
             <li>agirlik_kg: sayı veya "Vücut Ağırlığı" olabilir</li>
             <li>tekrar: sayı veya "5 + 7" gibi metin olabilir</li>
