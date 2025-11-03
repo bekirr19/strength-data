@@ -1,3 +1,22 @@
+import { db } from './firebase';
+import {
+  collection,
+  doc,
+  getDoc,
+  getDocs,
+  setDoc,
+  deleteDoc,
+  writeBatch,
+  query,
+  where,
+} from 'firebase/firestore';
+
+// !!ÖNEMLİ!!
+// Bu fonksiyon, Firebase Authentication'ı entegre ettikten sonra
+// mevcut giriş yapmış kullanıcının kimliğini döndürmelidir.
+// Şimdilik, tüm kullanıcılar için paylaşılan bir 'test-user' kimliği kullanıyoruz.
+const getCurrentUserId = () => 'test-user';
+
 const STORAGE = {
   EXERCISES: 'gym_exercises_v1',
   WORKOUTS: 'gym_workouts_v1',
@@ -66,28 +85,28 @@ export function normalizeExerciseName(name) {
 
 const BODY_WEIGHT_KEYWORDS = ['body weight', 'bodyweight', 'bw', 'vücut ağırlığı', 'vucut ağırlığı'];
 
-function getBodyWeightMap() {
-  const raw = localStorage.getItem(STORAGE.BODY_WEIGHT);
-  if (!raw) return {};
-  try {
-    const parsed = JSON.parse(raw);
-    return parsed && typeof parsed === 'object' ? parsed : {};
-  } catch (err) {
-    console.warn('Body weight parse error', err);
-    return {};
+async function getBodyWeightMap() {
+  const userId = getCurrentUserId();
+  const docRef = doc(db, 'body_weights', userId);
+  const docSnap = await getDoc(docRef);
+  if (docSnap.exists()) {
+    return docSnap.data().weights || {};
   }
+  return {};
 }
 
-function setBodyWeightMap(map) {
-  localStorage.setItem(STORAGE.BODY_WEIGHT, JSON.stringify(map));
+async function setBodyWeightMap(map) {
+  const userId = getCurrentUserId();
+  const docRef = doc(db, 'body_weights', userId);
+  await setDoc(docRef, { weights: map });
 }
 
-export function getBodyWeightCollection() {
-  return { ...getBodyWeightMap() };
+export async function getBodyWeightCollection() {
+  return getBodyWeightMap();
 }
 
-export function getBodyWeight(dateISO) {
-  const map = getBodyWeightMap();
+export async function getBodyWeight(dateISO) {
+  const map = await getBodyWeightMap();
   if (Object.prototype.hasOwnProperty.call(map, dateISO)) {
     const raw = map[dateISO];
     const value = typeof raw === 'number' ? raw : Number(raw);
@@ -96,8 +115,8 @@ export function getBodyWeight(dateISO) {
   return null;
 }
 
-function findLatestWeightBefore(dateISO) {
-  const map = getBodyWeightMap();
+async function findLatestWeightBefore(dateISO) {
+  const map = await getBodyWeightMap();
   const keys = Object.keys(map).sort();
   let latest = null;
   keys.forEach((key) => {
@@ -111,191 +130,58 @@ function findLatestWeightBefore(dateISO) {
   return Number.isFinite(value) ? { value, dateISO: latest } : null;
 }
 
-export function getBodyWeightInfo(dateISO) {
-  const exact = getBodyWeight(dateISO);
+export async function getBodyWeightInfo(dateISO) {
+  const exact = await getBodyWeight(dateISO);
   if (exact !== null) {
     return { value: exact, sourceDate: dateISO, isFallback: false };
   }
-  const fallback = findLatestWeightBefore(dateISO);
+  const fallback = await findLatestWeightBefore(dateISO);
   if (fallback) {
     return { value: fallback.value, sourceDate: fallback.dateISO, isFallback: true };
   }
   return { value: null, sourceDate: null, isFallback: false };
 }
 
-export function getBodyWeightWithFallback(dateISO) {
-  const info = getBodyWeightInfo(dateISO);
+export async function getBodyWeightWithFallback(dateISO) {
+  const info = await getBodyWeightInfo(dateISO);
   return info.value;
 }
 
-export function saveBodyWeight(dateISO, weight) {
+export async function saveBodyWeight(dateISO, weight) {
   if (!dateISO) return;
   const value = Number(weight);
   if (!Number.isFinite(value) || value <= 0) {
-    clearBodyWeight(dateISO);
+    await clearBodyWeight(dateISO);
     return;
   }
-  const map = getBodyWeightMap();
+  const map = await getBodyWeightMap();
   map[dateISO] = Number(value.toFixed(1));
-  setBodyWeightMap(map);
+  await setBodyWeightMap(map);
 }
 
-export function clearBodyWeight(dateISO) {
-  const map = getBodyWeightMap();
+export async function clearBodyWeight(dateISO) {
+  const map = await getBodyWeightMap();
   if (Object.prototype.hasOwnProperty.call(map, dateISO)) {
     delete map[dateISO];
-    setBodyWeightMap(map);
+    await setBodyWeightMap(map);
   }
 }
 
-function mergeExerciseStats(target, source) {
-  target.pr = Math.max(target.pr || 0, source.pr || 0);
-  target.prReps = Math.max(target.prReps || 0, source.prReps || 0);
-  target.used = Math.max(target.used || 0, source.used || 0);
-  const sourceCreated = source.createdAt || Date.now();
-  target.createdAt = Math.min(target.createdAt || sourceCreated, sourceCreated);
-  if (source.lastUsed) {
-    target.lastUsed = Math.max(target.lastUsed || 0, source.lastUsed);
-  }
-  if (!target.customCategory && source.customCategory) {
-    target.customCategory = source.customCategory;
-  }
-  if ((!Array.isArray(target.customMuscles) || target.customMuscles.length === 0) && Array.isArray(source.customMuscles) && source.customMuscles.length > 0) {
-    target.customMuscles = source.customMuscles;
-  }
-  if (!target.displayName && source.displayName) {
-    target.displayName = source.displayName;
-  }
-}
-
-function normalizeExerciseList(list) {
-  const map = {};
-  (list || []).forEach((item) => {
-    if (!item || (!item.name && !item.displayName)) return;
-
-    const rawName = typeof item.displayName === 'string' && item.displayName.trim().length > 0
-      ? item.displayName.trim()
-      : typeof item.name === 'string'
-        ? item.name.trim()
-        : '';
-
-    if (!rawName) return;
-
-    const canonical = normalizeExerciseName(rawName);
-    if (!canonical) return;
-
-    const key = canonical.toLowerCase();
-    const base = map[key];
-
-    const merged = {
-      ...item,
-      name: rawName,
-      displayName: rawName,
-      canonicalName: canonical,
-      pr: item.pr || 0,
-      prReps: item.prReps || 0,
-      used: item.used || 0,
-    };
-
-    if (!base) {
-      map[key] = merged;
-    } else {
-      mergeExerciseStats(base, merged);
-      if (merged.displayName && merged.displayName !== base.displayName) {
-        base.displayName = merged.displayName;
-        base.name = merged.displayName;
-      }
-    }
+// Exercises
+export async function getExercises() {
+  const userId = getCurrentUserId();
+  const q = query(collection(db, 'exercises'), where('userId', '==', userId));
+  const querySnapshot = await getDocs(q);
+  const exercises = [];
+  querySnapshot.forEach((doc) => {
+    exercises.push({ id: doc.id, ...doc.data() });
   });
 
-  return Object.values(map).map((entry) => ({
-    ...entry,
-    name: entry.displayName || entry.name || entry.canonicalName,
-    displayName: entry.displayName || entry.name || entry.canonicalName,
-    canonicalName: entry.canonicalName || normalizeExerciseName(entry.displayName || entry.name || ''),
-  }));
-}
-
-function normalizeWorkoutItems(items) {
-  const map = {};
-  (items || []).forEach((item) => {
-    if (!item || (!item.name && !item.displayName)) return;
-
-    const rawName = typeof item.displayName === 'string' && item.displayName.trim().length > 0
-      ? item.displayName.trim()
-      : typeof item.name === 'string'
-        ? item.name.trim()
-        : '';
-
-    if (!rawName) return;
-
-    const canonical = normalizeExerciseName(rawName);
-    if (!canonical) return;
-
-    const key = canonical.toLowerCase();
-    const normalizedSets = (item.sets || []).map((set) => {
-      const rawWeight = set?.wDisplay ?? set?.weightDisplay ?? set?.w ?? '';
-      const { value, display } = resolveWeightValue(rawWeight, rawName, item.dateISO || item.dateIso || item.date || null);
-      return {
-        w: value,
-        wDisplay: display,
-        r: Number(set?.r || 0),
-        note: set?.note || '',
-      };
-    }).filter((set) => Number.isFinite(set.w) && set.w > 0 && Number.isFinite(set.r) && set.r > 0);
-
-    if (normalizedSets.length === 0) return;
-
-    const { dateISO: _ignoreDateISO, dateIso: _ignoreDateIso, date: _ignoreDate, ...restItem } = item;
-    const cleanedItem = {
-      ...restItem,
-      name: rawName,
-      displayName: rawName,
-      canonicalName: canonical,
-      sets: normalizedSets,
-    };
-
-    if (!map[key]) {
-      map[key] = cleanedItem;
-    } else {
-      map[key].sets = map[key].sets.concat(normalizedSets);
-    }
-  });
-  return Object.values(map);
-}
-
-function normalizeWorkoutCollection(collection) {
-  const normalized = {};
-  Object.keys(collection || {}).forEach((iso) => {
-    const entry = collection[iso];
-    if (!entry) return;
-
-    const normalizedItems = normalizeWorkoutItems((entry.items || []).map((it) => ({ ...it, dateISO: entry.dateISO || iso }))); 
-    const dateISO = entry.dateISO || iso;
-
-    normalized[dateISO] = {
-      ...entry,
-      dateISO,
-      workoutName: entry.workoutName || '',
-      workoutFocus: Array.isArray(entry.workoutFocus) ? entry.workoutFocus : [],
-      workoutFuel: entry.workoutFuel || '',
-      notes: typeof entry.notes === 'string' ? entry.notes : '',
-      items: normalizedItems,
-    };
-  });
-  return normalized;
-}
-
-// Egzersizler
-export function getExercises() {
-  const raw = localStorage.getItem(STORAGE.EXERCISES);
-  if (raw) {
-    const parsed = JSON.parse(raw);
-    const normalized = normalizeExerciseList(parsed);
-    localStorage.setItem(STORAGE.EXERCISES, JSON.stringify(normalized));
-    return normalized;
+  if (exercises.length > 0) {
+    return exercises;
   }
 
+  // Seed data for new user
   const seed = [
     { name: 'Bench Press', displayName: 'Bench Press', canonicalName: 'Bench Press', createdAt: Date.now(), used: 0, pr: 100 },
     { name: 'Squat', displayName: 'Squat', canonicalName: 'Squat', createdAt: Date.now(), used: 0, pr: 120 },
@@ -303,154 +189,172 @@ export function getExercises() {
     { name: 'Overhead Press', displayName: 'Overhead Press', canonicalName: 'Overhead Press', createdAt: Date.now(), used: 0, pr: 60 },
     { name: 'Pull Up', displayName: 'Pull Up', canonicalName: 'Pull Up', createdAt: Date.now(), used: 0, pr: 0, prReps: 12 },
   ];
-  localStorage.setItem(STORAGE.EXERCISES, JSON.stringify(seed));
+
+  const batch = writeBatch(db);
+  seed.forEach(exercise => {
+      const docRef = doc(collection(db, 'exercises')); // auto-generate ID
+      batch.set(docRef, { ...exercise, userId });
+  });
+  await batch.commit();
+
   return seed;
 }
 
-export function saveExercises(list) {
-  const normalized = normalizeExerciseList(list);
-  localStorage.setItem(STORAGE.EXERCISES, JSON.stringify(normalized));
+export async function saveExercises(list) {
+  const userId = getCurrentUserId();
+  const batch = writeBatch(db);
+  
+  list.forEach(exercise => {
+      const { id, ...data } = exercise;
+      const docRef = id ? doc(db, 'exercises', id) : doc(collection(db, 'exercises'));
+      batch.set(docRef, { ...data, userId });
+  });
+
+  await batch.commit();
 }
 
-export function renameExerciseEverywhere(oldName, newDisplayName, newCanonicalName) {
+export async function renameExerciseEverywhere(oldName, newDisplayName, newCanonicalName) {
   const oldCanonical = normalizeExerciseName(oldName);
   const nextDisplay = (newDisplayName || '').trim() || oldCanonical;
   const nextCanonical = normalizeExerciseName(newCanonicalName || newDisplayName || oldName);
 
-  if (!nextCanonical) {
-    return;
-  }
+  if (!nextCanonical) return;
 
-  const all = getWorkouts();
-  let hasChanges = false;
+  const allWorkouts = await getWorkouts(); 
+  const batch = writeBatch(db);
 
-  Object.keys(all).forEach((iso) => {
-    const workout = all[iso];
-    if (!workout || !Array.isArray(workout.items)) return;
-
-    let workoutChanged = false;
-    const updatedItems = workout.items.map((item) => {
-      if (!item) return item;
-      const itemCanonical = item.canonicalName || normalizeExerciseName(item.name);
-      if (itemCanonical && itemCanonical.toLowerCase() === oldCanonical.toLowerCase()) {
-        if (
-          item.name === nextDisplay &&
-          (item.displayName || item.name) === nextDisplay &&
-          itemCanonical === nextCanonical
-        ) {
+  Object.values(allWorkouts).forEach(workout => {
+      let workoutChanged = false;
+      const updatedItems = workout.items.map(item => {
+          const itemCanonical = item.canonicalName || normalizeExerciseName(item.name);
+          if (itemCanonical && itemCanonical.toLowerCase() === oldCanonical.toLowerCase()) {
+              workoutChanged = true;
+              return {
+                  ...item,
+                  name: nextDisplay,
+                  displayName: nextDisplay,
+                  canonicalName: nextCanonical,
+              };
+          }
           return item;
-        }
+      });
 
-        workoutChanged = true;
-        return {
-          ...item,
-          name: nextDisplay,
-          displayName: nextDisplay,
-          canonicalName: nextCanonical,
-        };
+      if (workoutChanged) {
+          const docRef = doc(db, 'workouts', workout.dateISO);
+          batch.update(docRef, { items: updatedItems });
       }
-      return item;
-    });
+  });
 
-    if (workoutChanged) {
-      hasChanges = true;
-      workout.items = updatedItems;
+  await batch.commit();
+}
+
+
+export async function ensureExercise(name) {
+    const canonical = normalizeExerciseName(name);
+    if (!canonical) return;
+
+    const list = await getExercises();
+    const existing = list.find(e => (e.canonicalName || e.name).toLowerCase() === canonical.toLowerCase());
+
+    if (!existing) {
+        const newExercise = { 
+            name: canonical, 
+            canonicalName: canonical, 
+            displayName: canonical, 
+            createdAt: Date.now(), 
+            used: 0,
+            pr: 0,
+            prReps: 0,
+            userId: getCurrentUserId()
+        };
+        const docRef = doc(collection(db, 'exercises'));
+        await setDoc(docRef, newExercise);
     }
-  });
-
-  if (hasChanges) {
-    localStorage.setItem(STORAGE.WORKOUTS, JSON.stringify(all));
-  }
 }
 
-export function ensureExercise(name) {
-  const canonical = normalizeExerciseName(name);
-  if (!canonical) return;
+export async function updateExercisePR(name, prWeight, prReps) {
+    const canonical = normalizeExerciseName(name);
+    if (!canonical) return;
 
-  const list = getExercises();
-  if (!list.some((e) => e.name.toLowerCase() === canonical.toLowerCase())) {
-    list.push({ name: canonical, createdAt: Date.now(), used: 0 });
-    saveExercises(list);
-  }
+    const list = await getExercises();
+    const item = list.find(e => (e.canonicalName || e.name).toLowerCase() === canonical.toLowerCase());
+
+    if (item && item.id) {
+        const docRef = doc(db, 'exercises', item.id);
+        const updateData = {
+            used: (item.used || 0) + 1,
+            lastUsed: Date.now()
+        };
+        if (typeof prWeight === 'number' && prWeight > (item.pr || 0)) {
+            updateData.pr = prWeight;
+        }
+        if (typeof prReps === 'number' && prReps > (item.prReps || 0)) {
+            updateData.prReps = prReps;
+        }
+        await setDoc(docRef, updateData, { merge: true });
+    }
 }
 
-export function updateExercisePR(name, prWeight, prReps) {
-  const canonical = normalizeExerciseName(name);
-  if (!canonical) return;
-
-  const list = getExercises();
-  const item = list.find((e) => e.name.toLowerCase() === canonical.toLowerCase());
-  if (item) {
-    if (typeof prWeight === 'number' && prWeight > (item.pr || 0)) item.pr = prWeight;
-    if (typeof prReps === 'number' && prReps > (item.prReps || 0)) item.prReps = prReps;
-    item.used = (item.used || 0) + 1;
-    saveExercises(list);
-  }
+// Workouts
+export async function getWorkouts() {
+    const userId = getCurrentUserId();
+    const q = query(collection(db, 'workouts'), where('userId', '==', userId));
+    const querySnapshot = await getDocs(q);
+    const workouts = {};
+    querySnapshot.forEach(doc => {
+        const data = doc.data();
+        if (data.dateISO) {
+            workouts[data.dateISO] = { ...data, dateISO: data.dateISO };
+        }
+    });
+    return workouts;
 }
 
-// Antrenmanlar
-export function getWorkouts() {
-  const raw = localStorage.getItem(STORAGE.WORKOUTS);
-  if (raw) {
-    const parsed = JSON.parse(raw);
-    const normalized = normalizeWorkoutCollection(parsed);
-    localStorage.setItem(STORAGE.WORKOUTS, JSON.stringify(normalized));
-    return normalized;
-  }
-
-  // Örnek veri
-  const today = new Date();
-  const yday = new Date(today.getFullYear(), today.getMonth(), today.getDate() - 1);
-  const data = {};
-  data[toISODate(yday)] = {
-    dateISO: toISODate(yday),
-    workoutName: 'Pull Day',
-    workoutFocus: ['Sırt', 'Biceps'],
-    workoutFuel: '2 Yumurta, Kahve',
-    notes: 'Sıkı bir sırt & biceps günü!',
-    items: [
-      { name: 'Barbell Row', sets: [{ w: 60, r: 12 }, { w: 70, r: 10 }, { w: 70, r: 8 }] },
-      { name: 'Lat Pulldown', sets: [{ w: 50, r: 12 }, { w: 55, r: 10 }, { w: 55, r: 8 }] },
-      { name: 'Dumbbell Curl', sets: [{ w: 12, r: 15 }, { w: 12, r: 15 }, { w: 12, r: 12 }] },
-    ],
-  };
-  const normalizedSeed = normalizeWorkoutCollection(data);
-  localStorage.setItem(STORAGE.WORKOUTS, JSON.stringify(normalizedSeed));
-  return normalizedSeed;
+export async function getWorkoutByDate(dateISO) {
+    const userId = getCurrentUserId();
+    const docId = `${dateISO}_${userId}`;
+    const docRef = doc(db, 'workouts', docId);
+    const docSnap = await getDoc(docRef);
+    if (docSnap.exists()) {
+        const data = docSnap.data();
+        return { ...data, dateISO: data.dateISO || dateISO };
+    }
+    return null;
 }
 
-export function getWorkoutByDate(dateISO) {
-  const all = getWorkouts();
-  return all[dateISO];
+export async function saveWorkout(workout) {
+    if (!workout || !workout.dateISO) return;
+    const userId = getCurrentUserId();
+    
+    const workoutData = {
+        ...workout,
+        userId,
+    };
+
+    const docId = `${workout.dateISO}_${userId}`
+    const docRef = doc(db, 'workouts', docId);
+    await setDoc(docRef, workoutData);
+
+    // Update exercise stats
+    for (const item of workout.items) {
+        const canonical = normalizeExerciseName(item.name);
+        await ensureExercise(canonical);
+        const maxW = item.sets.reduce((m, s) => Math.max(m, Number(s.w || 0)), 0);
+        const maxR = item.sets.reduce((m, s) => Math.max(m, Number(s.r || 0)), 0);
+        await updateExercisePR(canonical, maxW, maxR);
+    }
 }
 
-export function saveWorkout(workout) {
-  if (!workout || !workout.dateISO) return;
-
-  const normalizedWorkout = {
-    ...workout,
-    dateISO: workout.dateISO,
-    workoutName: workout.workoutName || '',
-    workoutFocus: Array.isArray(workout.workoutFocus) ? workout.workoutFocus : [],
-    workoutFuel: workout.workoutFuel || '',
-    notes: typeof workout.notes === 'string' ? workout.notes : '',
-    items: normalizeWorkoutItems((workout.items || []).map((it) => ({ ...it, dateISO: workout.dateISO }))),
-  };
-
-  const all = getWorkouts();
-  all[normalizedWorkout.dateISO] = normalizedWorkout;
-  localStorage.setItem(STORAGE.WORKOUTS, JSON.stringify(all));
-
-  normalizedWorkout.items.forEach((it) => {
-    const canonical = it.canonicalName || normalizeExerciseName(it.name);
-    ensureExercise(canonical);
-    const maxW = it.sets.reduce((m, s) => Math.max(m, Number(s.w || 0)), 0);
-    const maxR = it.sets.reduce((m, s) => Math.max(m, Number(s.r || 0)), 0);
-    updateExercisePR(canonical, maxW, maxR);
-  });
+export async function deleteWorkout(dateISO) {
+    const userId = getCurrentUserId();
+    const docId = `${dateISO}_${userId}`;
+    const docRef = doc(db, 'workouts', docId);
+    await deleteDoc(docRef);
 }
 
-export function resolveWeightValue(weightInput, exerciseName, dateISO) {
+// ... (The rest of the utility functions like date helpers, normalizeExerciseName etc. remain the same)
+
+export async function resolveWeightValue(weightInput, exerciseName, dateISO) {
   let display = '';
   let value = 0;
 
@@ -479,7 +383,7 @@ export function resolveWeightValue(weightInput, exerciseName, dateISO) {
   const isBodyWeightExercise = normalizedName.toLowerCase() === 'pull up';
 
   if (isBodyWeightKeyword || isBodyWeightExercise || lower.startsWith('+')) {
-    const bodyWeight = getBodyWeight(dateISO);
+    const bodyWeight = await getBodyWeight(dateISO);
     const hasBodyWeight = Number.isFinite(bodyWeight) && bodyWeight > 0;
     const baseWeight = hasBodyWeight ? bodyWeight : 0;
     const plusIndex = raw.indexOf('+');
@@ -528,69 +432,46 @@ export function resolveWeightValue(weightInput, exerciseName, dateISO) {
   return { value, display: display || raw };
 }
 
-export function deleteWorkout(dateISO) {
-  const all = getWorkouts();
-  delete all[dateISO];
-  localStorage.setItem(STORAGE.WORKOUTS, JSON.stringify(all));
-}
-
-export function exportAllData() {
-  if (typeof window === 'undefined') {
-    return null;
-  }
-
-  try {
-    const exercisesRaw = window.localStorage.getItem(STORAGE.EXERCISES);
-    const workoutsRaw = window.localStorage.getItem(STORAGE.WORKOUTS);
-    const bodyWeightRaw = window.localStorage.getItem(STORAGE.BODY_WEIGHT);
+export async function exportAllData() {
+    const userId = getCurrentUserId();
+    const exercises = await getExercises();
+    const workouts = await getWorkouts();
+    const bodyWeight = await getBodyWeightMap();
 
     const payload = {
-      version: 1,
-      exportedAt: new Date().toISOString(),
-      exercises: exercisesRaw ? JSON.parse(exercisesRaw) : [],
-      workouts: workoutsRaw ? JSON.parse(workoutsRaw) : {},
-      bodyWeight: bodyWeightRaw ? JSON.parse(bodyWeightRaw) : {},
+        version: 2,
+        exportedAt: new Date().toISOString(),
+        exercises,
+        workouts,
+        bodyWeight,
     };
 
     return payload;
-  } catch (err) {
-    console.error('Export error', err);
-    return null;
-  }
 }
 
-export function importAllData(payload) {
-  if (typeof window === 'undefined') {
-    throw new Error('Bu işlem tarayıcı ortamında yapılmalı.');
-  }
-
-  if (!payload || typeof payload !== 'object') {
-    throw new Error('Geçersiz veri paketi.');
-  }
-
-  const { exercises, workouts, bodyWeight } = payload;
-
-  if (exercises !== undefined) {
-    if (!Array.isArray(exercises)) {
-      throw new Error('Exercises listesi geçersiz.');
+export async function importAllData(payload) {
+    if (!payload || typeof payload !== 'object') {
+        throw new Error('Geçersiz veri paketi.');
     }
-    saveExercises(exercises);
-  }
 
-  if (workouts !== undefined) {
-    if (!workouts || typeof workouts !== 'object') {
-      throw new Error('Workouts verisi geçersiz.');
-    }
-    const normalized = normalizeWorkoutCollection(workouts);
-    window.localStorage.setItem(STORAGE.WORKOUTS, JSON.stringify(normalized));
-  }
+    const { exercises, workouts, bodyWeight } = payload;
 
-  if (bodyWeight !== undefined) {
-    if (!bodyWeight || typeof bodyWeight !== 'object') {
-      throw new Error('Body weight verisi geçersiz.');
+    if (exercises) {
+        await saveExercises(exercises);
     }
-    setBodyWeightMap(bodyWeight);
-  }
+    if (workouts) {
+        const batch = writeBatch(db);
+        const userId = getCurrentUserId();
+        Object.values(workouts).forEach(workout => {
+            const docId = `${workout.dateISO}_${userId}`;
+            const docRef = doc(db, 'workouts', docId);
+            batch.set(docRef, { ...workout, userId });
+        });
+        await batch.commit();
+    }
+    if (bodyWeight) {
+        await setBodyWeightMap(bodyWeight);
+    }
 }
 
 // Tarih yardımcıları

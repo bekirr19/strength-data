@@ -1,4 +1,4 @@
-import { useMemo, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { getWorkouts, getExercises, formatDateTRFull, fromISO, normalizeExerciseName, turkishMonths } from '../utils/storage';
 import { Area, AreaChart, CartesianGrid, Tooltip, ResponsiveContainer, XAxis, YAxis } from 'recharts';
@@ -8,16 +8,27 @@ export default function ExerciseDetailPage() {
   const { exerciseName } = useParams();
   const decodedName = decodeURIComponent(exerciseName);
   const canonicalName = normalizeExerciseName(decodedName) || decodedName;
-  const exercises = getExercises();
+  
+  const [exercises, setExercises] = useState([]);
+  const [workouts, setWorkouts] = useState({});
+  const [timeRange, setTimeRange] = useState('monthly');
+  const [monthSelection, setMonthSelection] = useState('rolling');
+
+  useEffect(() => {
+    const fetchData = async () => {
+      const [exercisesData, workoutsData] = await Promise.all([getExercises(), getWorkouts()]);
+      setExercises(exercisesData);
+      setWorkouts(workoutsData);
+    };
+    fetchData();
+  }, []);
+
   const matchedExercise = exercises.find((exercise) => {
     const key = (exercise.canonicalName || normalizeExerciseName(exercise.name)).toLowerCase();
     return key === canonicalName.toLowerCase();
   });
   const displayName = matchedExercise?.displayName || decodedName;
-  const [timeRange, setTimeRange] = useState('monthly');
-  const [monthSelection, setMonthSelection] = useState('rolling');
-
-  const workouts = getWorkouts();
+  
   const history = [];
   let pr = 0;
 

@@ -9,9 +9,64 @@ export default function WorkoutDetailPage() {
   const navigate = useNavigate();
   const { date } = useParams();
   const [workout, setWorkout] = useState({ dateISO: date, items: [], notes: '', workoutFuel: '', workoutName: '', workoutFocus: [] });
-  const [exerciseLibrary, setExerciseLibrary] = useState(() => getExercises());
+  const [exerciseLibrary, setExerciseLibrary] = useState([]);
   const [isPickerOpen, setIsPickerOpen] = useState(false);
   const [pickerSearch, setPickerSearch] = useState('');
+
+  useEffect(() => {
+    const fetchData = async () => {
+      const [existingWorkout, exercises] = await Promise.all([
+        getWorkoutByDate(date),
+        getExercises()
+      ]);
+      setExerciseLibrary(exercises);
+
+      if (existingWorkout) {
+        setWorkout({
+          ...existingWorkout,
+          workoutFocus: Array.isArray(existingWorkout.workoutFocus) ? existingWorkout.workoutFocus : [],
+          items: (existingWorkout.items || []).map((item) => ({
+            ...item,
+            name: item.displayName || item.name,
+            displayName: item.displayName || item.name,
+            canonicalName: item.canonicalName || normalizeExerciseName(item.displayName || item.name),
+            sets: (item.sets || []).map((set) => ({
+              ...set,
+              w: typeof set.wDisplay === 'string' && set.wDisplay.length > 0
+                ? set.wDisplay
+                : (Number.isFinite(Number(set.w)) && Number(set.w) > 0 ? String(Number(set.w)) : ''),
+              r: Number(set.r || 0),
+            })),
+          })),
+        });
+      } else {
+        setWorkout({
+          dateISO: date,
+          workoutName: '',
+          workoutFocus: [],
+          workoutFuel: '',
+          items: [
+            {
+              name: 'Bench Press',
+              displayName: 'Bench Press',
+              canonicalName: normalizeExerciseName('Bench Press'),
+              sets: [{ w: '80', r: 10 }, { w: '85', r: 8 }],
+            },
+            {
+              name: 'Squat',
+              displayName: 'Squat',
+              canonicalName: normalizeExerciseName('Squat'),
+              sets: [{ w: '100', r: 12 }],
+            },
+          ],
+          notes: '',
+        });
+      }
+    };
+
+    fetchData();
+  }, [date]);
+
   const filteredLibrary = useMemo(() => {
     const query = pickerSearch.trim().toLowerCase();
 
@@ -46,62 +101,9 @@ export default function WorkoutDetailPage() {
     setPickerSearch('');
   };
 
-  useEffect(() => {
-    const handleFocus = () => {
-      setExerciseLibrary(getExercises());
-    };
-
-    window.addEventListener('focus', handleFocus);
-    return () => window.removeEventListener('focus', handleFocus);
-  }, []);
-
-  useEffect(() => {
-    const existing = getWorkoutByDate(date);
-    if (existing) {
-      setWorkout({
-        ...existing,
-        workoutFocus: Array.isArray(existing.workoutFocus) ? existing.workoutFocus : [],
-        items: (existing.items || []).map((item) => ({
-          ...item,
-          name: item.displayName || item.name,
-          displayName: item.displayName || item.name,
-          canonicalName: item.canonicalName || normalizeExerciseName(item.displayName || item.name),
-          sets: (item.sets || []).map((set) => ({
-            ...set,
-            w: typeof set.wDisplay === 'string' && set.wDisplay.length > 0
-              ? set.wDisplay
-              : (Number.isFinite(Number(set.w)) && Number(set.w) > 0 ? String(Number(set.w)) : ''),
-            r: Number(set.r || 0),
-          })),
-        })),
-      });
-    } else {
-      setWorkout({
-        dateISO: date,
-        workoutName: '',
-        workoutFocus: [],
-        workoutFuel: '',
-        items: [
-          {
-            name: 'Bench Press',
-            displayName: 'Bench Press',
-            canonicalName: normalizeExerciseName('Bench Press'),
-            sets: [{ w: '80', r: 10 }, { w: '85', r: 8 }],
-          },
-          {
-            name: 'Squat',
-            displayName: 'Squat',
-            canonicalName: normalizeExerciseName('Squat'),
-            sets: [{ w: '100', r: 12 }],
-          },
-        ],
-        notes: '',
-      });
-    }
-  }, [date]);
-
-  const openExercisePicker = () => {
-    setExerciseLibrary(getExercises());
+  const openExercisePicker = async () => {
+    const exercises = await getExercises();
+    setExerciseLibrary(exercises);
     setPickerSearch('');
     setIsPickerOpen(true);
   };
@@ -194,81 +196,85 @@ export default function WorkoutDetailPage() {
     return clamped % 1 === 0 ? String(clamped) : clamped.toFixed(1);
   };
 
-  const handleDelete = () => {
+  const handleDelete = async () => {
     if (confirm('Bu antrenmanı silmek istediğinizden emin misiniz?')) {
-      deleteWorkout(date);
+      await deleteWorkout(date);
       alert('Antrenman silindi!');
       navigate('/');
     }
   };
 
-  const handleSave = () => {
+  const handleSave = async () => {
     const issues = [];
+    
+    const cleanedItems = await Promise.all(workout.items.map(async (it, exerciseIdx) => {
+      const trimmedName = (it.displayName || it.name || '').trim();
+      const exerciseLabel = trimmedName || `Egzersiz ${exerciseIdx + 1}`;
 
-    const cleanedItems = workout.items
-      .map((it, exerciseIdx) => {
-        const trimmedName = (it.displayName || it.name || '').trim();
-        const exerciseLabel = trimmedName || `Egzersiz ${exerciseIdx + 1}`;
+      if (!trimmedName) {
+        issues.push(`${exerciseLabel} için bir isim girin.`);
+        return null;
+      }
 
-        if (!trimmedName) {
-          issues.push(`${exerciseLabel} için bir isim girin.`);
+      const canonical = it.canonicalName || normalizeExerciseName(trimmedName);
+      if (!canonical) {
+        issues.push(`${exerciseLabel} adı geçerli değil.`);
+        return null;
+      }
+
+      const sets = Array.isArray(it.sets) ? it.sets : [];
+      if (sets.length === 0) {
+        issues.push(`${exerciseLabel} için en az bir set ekleyin.`);
+        return null;
+      }
+
+      const cleanedSets = await Promise.all(sets.map(async (set, setIdx) => {
+        const reps = Number(set.r);
+        if (!Number.isFinite(reps) || reps <= 0) {
+          issues.push(`${exerciseLabel} set ${setIdx + 1} için geçerli tekrar sayısı girin.`);
           return null;
         }
 
-        const canonical = it.canonicalName || normalizeExerciseName(trimmedName);
-        if (!canonical) {
-          issues.push(`${exerciseLabel} adı geçerli değil.`);
-          return null;
-        }
-
-        const sets = Array.isArray(it.sets) ? it.sets : [];
-        if (sets.length === 0) {
-          issues.push(`${exerciseLabel} için en az bir set ekleyin.`);
-          return null;
-        }
-
-        const cleanedSets = [];
-
-        sets.forEach((set, setIdx) => {
-          const reps = Number(set.r);
-          if (!Number.isFinite(reps) || reps <= 0) {
-            issues.push(`${exerciseLabel} set ${setIdx + 1} için geçerli tekrar sayısı girin.`);
-            return;
-          }
-
-          const { value, display } = resolveWeightValue(set.w, trimmedName, workout.dateISO);
-          if (!Number.isFinite(value) || value <= 0) {
-            issues.push(`${exerciseLabel} set ${setIdx + 1} için geçerli ağırlık girin.`);
-            return;
-          }
-
-          cleanedSets.push({
-            w: value,
-            wDisplay: display || String(value),
-            r: reps,
-          });
-        });
-
-        if (cleanedSets.length === 0) {
+        const { value, display } = await resolveWeightValue(set.w, trimmedName, workout.dateISO);
+        if (!Number.isFinite(value) || value <= 0) {
+          issues.push(`${exerciseLabel} set ${setIdx + 1} için geçerli ağırlık girin: "${set.w}"`);
           return null;
         }
 
         return {
-          ...it,
-          name: trimmedName,
-          displayName: trimmedName,
-          canonicalName: canonical,
-          sets: cleanedSets,
+          w: value,
+          wDisplay: display || String(value),
+          r: reps,
         };
-      })
-      .filter(Boolean);
+      }));
+
+      const finalSets = cleanedSets.filter(Boolean);
+      if(finalSets.length !== sets.length) { // Check if any sets were invalid
+        return null;
+      }
+
+      return {
+        ...it,
+        name: trimmedName,
+        displayName: trimmedName,
+        canonicalName: canonical,
+        sets: finalSets,
+      };
+    }));
+
+    const finalItems = cleanedItems.filter(Boolean);
 
     if (issues.length > 0) {
       alert(issues.join('\n'));
       return;
     }
+    
+    if (finalItems.length !== workout.items.length) {
+        // This case handles where an entire item becomes invalid due to set issues.
+        return;
+    }
 
-    if (cleanedItems.length === 0) {
+    if (finalItems.length === 0) {
       alert('Kaydetmek için en az bir geçerli egzersiz ve set girin.');
       return;
     }
@@ -276,10 +282,10 @@ export default function WorkoutDetailPage() {
     const cleaned = {
       ...workout,
       workoutFocus: Array.isArray(workout.workoutFocus) ? workout.workoutFocus : [],
-      items: cleanedItems,
+      items: finalItems,
     };
 
-    saveWorkout(cleaned);
+    await saveWorkout(cleaned);
     alert('Antrenman kaydedildi!');
     navigate('/');
   };

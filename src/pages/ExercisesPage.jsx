@@ -12,12 +12,12 @@ import {
 
 export default function ExercisesPage() {
   const navigate = useNavigate();
-  const [exercises, setExercises] = useState(getExercises());
+  const [exercises, setExercises] = useState([]);
+  const [workouts, setWorkouts] = useState({});
   const [search, setSearch] = useState('');
   const [sortBy, setSortBy] = useState('az');
   const [selectedMuscle, setSelectedMuscle] = useState('all');
   const [selectedTemplate, setSelectedTemplate] = useState('');
-  const [workouts, setWorkouts] = useState(() => getWorkouts());
   const [editingKey, setEditingKey] = useState(null);
   const [editingOriginalName, setEditingOriginalName] = useState('');
   const [editForm, setEditForm] = useState({ name: '', category: 'other', muscles: [] });
@@ -25,41 +25,44 @@ export default function ExercisesPage() {
   const LIBRARY_SEEDED_KEY = 'exercise_library_seed_v2';
 
   useEffect(() => {
-    if (typeof window === 'undefined') return;
-    if (localStorage.getItem(LIBRARY_SEEDED_KEY)) return;
+    const fetchData = async () => {
+      const [exercisesData, workoutsData] = await Promise.all([getExercises(), getWorkouts()]);
+      setExercises(exercisesData);
+      setWorkouts(workoutsData);
 
-    setExercises((current) => {
-      const existingKeys = new Set(
-        current.map((exercise) => (exercise.canonicalName || normalizeExerciseName(exercise.name)).toLowerCase())
-      );
-
-      const missing = SUGGESTED_EXERCISES.filter((option) => {
-        const key = normalizeExerciseName(option.name).toLowerCase();
-        return !existingKeys.has(key);
-      }).map((option) => {
-        const canonicalOption = normalizeExerciseName(option.name);
-        return {
-          name: canonicalOption,
-          displayName: canonicalOption,
-          canonicalName: canonicalOption,
-          createdAt: Date.now(),
-          used: 0,
-        };
-      });
-
-      if (missing.length > 0) {
-        const updated = [...current, ...missing];
-        saveExercises(updated);
-        localStorage.setItem(LIBRARY_SEEDED_KEY, '1');
-        return updated;
+      if (typeof window !== 'undefined' && !localStorage.getItem(LIBRARY_SEEDED_KEY)) {
+        const existingKeys = new Set(
+          exercisesData.map((exercise) => (exercise.canonicalName || normalizeExerciseName(exercise.name)).toLowerCase())
+        );
+  
+        const missing = SUGGESTED_EXERCISES.filter((option) => {
+          const key = normalizeExerciseName(option.name).toLowerCase();
+          return !existingKeys.has(key);
+        }).map((option) => {
+          const canonicalOption = normalizeExerciseName(option.name);
+          return {
+            name: canonicalOption,
+            displayName: canonicalOption,
+            canonicalName: canonicalOption,
+            createdAt: Date.now(),
+            used: 0,
+          };
+        });
+  
+        if (missing.length > 0) {
+          const updated = [...exercisesData, ...missing];
+          await saveExercises(updated);
+          setExercises(updated);
+          localStorage.setItem(LIBRARY_SEEDED_KEY, '1');
+        } else {
+          localStorage.setItem(LIBRARY_SEEDED_KEY, '1');
+        }
       }
-
-      localStorage.setItem(LIBRARY_SEEDED_KEY, '1');
-      return current;
-    });
+    };
+    fetchData();
   }, []);
 
-  const addExerciseByName = (rawName) => {
+  const addExerciseByName = async (rawName) => {
     if (!rawName) return;
     const canonical = normalizeExerciseName(rawName);
     if (!canonical) return;
@@ -68,9 +71,10 @@ export default function ExercisesPage() {
       alert('Bu isimde bir egzersiz zaten var.');
       return;
     }
-    const updated = [...exercises, { name: canonical, displayName: canonical, canonicalName: canonical, createdAt: Date.now(), used: 0 }];
-    saveExercises(updated);
-    setExercises(getExercises());
+    const newExercise = { name: canonical, displayName: canonical, canonicalName: canonical, createdAt: Date.now(), used: 0 };
+    await saveExercises([...exercises, newExercise]);
+    const updatedExercises = await getExercises();
+    setExercises(updatedExercises);
   };
 
   const handleAddExercise = () => {
@@ -118,7 +122,7 @@ export default function ExercisesPage() {
     });
   };
 
-  const handleEditSave = () => {
+  const handleEditSave = async () => {
     const trimmedName = editForm.name.trim();
     if (!trimmedName) {
       alert('Lütfen geçerli bir egzersiz adı girin.');
@@ -157,14 +161,16 @@ export default function ExercisesPage() {
       };
     });
 
-  saveExercises(updatedList);
-  setExercises(getExercises());
+    await saveExercises(updatedList);
+    const updatedExercises = await getExercises();
+    setExercises(updatedExercises);
 
     if (editingOriginalName) {
       const originalCanonical = normalizeExerciseName(editingOriginalName);
-      renameExerciseEverywhere(editingOriginalName, trimmedName, normalizedNew);
+      await renameExerciseEverywhere(editingOriginalName, trimmedName, normalizedNew);
       if (originalCanonical !== normalizedNew) {
-        setWorkouts(getWorkouts());
+        const updatedWorkouts = await getWorkouts();
+        setWorkouts(updatedWorkouts);
       }
     }
 

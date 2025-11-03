@@ -20,11 +20,24 @@ export default function MainPage() {
       return todayISO;
     }
   });
+  const [workout, setWorkout] = useState(null);
   const [isCalendarOpen, setIsCalendarOpen] = useState(false);
   const [isImportOpen, setIsImportOpen] = useState(false);
   const [refreshKey, setRefreshKey] = useState(0);
   const [bodyWeightInput, setBodyWeightInput] = useState('');
   const [bodyWeightMeta, setBodyWeightMeta] = useState({ value: null, isFallback: false, sourceDate: null });
+
+  useEffect(() => {
+    const fetchData = async () => {
+      const workoutData = await getWorkoutByDate(selectedDate);
+      setWorkout(workoutData);
+      const bodyWeightInfo = await getBodyWeightInfo(selectedDate);
+      setBodyWeightInput(bodyWeightInfo.value !== null ? String(bodyWeightInfo.value) : '');
+      setBodyWeightMeta(bodyWeightInfo);
+    };
+    fetchData();
+  }, [selectedDate, refreshKey]);
+
 
   const handleSelectDate = (iso) => {
     setSelectedDate(iso);
@@ -37,7 +50,6 @@ export default function MainPage() {
     }
   };
 
-  const workout = getWorkoutByDate(selectedDate);
   const dateHuman = formatDateTRFull(selectedDate);
 
   const handleExerciseClick = (exerciseName) => {
@@ -54,18 +66,12 @@ export default function MainPage() {
     return () => window.removeEventListener('focus', handleFocus);
   }, []);
 
-  useEffect(() => {
-    const info = getBodyWeightInfo(selectedDate);
-    setBodyWeightInput(info.value !== null ? String(info.value) : '');
-    setBodyWeightMeta(info);
-  }, [selectedDate, refreshKey]);
-
-  const commitBodyWeight = (nextValue = bodyWeightInput) => {
+  const commitBodyWeight = async (nextValue = bodyWeightInput) => {
     const trimmed = (nextValue ?? '').trim().replace(',', '.');
 
     if (!trimmed) {
-      clearBodyWeight(selectedDate);
-      const latest = getBodyWeightInfo(selectedDate);
+      await clearBodyWeight(selectedDate);
+      const latest = await getBodyWeightInfo(selectedDate);
       setBodyWeightInput(latest.value !== null ? String(Number(latest.value.toFixed(1))) : '');
       setBodyWeightMeta(latest);
       return;
@@ -77,8 +83,8 @@ export default function MainPage() {
       return;
     }
 
-    saveBodyWeight(selectedDate, numeric);
-    const latest = getBodyWeightInfo(selectedDate);
+    await saveBodyWeight(selectedDate, numeric);
+    const latest = await getBodyWeightInfo(selectedDate);
     setBodyWeightInput(latest.value !== null ? String(Number(latest.value.toFixed(1))) : '');
     setBodyWeightMeta({ ...latest, isFallback: false, sourceDate: selectedDate });
   };
@@ -95,8 +101,8 @@ export default function MainPage() {
     commitBodyWeight('');
   };
 
-  const handleExportData = () => {
-    const payload = exportAllData();
+  const handleExportData = async () => {
+    const payload = await exportAllData();
     if (!payload) {
       alert('Veriler dışa aktarılamadı. Lütfen tekrar deneyin.');
       return;
