@@ -5,13 +5,21 @@ import { WORKOUT_TYPE_META, detectWorkoutType } from '../utils/workoutTypes';
 export default function CalendarModal({ isOpen, onClose, onSelectDate }) {
   const [currentMonth, setCurrentMonth] = useState(new Date());
   const [workoutMetadata, setWorkoutMetadata] = useState({});
+  const [isLoading, setIsLoading] = useState(false);
 
   // Modal açıldığında verileri yenile
   useEffect(() => {
     if (isOpen) {
-      const workouts = getWorkouts();
+      loadWorkouts();
+    }
+  }, [isOpen, currentMonth]);
+
+  const loadWorkouts = async () => {
+    try {
+      setIsLoading(true);
+      const workouts = await getWorkouts();
       const metadata = {};
-      Object.keys(workouts).forEach((iso) => {
+      Object.keys(workouts || {}).forEach((iso) => {
         const workout = workouts[iso];
         metadata[iso] = {
           hasWorkout: true,
@@ -19,8 +27,13 @@ export default function CalendarModal({ isOpen, onClose, onSelectDate }) {
         };
       });
       setWorkoutMetadata(metadata);
+      console.log('CalendarModal: Workout metadata yüklendi:', Object.keys(metadata).length, 'gün');
+    } catch (error) {
+      console.error('CalendarModal: Workout metadata yüklenirken hata:', error);
+    } finally {
+      setIsLoading(false);
     }
-  }, [isOpen]);
+  };
 
   if (!isOpen) return null;
 
@@ -126,7 +139,7 @@ export default function CalendarModal({ isOpen, onClose, onSelectDate }) {
           {Object.entries(WORKOUT_TYPE_META).map(([key, meta]) => (
             <div key={key} className="flex items-center gap-2">
               <span className={`h-2.5 w-2.5 rounded-full ${meta.dotClass}`} />
-              <span>{meta.label}</span>
+              <span>{meta.badgeLabel || meta.label}</span>
             </div>
           ))}
         </div>

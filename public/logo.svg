@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
+  <defs>
+    <linearGradient id="bg" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#0b1713" />
+      <stop offset="100%" stop-color="#0f1f19" />
+    </linearGradient>
+    <filter id="glow" x="-40%" y="-40%" width="180%" height="180%">
+      <feGaussianBlur stdDeviation="6" result="coloredBlur" />
+      <feMerge>
+        <feMergeNode in="coloredBlur" />
+        <feMergeNode in="SourceGraphic" />
+      </feMerge>
+    </filter>
+  </defs>
+
+  <rect fill="url(#bg)" width="512" height="512" rx="56" />
+
+  <g fill="none" stroke="#0df293" stroke-width="18" stroke-linecap="round" stroke-linejoin="round" filter="url(#glow)">
+    <!-- Uprights -->
+    <path d="M156 134v220M356 134v220" />
+    <!-- Top rail -->
+    <path d="M132 156h248" />
+    <!-- Barbell sleeves -->
+    <path d="M112 186h32M368 186h32" />
+    <!-- Data plates -->
+    <rect x="84" y="162" width="44" height="108" rx="10" />
+    <rect x="384" y="162" width="44" height="108" rx="10" />
+    <path d="M96 202l18 18 18-26" />
+    <path d="M404 208l12 10 10-14" />
+    <!-- Seat supports -->
+    <path d="M188 274h136M224 274v72M288 274v72" />
+    <!-- Seat pad -->
+    <rect x="190" y="246" width="132" height="40" rx="12" />
+    <!-- Base -->
+    <path d="M128 360h256" />
+    <rect x="140" y="344" width="52" height="64" rx="12" />
+    <rect x="320" y="344" width="52" height="64" rx="12" />
+  </g>
+
+  <text x="256" y="444" fill="#0df293" font-family="'Inter', 'Segoe UI', sans-serif" font-size="64" font-weight="700" text-anchor="middle" letter-spacing="6">
+    STRENGTH DATA
+  </text>
+</svg>

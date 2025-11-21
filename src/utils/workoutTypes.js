@@ -1,17 +1,23 @@
 export const WORKOUT_TYPE_META = {
   push: {
-    label: 'Push Day',
-    buttonClass: 'bg-orange-500/20 text-orange-200 border border-orange-400/40 font-semibold',
+    label: 'PUSH',
+    badgeLabel: 'Push Day',
+    buttonClass: 'bg-orange-500/25 text-orange-100 border border-orange-400/40 font-semibold',
+    badgeClass: 'bg-orange-500/15 text-orange-100 border border-orange-500/40 font-semibold',
     dotClass: 'bg-orange-400',
   },
   pull: {
-    label: 'Pull Day',
-    buttonClass: 'bg-sky-500/20 text-sky-200 border border-sky-400/40 font-semibold',
+    label: 'PULL',
+    badgeLabel: 'Pull Day',
+    buttonClass: 'bg-sky-500/25 text-sky-100 border border-sky-400/40 font-semibold',
+    badgeClass: 'bg-sky-500/15 text-sky-100 border border-sky-500/40 font-semibold',
     dotClass: 'bg-sky-400',
   },
   leg: {
-    label: 'Leg Day',
-    buttonClass: 'bg-lime-500/20 text-lime-200 border border-lime-400/40 font-semibold',
+    label: 'LEG',
+    badgeLabel: 'Leg Day',
+    buttonClass: 'bg-lime-500/25 text-lime-100 border border-lime-400/40 font-semibold',
+    badgeClass: 'bg-lime-500/15 text-lime-100 border border-lime-500/40 font-semibold',
     dotClass: 'bg-lime-400',
   },
 };

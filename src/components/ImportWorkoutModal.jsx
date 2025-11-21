@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { saveWorkout, toISODate, ensureExercise, resolveWeightValue, saveExercises, saveBodyWeight } from '../utils/storage';
+import { saveWorkout, toISODate, ensureExercise, resolveWeightValue, saveExercises, saveBodyWeight, clearCache, exportAllData } from '../utils/storage';
 
 export default function ImportWorkoutModal({ isOpen, onClose, selectedDate, onSuccess }) {
   const [jsonText, setJsonText] = useState('');
@@ -28,13 +28,40 @@ export default function ImportWorkoutModal({ isOpen, onClose, selectedDate, onSu
     return selectedDate; // Fallback
   };
 
-  const handleImport = () => {
+  const handleExportAll = async () => {
+    try {
+      const payload = await exportAllData();
+      if (!payload) {
+        alert('Veriler dışa aktarılamadı. Lütfen tekrar deneyin.');
+        return;
+      }
+
+      const fileName = `strength-data-export-${payload.exportedAt.replace(/[:.]/g, '-')}.json`;
+      const blob = new Blob([JSON.stringify(payload, null, 2)], { type: 'application/json' });
+      const url = URL.createObjectURL(blob);
+      const link = document.createElement('a');
+      link.href = url;
+      link.download = fileName;
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+      URL.revokeObjectURL(url);
+    } catch (err) {
+      console.error('Export işlemi sırasında hata:', err);
+      alert('Veriler dışa aktarılamadı. Lütfen tekrar deneyin.');
+    }
+  };
+
+  const handleImport = async () => {
     setError('');
     
     try {
+      console.log('Import başlıyor...');
       const data = JSON.parse(jsonText);
+      console.log('JSON parse başarılı, data:', data);
 
       if (data && typeof data === 'object' && data.version && data.workouts) {
+        console.log('Bulk import modu - workouts sayısı:', Object.keys(data.workouts).length);
         if (!data.workouts || typeof data.workouts !== 'object') {
           throw new Error('Geçersiz workouts yapısı.');
         }
@@ -50,24 +77,30 @@ export default function ImportWorkoutModal({ isOpen, onClose, selectedDate, onSu
 
         const confirmed = confirm('Bu işlem içe aktarılan günlerdeki mevcut antrenmanları siler ve yerlerine yeni verileri ekler. Egzersiz listesi ve varsa vücut ağırlığı kayıtları da güncellenecek. Devam edilsin mi?');
         if (!confirmed) {
+          console.log('Kullanıcı import işlemini iptal etti');
           return;
         }
 
+        console.log('Import onaylandı, işlem başlıyor...');
+
         if (Array.isArray(data.exercises)) {
-          saveExercises(data.exercises);
+          console.log('Exercises kaydediliyor:', data.exercises.length);
+          await saveExercises(data.exercises);
         }
 
         if (data.bodyWeight && typeof data.bodyWeight === 'object') {
-          Object.entries(data.bodyWeight).forEach(([dateISO, value]) => {
-            if (!dateISO) return;
-            saveBodyWeight(dateISO, value);
-          });
+          console.log('Body weight kaydediliyor:', Object.keys(data.bodyWeight).length, 'gün');
+          for (const [dateISO, value] of Object.entries(data.bodyWeight)) {
+            if (!dateISO) continue;
+            await saveBodyWeight(dateISO, value);
+          }
         }
 
         let workoutCount = 0;
         let setCount = 0;
 
-        entries.forEach(([dateISO, workoutPayload]) => {
+        console.log('Workouts kaydediliyor...');
+        for (const [dateISO, workoutPayload] of entries) {
           const mergedWorkout = {
             ...workoutPayload,
             dateISO,
@@ -80,9 +113,13 @@ export default function ImportWorkoutModal({ isOpen, onClose, selectedDate, onSu
             }, 0);
           }
 
-          saveWorkout(mergedWorkout);
+          console.log(`Kaydediliyor: ${dateISO}`, mergedWorkout);
+          const result = await saveWorkout(mergedWorkout);
+          console.log(`Kaydedildi: ${dateISO}`, result);
           workoutCount += 1;
-        });
+        }
+
+        console.log(`Import tamamlandı: ${workoutCount} workout, ${setCount} set`);
 
         const extraMessages = [];
         if (Array.isArray(data.exercises)) {
@@ -97,12 +134,34 @@ export default function ImportWorkoutModal({ isOpen, onClose, selectedDate, onSu
 
         const extraText = extraMessages.length > 0 ? `\n${extraMessages.join('\n')}` : '';
         alert(`✅ ${workoutCount} gün güncellendi. Toplam ${setCount} set içe aktarıldı.${extraText}`);
+        
+        // Cache'i temizle
+        console.log('Import tamamlandı, cache temizleniyor...');
+        clearCache();
+        
+        if (typeof window !== 'undefined') {
+          // LocalStorage cache'i de temizle
+          try {
+            window.localStorage.removeItem('firebase_cache_workouts');
+            window.localStorage.removeItem('firebase_cache_exercises');
+            window.localStorage.removeItem('firebase_cache_bodyWeight');
+          } catch (e) {
+            console.warn('LocalStorage cache temizlenemedi:', e);
+          }
+        }
+        
         if (onSuccess) {
           onSuccess();
         }
-        if (typeof window !== 'undefined') {
-          window.location.reload();
-        }
+        
+        // Biraz bekle ki Firebase yazma işlemi kesinlikle tamamlansın
+        console.log('500ms sonra sayfa yenilenecek...');
+        setTimeout(() => {
+          if (typeof window !== 'undefined') {
+            console.log('Sayfa yenileniyor...');
+            window.location.reload();
+          }
+        }, 500);
         return;
       }
       
@@ -110,7 +169,7 @@ export default function ImportWorkoutModal({ isOpen, onClose, selectedDate, onSu
       const targetDate = data.tarih ? parseDate(data.tarih) : selectedDate;
       
       // Egzersizleri dönüştür
-      const items = (data.egzersizler || []).map(ex => {
+      const itemsPromises = (data.egzersizler || []).map(async (ex) => {
         const sets = (ex.setler || []).map((s) => {
           let reps = 0;
 
@@ -126,7 +185,18 @@ export default function ImportWorkoutModal({ isOpen, onClose, selectedDate, onSu
             : (s.agirlik || s.weight || '');
           const { value, display } = resolveWeightValue(rawWeight, ex.isim, targetDate);
 
-          if (!Number.isFinite(value) || value <= 0 || !Number.isFinite(reps) || reps <= 0) {
+          // Tekrar kontrolü
+          if (!Number.isFinite(reps) || reps <= 0) {
+            console.warn(`Set atlandı (geçersiz tekrar): ${ex.isim}`, s);
+            return null;
+          }
+
+          // Ağırlık kontrolü - Body Weight (display var ama value = 0) veya geçerli sayı olmalı
+          const isBodyWeight = display && (display === 'Body Weight' || display.startsWith('BW'));
+          const hasValidWeight = Number.isFinite(value) && value > 0;
+          
+          if (!isBodyWeight && !hasValidWeight) {
+            console.warn(`Set atlandı (geçersiz ağırlık): ${ex.isim}`, s, { value, display });
             return null;
           }
 
@@ -139,14 +209,17 @@ export default function ImportWorkoutModal({ isOpen, onClose, selectedDate, onSu
         }).filter(Boolean);
         
         if (sets.length > 0) {
-          ensureExercise(ex.isim);
+          await ensureExercise(ex.isim);
+          return {
+            name: ex.isim,
+            sets: sets
+          };
         }
         
-        return {
-          name: ex.isim,
-          sets: sets
-        };
-      }).filter(item => item.sets.length > 0);
+        return null;
+      });
+      
+      const items = (await Promise.all(itemsPromises)).filter(Boolean);
       
       if (items.length === 0) {
         setError('Geçerli egzersiz bulunamadı. Lütfen JSON formatını kontrol edin.');
@@ -173,7 +246,7 @@ export default function ImportWorkoutModal({ isOpen, onClose, selectedDate, onSu
       };
       
       // Kaydet
-      saveWorkout(workout);
+      await saveWorkout(workout);
       
       alert(`✅ Antrenman başarıyla ${targetDate} tarihine eklendi!\n\n${items.length} egzersiz, ${items.reduce((acc, it) => acc + it.sets.length, 0)} set kaydedildi.`);
       
@@ -183,6 +256,7 @@ export default function ImportWorkoutModal({ isOpen, onClose, selectedDate, onSu
       
     } catch (err) {
       console.error('JSON parse error:', err);
+      console.error('Error stack:', err.stack);
       setError('JSON formatı hatalı. Lütfen geçerli bir JSON yapısı girin.\n\nHata: ' + err.message);
     }
   };
@@ -220,9 +294,18 @@ export default function ImportWorkoutModal({ isOpen, onClose, selectedDate, onSu
               Seçili tarih: {selectedDate}
             </p>
           </div>
-          <button onClick={onClose} className="p-2 hover:bg-gray-800 active:bg-gray-700 rounded-lg transition">
-            <span className="material-symbols-outlined text-gray-400">close</span>
-          </button>
+          <div className="flex items-center gap-2">
+            <button
+              onClick={handleExportAll}
+              className="inline-flex items-center gap-1 px-3 py-2 rounded-lg bg-transparent text-primary border border-primary/40 text-xs md:text-sm font-semibold hover:bg-primary/10 transition"
+            >
+              <span className="material-symbols-outlined text-sm align-middle">download</span>
+              Dışa Aktar
+            </button>
+            <button onClick={onClose} className="p-2 hover:bg-gray-800 active:bg-gray-700 rounded-lg transition">
+              <span className="material-symbols-outlined text-gray-400">close</span>
+            </button>
+          </div>
         </div>
 
         <div className="mb-4">

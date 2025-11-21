@@ -76,11 +76,13 @@ const EXERCISE_LIBRARY = [
   { name: 'Push Up', category: 'push', muscles: ['chest', 'shoulders', 'triceps', 'core'] },
   // Push - Shoulders
   { name: 'Overhead Press', category: 'push', muscles: ['shoulders', 'triceps'] },
+  { name: 'Front Shoulder', category: 'push', muscles: ['shoulders'] },
   { name: 'Lateral Raise', category: 'push', muscles: ['shoulders'] },
   { name: 'Face Pull', category: 'push', muscles: ['shoulders', 'rearShoulders', 'back'] },
   { name: 'Rear Delt Fly', category: 'push', muscles: ['rearShoulders', 'shoulders'] },
   // Push - Triceps
   { name: 'Triceps Pushdown', category: 'push', muscles: ['triceps'] },
+  { name: 'Rope Pushdown', category: 'push', muscles: ['triceps'] },
   { name: 'Cable Skull Crusher', category: 'push', muscles: ['triceps'] },
   { name: 'Skull Crusher', category: 'push', muscles: ['triceps'] },
   { name: 'One Arm Overhead Triceps Extension', category: 'push', muscles: ['triceps'] },

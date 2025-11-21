@@ -1,12 +1,13 @@
-import { useState, useRef, useEffect, useMemo, useCallback } from 'react';
-import { toISODate, turkishWeekdaysShort, turkishMonths, getWorkouts, fromISO } from '../utils/storage';
+import { useState, useRef, useEffect, useCallback } from 'react';
+import { toISODate, turkishWeekdaysShort, turkishMonths, getWorkouts, fromISO, formatDateTRFull } from '../utils/storage';
 import { WORKOUT_TYPE_META, detectWorkoutType } from '../utils/workoutTypes';
 
-const DAYS_VISIBLE = 14;
+const DAYS_VISIBLE = 21;
+const HALF_WINDOW = Math.floor(DAYS_VISIBLE / 2);
 
 const computeWindowStart = (iso) => {
   const base = fromISO(iso);
-  base.setDate(base.getDate() - (DAYS_VISIBLE - 1));
+  base.setDate(base.getDate() - HALF_WINDOW);
   return base;
 };
 
@@ -33,12 +34,32 @@ const getISOWeekNumber = (date) => {
   return Math.ceil(((target - yearStart) / 86400000 + 1) / 7);
 };
 
-export default function WeekStrip({ selectedDate, onDateSelect }) {
+export default function WeekStrip({ selectedDate, onDateSelect, refreshKey }) {
   const [weekStart, setWeekStart] = useState(() => computeWindowStart(selectedDate));
+  const [workouts, setWorkouts] = useState({});
+  const [isLoading, setIsLoading] = useState(false);
 
   const containerRef = useRef(null);
   const todayISO = toISODate(new Date());
-  const workouts = useMemo(() => getWorkouts(), []);
+
+  // Workouts'u async olarak yükle
+  useEffect(() => {
+    loadWorkouts();
+  }, [refreshKey]);
+
+  const loadWorkouts = async () => {
+    try {
+      setIsLoading(true);
+      const data = await getWorkouts();
+      setWorkouts(data || {});
+      console.log('WeekStrip: Workouts yüklendi:', Object.keys(data || {}).length, 'gün');
+    } catch (error) {
+      console.error('WeekStrip: Workouts yüklenirken hata:', error);
+      setWorkouts({});
+    } finally {
+      setIsLoading(false);
+    }
+  };
 
   const days = [];
   for (let i = 0; i < DAYS_VISIBLE; i++) {
@@ -77,49 +98,7 @@ export default function WeekStrip({ selectedDate, onDateSelect }) {
 
   const handlePrevDay = () => moveSelectionBy(-1);
   const handleNextDay = () => moveSelectionBy(1);
-  const handleGoToday = () => {
-    if (selectedDate !== todayISO) {
-      setWeekStart(computeWindowStart(todayISO));
-    }
-    onDateSelect(todayISO);
-  };
-
-  // Touch swipe işlemleri
-  useEffect(() => {
-    const container = containerRef.current;
-    if (!container) return;
-
-    let startX = 0;
-    let isDragging = false;
-
-    const onTouchStart = (e) => {
-      startX = e.touches[0].clientX;
-      isDragging = true;
-    };
-
-    const onTouchEnd = (e) => {
-      if (!isDragging) return;
-      const endX = e.changedTouches[0].clientX;
-      const diff = startX - endX;
-
-      if (Math.abs(diff) > 50) {
-        if (diff > 0) {
-          moveSelectionBy(1);
-        } else {
-          moveSelectionBy(-1);
-        }
-      }
-      isDragging = false;
-    };
-
-    container.addEventListener('touchstart', onTouchStart);
-    container.addEventListener('touchend', onTouchEnd);
-
-    return () => {
-      container.removeEventListener('touchstart', onTouchStart);
-      container.removeEventListener('touchend', onTouchEnd);
-    };
-  }, [moveSelectionBy]);
+  // Mobilde doğal kaydırma deneyimi için özel dokunma dinleyicisi yok
 
   useEffect(() => {
     const selectedDateObj = fromISO(selectedDate);
@@ -127,12 +106,19 @@ export default function WeekStrip({ selectedDate, onDateSelect }) {
     const windowEnd = new Date(windowStart);
     windowEnd.setDate(windowEnd.getDate() + DAYS_VISIBLE - 1);
 
-    if (selectedDateObj < windowStart) {
-      setWeekStart(() => new Date(selectedDateObj));
-    } else if (selectedDateObj > windowEnd) {
+    if (selectedDateObj < windowStart || selectedDateObj > windowEnd) {
       const adjustedStart = new Date(selectedDateObj);
-      adjustedStart.setDate(adjustedStart.getDate() - (DAYS_VISIBLE - 1));
+      adjustedStart.setDate(adjustedStart.getDate() - HALF_WINDOW);
       setWeekStart(() => adjustedStart);
+    }
+  }, [selectedDate, weekStart]);
+
+  useEffect(() => {
+    const container = containerRef.current;
+    if (!container) return;
+    const target = container.querySelector(`[data-day="${selectedDate}"]`);
+    if (target) {
+      target.scrollIntoView({ behavior: 'smooth', inline: 'center', block: 'nearest' });
     }
   }, [selectedDate, weekStart]);
 
@@ -144,7 +130,8 @@ export default function WeekStrip({ selectedDate, onDateSelect }) {
   const weekLabel = weekStartNumber === weekEndNumber
     ? `Hafta ${weekStartNumber}`
     : `Hafta ${weekStartNumber} - ${weekEndNumber}`;
-  const rangeLabel = formatRangeLabel(rangeStart, rangeEnd);
+  const selectedDateLabelFull = formatDateTRFull(selectedDate);
+  const selectedDateDisplay = selectedDateLabelFull.split(', ')[0] || selectedDateLabelFull;
 
   return (
     <div className="sticky top-[57px] md:top-[65px] z-10 bg-background-dark/95 backdrop-blur-sm border-b border-gray-700/50">
@@ -158,7 +145,10 @@ export default function WeekStrip({ selectedDate, onDateSelect }) {
             <span className="material-symbols-outlined text-gray-400 text-lg md:text-xl">chevron_left</span>
           </button>
 
-          <div ref={containerRef} className="grid grid-cols-7 gap-1.5 md:gap-3 flex-1 py-1">
+          <div
+            ref={containerRef}
+            className="flex flex-1 gap-1.5 md:gap-3 overflow-x-auto no-scrollbar py-1 px-1 scroll-smooth snap-x snap-mandatory"
+          >
             {days.map((d) => {
               const iso = toISODate(d);
               const isSelected = iso === selectedDate;
@@ -168,25 +158,26 @@ export default function WeekStrip({ selectedDate, onDateSelect }) {
               const typeMeta = workoutType ? WORKOUT_TYPE_META[workoutType] : null;
               const hasWorkout = Boolean(workout);
 
-              let paletteClasses = 'bg-transparent text-gray-300 hover:bg-gray-800 active:bg-gray-700';
+              let paletteClasses = 'bg-transparent text-gray-300 hover:bg-gray-800/60 active:bg-gray-700/60 border border-transparent';
               if (typeMeta) {
-                paletteClasses = `${typeMeta.buttonClass} hover:opacity-95 active:opacity-90`;
+                paletteClasses = `${typeMeta.buttonClass} hover:brightness-110 active:brightness-125 transition`;
               } else if (hasWorkout) {
-                paletteClasses = 'bg-primary/30 text-primary font-semibold hover:bg-primary/40 active:bg-primary/50';
+                paletteClasses = 'bg-primary/25 text-primary font-semibold border border-primary/40 hover:bg-primary/35 active:bg-primary/45';
               }
 
               if (isSelected) {
-                paletteClasses = 'bg-primary text-background-dark hover:bg-primary/90 active:bg-primary/80 ring-2 ring-white/80 scale-105';
+                paletteClasses = 'bg-primary text-background-dark border border-primary/90 hover:bg-primary/90 active:bg-primary/80 ring-2 ring-white/80 scale-105';
               } else if (isToday) {
-                paletteClasses += ' ring-1 ring-primary/50';
+                paletteClasses += ' ring-1 ring-primary/60';
               }
 
               return (
                 <button
                   key={iso}
+                  data-day={iso}
                   onClick={() => onDateSelect(iso)}
                   className={`
-                    flex flex-col items-center justify-center text-center p-2 md:p-2.5 rounded-lg transition-all border border-transparent min-h-[3.5rem]
+                    flex min-w-[68px] flex-col items-center justify-center text-center p-2 md:p-2.5 rounded-2xl transition-all border border-transparent min-h-[3.5rem] snap-start
                     ${paletteClasses}
                   `}
                 >
@@ -197,8 +188,13 @@ export default function WeekStrip({ selectedDate, onDateSelect }) {
                     {d.getDate()}
                   </span>
                   {typeMeta && (
-                    <span className="mt-0.5 text-[10px] font-semibold uppercase tracking-wide opacity-80">
-                      {typeMeta.label.split(' ')[0]}
+                    <span className="mt-0.5 text-[10px] font-semibold uppercase tracking-wide opacity-90">
+                      {typeMeta.label}
+                    </span>
+                  )}
+                  {!typeMeta && hasWorkout && (
+                    <span className="mt-0.5 text-[10px] font-semibold uppercase tracking-wide text-primary/80">
+                      Workout
                     </span>
                   )}
                 </button>
@@ -214,20 +210,12 @@ export default function WeekStrip({ selectedDate, onDateSelect }) {
             <span className="material-symbols-outlined text-gray-400 text-lg md:text-xl">chevron_right</span>
           </button>
 
-          <button
-            onClick={handleGoToday}
-            className="p-1 md:p-1.5 hover:bg-primary/20 active:bg-primary/30 rounded-lg transition flex-shrink-0"
-            aria-label="Bugüne git"
-            title="Bugüne git"
-          >
-            <span className="material-symbols-outlined text-primary text-lg md:text-xl">today</span>
-          </button>
         </div>
 
         <div className="mt-2 text-center text-[11px] md:text-xs text-gray-400 font-medium">
           <span className="text-primary/80">{weekLabel}</span>
           <span className="mx-1 text-gray-600">•</span>
-          <span>{rangeLabel}</span>
+          <span>{selectedDateDisplay}</span>
         </div>
       </div>
     </div>

@@ -73,3 +73,16 @@ input[type='number'] {
     padding-bottom: env(safe-area-inset-bottom);
   }
 }
+
+/* Prevent iOS Safari from auto-zooming focused inputs */
+@supports (-webkit-touch-callout: none) {
+  input,
+  textarea,
+  select {
+    font-size: 16px;
+  }
+
+  .touch-manipulation {
+    touch-action: manipulation;
+  }
+}

@@ -1,0 +1,16 @@
+{
+  "rules": {
+    ".read": true,
+    ".write": true,
+    "gym_exercises_v1": {
+      ".indexOn": ["name", "canonicalName"]
+    },
+    "gym_workouts_v1": {
+      ".indexOn": ["dateISO"]
+    },
+    "gym_body_weight_v1": {
+      ".read": true,
+      ".write": true
+    }
+  }
+}

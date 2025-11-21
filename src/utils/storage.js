@@ -1,7 +1,11 @@
+import { database } from '../firebase';
+import { ref, set, get, update, remove, onValue } from 'firebase/database';
+
 const STORAGE = {
   EXERCISES: 'gym_exercises_v1',
   WORKOUTS: 'gym_workouts_v1',
   BODY_WEIGHT: 'gym_body_weight_v1',
+  IMPROVEMENTS: 'gym_improvements_v1',
 };
 
 const EXERCISE_SYNONYMS = {
@@ -11,6 +15,11 @@ const EXERCISE_SYNONYMS = {
   'fly': 'Chest Fly',
   'bench presss': 'Bench Press',
   'pull up': 'Pull Up',
+  'pull-up': 'Pull Up',
+  'pullup': 'Pull Up',
+  'pull ups': 'Pull Up',
+  'pull-ups': 'Pull Up',
+  'pullups': 'Pull Up',
   'barfix': 'Pull Up',
   'chin up': 'Chin Up',
   'incline dumbbell press': 'Incline Dumbbell Press',
@@ -29,6 +38,12 @@ const EXERCISE_SYNONYMS = {
   'posterior deltoid(rope)': 'Rear Delt Fly',
   'posterior deltoid (rope)': 'Rear Delt Fly',
   'triceps pushdown': 'Triceps Pushdown',
+  'rope pushdown': 'Rope Pushdown',
+  'rope push down': 'Rope Pushdown',
+  'rope triceps pushdown': 'Rope Pushdown',
+  'front shoulder': 'Front Shoulder',
+  'ön omuz': 'Front Shoulder',
+  'on omuz': 'Front Shoulder',
   'cable skull crusher': 'Cable Skull Crusher',
   'one arm overhead triceps extension': 'One Arm Overhead Triceps Extension',
   'skull crusher': 'Skull Crusher',
@@ -66,28 +81,156 @@ export function normalizeExerciseName(name) {
 
 const BODY_WEIGHT_KEYWORDS = ['body weight', 'bodyweight', 'bw', 'vücut ağırlığı', 'vucut ağırlığı'];
 
-function getBodyWeightMap() {
-  const raw = localStorage.getItem(STORAGE.BODY_WEIGHT);
-  if (!raw) return {};
+// =====================================================================
+// FIREBASE HELPER FUNCTIONS
+// =====================================================================
+
+// Cache mekanizması - gereksiz firebase çağrılarını azaltmak için
+let cachedData = {
+  exercises: null,
+  workouts: null,
+  bodyWeight: null,
+  improvements: null,
+  lastFetch: {
+    exercises: 0,
+    workouts: 0,
+    bodyWeight: 0,
+    improvements: 0,
+  }
+};
+
+const CACHE_DURATION = 5000; // 5 saniye cache
+
+// Firebase'den veri okuma helper fonksiyonu
+async function getFirebaseData(path) {
   try {
-    const parsed = JSON.parse(raw);
-    return parsed && typeof parsed === 'object' ? parsed : {};
-  } catch (err) {
-    console.warn('Body weight parse error', err);
-    return {};
+    console.log(`Firebase'den okunuyor: ${path}`);
+    const dataRef = ref(database, path);
+    const snapshot = await get(dataRef);
+    const exists = snapshot.exists();
+    const data = exists ? snapshot.val() : null;
+    console.log(`Firebase okuma sonucu (${path}): exists=${exists}, data=`, data);
+    return data;
+  } catch (error) {
+    console.error(`Firebase'den veri okunurken hata (${path}):`, error);
+    // Fallback: LocalStorage'dan oku
+    return getFallbackFromLocalStorage(path);
   }
 }
 
-function setBodyWeightMap(map) {
-  localStorage.setItem(STORAGE.BODY_WEIGHT, JSON.stringify(map));
+// Firebase'e veri yazma helper fonksiyonu
+async function setFirebaseData(path, data) {
+  try {
+    console.log(`Firebase'e yazılıyor: ${path}`, data);
+    const dataRef = ref(database, path);
+    await set(dataRef, data);
+    console.log(`Firebase yazma başarılı: ${path}`);
+    // Cache'i güncelle
+    updateCache(path, data);
+    console.log(`Cache güncellendi: ${path}`);
+  } catch (error) {
+    console.error(`Firebase'e veri yazılırken hata (${path}):`, error);
+    // Fallback: LocalStorage'a yaz
+    setFallbackToLocalStorage(path, data);
+  }
 }
 
-export function getBodyWeightCollection() {
-  return { ...getBodyWeightMap() };
+// Firebase'den veri silme
+async function removeFirebaseData(path) {
+  try {
+    const dataRef = ref(database, path);
+    await remove(dataRef);
+  } catch (error) {
+    console.error(`Firebase'den veri silinirken hata (${path}):`, error);
+  }
 }
 
-export function getBodyWeight(dateISO) {
-  const map = getBodyWeightMap();
+// Cache güncelleme
+function updateCache(path, data) {
+  const now = Date.now();
+  if (path.includes(STORAGE.EXERCISES)) {
+    cachedData.exercises = data;
+    cachedData.lastFetch.exercises = now;
+  } else if (path.includes(STORAGE.WORKOUTS)) {
+    cachedData.workouts = data;
+    cachedData.lastFetch.workouts = now;
+  } else if (path.includes(STORAGE.BODY_WEIGHT)) {
+    cachedData.bodyWeight = data;
+    cachedData.lastFetch.bodyWeight = now;
+  } else if (path.includes(STORAGE.IMPROVEMENTS)) {
+    cachedData.improvements = data;
+    cachedData.lastFetch.improvements = now;
+  }
+}
+
+// Cache kontrolü
+function isCacheValid(type) {
+  const now = Date.now();
+  return (now - cachedData.lastFetch[type]) < CACHE_DURATION;
+}
+
+// Cache temizleme
+export function clearCache() {
+  console.log('Cache temizleniyor...');
+  cachedData.exercises = null;
+  cachedData.workouts = null;
+  cachedData.bodyWeight = null;
+  cachedData.improvements = null;
+  cachedData.lastFetch = {
+    exercises: 0,
+    workouts: 0,
+    bodyWeight: 0,
+    improvements: 0,
+  };
+  console.log('Cache temizlendi');
+}
+
+// LocalStorage fallback - offline çalışma için
+function getFallbackFromLocalStorage(path) {
+  try {
+    const data = localStorage.getItem(path);
+    return data ? JSON.parse(data) : null;
+  } catch (err) {
+    console.warn('LocalStorage fallback okuma hatası:', err);
+    return null;
+  }
+}
+
+function setFallbackToLocalStorage(path, data) {
+  try {
+    localStorage.setItem(path, JSON.stringify(data));
+  } catch (err) {
+    console.warn('LocalStorage fallback yazma hatası:', err);
+  }
+}
+
+// =====================================================================
+// BODY WEIGHT FUNCTIONS
+// =====================================================================
+
+async function getBodyWeightMap() {
+  // Cache kontrolü
+  if (cachedData.bodyWeight && isCacheValid('bodyWeight')) {
+    return cachedData.bodyWeight;
+  }
+
+  const data = await getFirebaseData(STORAGE.BODY_WEIGHT);
+  const map = data && typeof data === 'object' ? data : {};
+  updateCache(STORAGE.BODY_WEIGHT, map);
+  return map;
+}
+
+async function setBodyWeightMap(map) {
+  await setFirebaseData(STORAGE.BODY_WEIGHT, map);
+}
+
+export async function getBodyWeightCollection() {
+  const map = await getBodyWeightMap();
+  return { ...map };
+}
+
+export async function getBodyWeight(dateISO) {
+  const map = await getBodyWeightMap();
   if (Object.prototype.hasOwnProperty.call(map, dateISO)) {
     const raw = map[dateISO];
     const value = typeof raw === 'number' ? raw : Number(raw);
@@ -96,8 +239,8 @@ export function getBodyWeight(dateISO) {
   return null;
 }
 
-function findLatestWeightBefore(dateISO) {
-  const map = getBodyWeightMap();
+async function findLatestWeightBefore(dateISO) {
+  const map = await getBodyWeightMap();
   const keys = Object.keys(map).sort();
   let latest = null;
   keys.forEach((key) => {
@@ -111,42 +254,117 @@ function findLatestWeightBefore(dateISO) {
   return Number.isFinite(value) ? { value, dateISO: latest } : null;
 }
 
-export function getBodyWeightInfo(dateISO) {
-  const exact = getBodyWeight(dateISO);
+export async function getBodyWeightInfo(dateISO) {
+  const exact = await getBodyWeight(dateISO);
   if (exact !== null) {
     return { value: exact, sourceDate: dateISO, isFallback: false };
   }
-  const fallback = findLatestWeightBefore(dateISO);
+  const fallback = await findLatestWeightBefore(dateISO);
   if (fallback) {
     return { value: fallback.value, sourceDate: fallback.dateISO, isFallback: true };
   }
   return { value: null, sourceDate: null, isFallback: false };
 }
 
-export function getBodyWeightWithFallback(dateISO) {
-  const info = getBodyWeightInfo(dateISO);
+export async function getBodyWeightWithFallback(dateISO) {
+  const info = await getBodyWeightInfo(dateISO);
   return info.value;
 }
 
-export function saveBodyWeight(dateISO, weight) {
+export async function saveBodyWeight(dateISO, weight) {
   if (!dateISO) return;
   const value = Number(weight);
   if (!Number.isFinite(value) || value <= 0) {
-    clearBodyWeight(dateISO);
+    await clearBodyWeight(dateISO);
     return;
   }
-  const map = getBodyWeightMap();
+  const map = await getBodyWeightMap();
   map[dateISO] = Number(value.toFixed(1));
-  setBodyWeightMap(map);
+  await setBodyWeightMap(map);
 }
 
-export function clearBodyWeight(dateISO) {
-  const map = getBodyWeightMap();
+export async function clearBodyWeight(dateISO) {
+  const map = await getBodyWeightMap();
   if (Object.prototype.hasOwnProperty.call(map, dateISO)) {
     delete map[dateISO];
-    setBodyWeightMap(map);
+    await setBodyWeightMap(map);
   }
 }
+
+// =====================================================================
+// IMPROVEMENTS FUNCTIONS
+// =====================================================================
+
+function generateImprovementId() {
+  if (typeof crypto !== 'undefined' && typeof crypto.randomUUID === 'function') {
+    return crypto.randomUUID();
+  }
+  return `imp_${Date.now()}_${Math.random().toString(36).slice(2, 8)}`;
+}
+
+async function getImprovementsMap() {
+  if (cachedData.improvements && isCacheValid('improvements')) {
+    return cachedData.improvements;
+  }
+
+  const data = await getFirebaseData(STORAGE.IMPROVEMENTS);
+  const map = data && typeof data === 'object' ? data : {};
+  updateCache(STORAGE.IMPROVEMENTS, map);
+  return map;
+}
+
+async function setImprovementsMap(map) {
+  await setFirebaseData(STORAGE.IMPROVEMENTS, map);
+}
+
+export async function getImprovements() {
+  const map = await getImprovementsMap();
+  return Object.values(map)
+    .filter((item) => item && typeof item === 'object' && item.id)
+    .sort((a, b) => (b.updatedAt || 0) - (a.updatedAt || 0));
+}
+
+export async function getImprovementById(id) {
+  if (!id) return null;
+  const map = await getImprovementsMap();
+  return map[id] || null;
+}
+
+export async function saveImprovement(note) {
+  if (!note || typeof note !== 'object') return null;
+
+  const map = await getImprovementsMap();
+  const now = Date.now();
+  const id = typeof note.id === 'string' && note.id.trim().length > 0
+    ? note.id.trim()
+    : generateImprovementId();
+  const existing = map[id] || null;
+
+  const record = {
+    id,
+    title: typeof note.title === 'string' ? note.title.trim() : '',
+    content: typeof note.content === 'string' ? note.content.trim() : '',
+    createdAt: existing?.createdAt || now,
+    updatedAt: now,
+  };
+
+  map[id] = record;
+  await setImprovementsMap(map);
+  return record;
+}
+
+export async function deleteImprovement(id) {
+  if (!id) return;
+  const map = await getImprovementsMap();
+  if (Object.prototype.hasOwnProperty.call(map, id)) {
+    delete map[id];
+    await setImprovementsMap(map);
+  }
+}
+
+// =====================================================================
+// EXERCISE NORMALIZATION
+// =====================================================================
 
 function mergeExerciseStats(target, source) {
   target.pr = Math.max(target.pr || 0, source.pr || 0);
@@ -233,6 +451,9 @@ function normalizeWorkoutItems(items) {
     if (!canonical) return;
 
     const key = canonical.toLowerCase();
+    
+    console.log(`normalizeWorkoutItems: İşleniyor - ${rawName}, sets: ${(item.sets || []).length}`);
+    
     const normalizedSets = (item.sets || []).map((set) => {
       const rawWeight = set?.wDisplay ?? set?.weightDisplay ?? set?.w ?? '';
       const { value, display } = resolveWeightValue(rawWeight, rawName, item.dateISO || item.dateIso || item.date || null);
@@ -242,7 +463,26 @@ function normalizeWorkoutItems(items) {
         r: Number(set?.r || 0),
         note: set?.note || '',
       };
-    }).filter((set) => Number.isFinite(set.w) && set.w > 0 && Number.isFinite(set.r) && set.r > 0);
+    }).filter((set) => {
+      // Tekrar kontrolü
+      if (!Number.isFinite(set.r) || set.r <= 0) {
+        console.warn(`Set filtrelendi (geçersiz tekrar): ${rawName}`, set);
+        return false;
+      }
+      
+      // Ağırlık kontrolü - Body Weight veya geçerli sayı olmalı
+      const isBodyWeight = set.wDisplay && (set.wDisplay === 'Body Weight' || set.wDisplay.startsWith('BW'));
+      const hasValidWeight = Number.isFinite(set.w) && set.w > 0;
+      
+      if (!isBodyWeight && !hasValidWeight) {
+        console.warn(`Set filtrelendi (geçersiz ağırlık): ${rawName}`, set);
+        return false;
+      }
+      
+      return true;
+    });
+
+    console.log(`normalizeWorkoutItems: ${rawName} - ${normalizedSets.length} set kabul edildi`);
 
     if (normalizedSets.length === 0) return;
 
@@ -286,16 +526,25 @@ function normalizeWorkoutCollection(collection) {
   return normalized;
 }
 
-// Egzersizler
-export function getExercises() {
-  const raw = localStorage.getItem(STORAGE.EXERCISES);
-  if (raw) {
-    const parsed = JSON.parse(raw);
-    const normalized = normalizeExerciseList(parsed);
-    localStorage.setItem(STORAGE.EXERCISES, JSON.stringify(normalized));
+// =====================================================================
+// EXERCISES FUNCTIONS
+// =====================================================================
+
+export async function getExercises() {
+  // Cache kontrolü
+  if (cachedData.exercises && isCacheValid('exercises')) {
+    return cachedData.exercises;
+  }
+
+  const data = await getFirebaseData(STORAGE.EXERCISES);
+  
+  if (data && Array.isArray(data)) {
+    const normalized = normalizeExerciseList(data);
+    updateCache(STORAGE.EXERCISES, normalized);
     return normalized;
   }
 
+  // İlk kez çalıştırılıyorsa seed data ekle
   const seed = [
     { name: 'Bench Press', displayName: 'Bench Press', canonicalName: 'Bench Press', createdAt: Date.now(), used: 0, pr: 100 },
     { name: 'Squat', displayName: 'Squat', canonicalName: 'Squat', createdAt: Date.now(), used: 0, pr: 120 },
@@ -303,16 +552,17 @@ export function getExercises() {
     { name: 'Overhead Press', displayName: 'Overhead Press', canonicalName: 'Overhead Press', createdAt: Date.now(), used: 0, pr: 60 },
     { name: 'Pull Up', displayName: 'Pull Up', canonicalName: 'Pull Up', createdAt: Date.now(), used: 0, pr: 0, prReps: 12 },
   ];
-  localStorage.setItem(STORAGE.EXERCISES, JSON.stringify(seed));
+  await setFirebaseData(STORAGE.EXERCISES, seed);
+  updateCache(STORAGE.EXERCISES, seed);
   return seed;
 }
 
-export function saveExercises(list) {
+export async function saveExercises(list) {
   const normalized = normalizeExerciseList(list);
-  localStorage.setItem(STORAGE.EXERCISES, JSON.stringify(normalized));
+  await setFirebaseData(STORAGE.EXERCISES, normalized);
 }
 
-export function renameExerciseEverywhere(oldName, newDisplayName, newCanonicalName) {
+export async function renameExerciseEverywhere(oldName, newDisplayName, newCanonicalName) {
   const oldCanonical = normalizeExerciseName(oldName);
   const nextDisplay = (newDisplayName || '').trim() || oldCanonical;
   const nextCanonical = normalizeExerciseName(newCanonicalName || newDisplayName || oldName);
@@ -321,7 +571,7 @@ export function renameExerciseEverywhere(oldName, newDisplayName, newCanonicalNa
     return;
   }
 
-  const all = getWorkouts();
+  const all = await getWorkouts();
   let hasChanges = false;
 
   Object.keys(all).forEach((iso) => {
@@ -359,50 +609,65 @@ export function renameExerciseEverywhere(oldName, newDisplayName, newCanonicalNa
   });
 
   if (hasChanges) {
-    localStorage.setItem(STORAGE.WORKOUTS, JSON.stringify(all));
+    await setFirebaseData(STORAGE.WORKOUTS, all);
   }
 }
 
-export function ensureExercise(name) {
+export async function ensureExercise(name) {
   const canonical = normalizeExerciseName(name);
   if (!canonical) return;
 
-  const list = getExercises();
+  const list = await getExercises();
   if (!list.some((e) => e.name.toLowerCase() === canonical.toLowerCase())) {
     list.push({ name: canonical, createdAt: Date.now(), used: 0 });
-    saveExercises(list);
+    await saveExercises(list);
   }
 }
 
-export function updateExercisePR(name, prWeight, prReps) {
+export async function updateExercisePR(name, prWeight, prReps) {
   const canonical = normalizeExerciseName(name);
   if (!canonical) return;
 
-  const list = getExercises();
+  const list = await getExercises();
   const item = list.find((e) => e.name.toLowerCase() === canonical.toLowerCase());
   if (item) {
     if (typeof prWeight === 'number' && prWeight > (item.pr || 0)) item.pr = prWeight;
     if (typeof prReps === 'number' && prReps > (item.prReps || 0)) item.prReps = prReps;
     item.used = (item.used || 0) + 1;
-    saveExercises(list);
+    await saveExercises(list);
   }
 }
 
-// Antrenmanlar
-export function getWorkouts() {
-  const raw = localStorage.getItem(STORAGE.WORKOUTS);
-  if (raw) {
-    const parsed = JSON.parse(raw);
-    const normalized = normalizeWorkoutCollection(parsed);
-    localStorage.setItem(STORAGE.WORKOUTS, JSON.stringify(normalized));
+// =====================================================================
+// WORKOUTS FUNCTIONS
+// =====================================================================
+
+export async function getWorkouts() {
+  console.log('getWorkouts çağrıldı');
+  
+  // Cache kontrolü
+  if (cachedData.workouts && isCacheValid('workouts')) {
+    console.log('getWorkouts: Cache\'den döndürülüyor, sayı:', Object.keys(cachedData.workouts || {}).length);
+    return cachedData.workouts;
+  }
+
+  console.log('getWorkouts: Firebase\'den çekiliyor...');
+  const data = await getFirebaseData(STORAGE.WORKOUTS);
+  console.log('getWorkouts: Firebase\'den gelen data:', data ? Object.keys(data).length : 0, 'gün');
+  
+  if (data && typeof data === 'object') {
+    const normalized = normalizeWorkoutCollection(data);
+    console.log('getWorkouts: Normalize edildi:', Object.keys(normalized).length, 'gün');
+    updateCache(STORAGE.WORKOUTS, normalized);
     return normalized;
   }
 
-  // Örnek veri
+  console.log('getWorkouts: Veri yok, seed data oluşturuluyor...');
+  // İlk kez çalıştırılıyorsa örnek veri ekle
   const today = new Date();
   const yday = new Date(today.getFullYear(), today.getMonth(), today.getDate() - 1);
-  const data = {};
-  data[toISODate(yday)] = {
+  const seedData = {};
+  seedData[toISODate(yday)] = {
     dateISO: toISODate(yday),
     workoutName: 'Pull Day',
     workoutFocus: ['Sırt', 'Biceps'],
@@ -414,18 +679,63 @@ export function getWorkouts() {
       { name: 'Dumbbell Curl', sets: [{ w: 12, r: 15 }, { w: 12, r: 15 }, { w: 12, r: 12 }] },
     ],
   };
-  const normalizedSeed = normalizeWorkoutCollection(data);
-  localStorage.setItem(STORAGE.WORKOUTS, JSON.stringify(normalizedSeed));
+  const normalizedSeed = normalizeWorkoutCollection(seedData);
+  await setFirebaseData(STORAGE.WORKOUTS, normalizedSeed);
+  updateCache(STORAGE.WORKOUTS, normalizedSeed);
+  console.log('getWorkouts: Seed data oluşturuldu');
   return normalizedSeed;
 }
 
-export function getWorkoutByDate(dateISO) {
-  const all = getWorkouts();
-  return all[dateISO];
+export async function getWorkoutByDate(dateISO) {
+  console.log('getWorkoutByDate çağrıldı:', dateISO);
+  const all = await getWorkouts();
+  console.log('Tüm workouts:', Object.keys(all || {}).length, 'gün');
+  const result = all[dateISO];
+  console.log('getWorkoutByDate sonuç:', dateISO, result);
+  return result;
 }
 
-export function saveWorkout(workout) {
-  if (!workout || !workout.dateISO) return;
+export async function saveWorkout(workout) {
+  if (!workout || !workout.dateISO) {
+    console.warn('saveWorkout: Geçersiz workout verisi', workout);
+    return;
+  }
+
+  console.log('saveWorkout çağrıldı:', workout.dateISO, workout);
+
+  // Body Weight değerini al
+  const bodyWeightInfo = await getBodyWeightInfo(workout.dateISO);
+  const bodyWeightKg = bodyWeightInfo.value || 0;
+  console.log('Body Weight:', bodyWeightKg, 'kg');
+
+  // Items'ı normalize et ve Body Weight setlerini gerçek değere çevir
+  const normalizedItems = normalizeWorkoutItems((workout.items || []).map((it) => ({ ...it, dateISO: workout.dateISO })));
+  
+  // Body Weight setlerini gerçek kg değerine çevir
+  const resolvedItems = normalizedItems.map(item => ({
+    ...item,
+    sets: item.sets.map(set => {
+      // Body Weight set'i mi?
+      if (set.wDisplay === 'Body Weight') {
+        return {
+          ...set,
+          w: bodyWeightKg,
+          wDisplay: 'Body Weight',
+        };
+      }
+      // BW+X formatı mı?
+      if (set.wDisplay && set.wDisplay.startsWith('BW+')) {
+        const additional = set.w; // resolveWeightValue zaten ek değeri w'ye koymuş
+        return {
+          ...set,
+          w: bodyWeightKg + additional,
+          wDisplay: set.wDisplay,
+        };
+      }
+      // Normal set
+      return set;
+    })
+  }));
 
   const normalizedWorkout = {
     ...workout,
@@ -434,20 +744,30 @@ export function saveWorkout(workout) {
     workoutFocus: Array.isArray(workout.workoutFocus) ? workout.workoutFocus : [],
     workoutFuel: workout.workoutFuel || '',
     notes: typeof workout.notes === 'string' ? workout.notes : '',
-    items: normalizeWorkoutItems((workout.items || []).map((it) => ({ ...it, dateISO: workout.dateISO }))),
+    items: resolvedItems,
   };
 
-  const all = getWorkouts();
-  all[normalizedWorkout.dateISO] = normalizedWorkout;
-  localStorage.setItem(STORAGE.WORKOUTS, JSON.stringify(all));
+  console.log('Normalized workout:', normalizedWorkout);
 
-  normalizedWorkout.items.forEach((it) => {
+  const all = await getWorkouts();
+  console.log('Mevcut workouts sayısı:', Object.keys(all || {}).length);
+  
+  all[normalizedWorkout.dateISO] = normalizedWorkout;
+  console.log('Workout eklendi, yeni sayı:', Object.keys(all).length);
+  
+  await setFirebaseData(STORAGE.WORKOUTS, all);
+  console.log('Firebase\'e yazıldı:', normalizedWorkout.dateISO);
+
+  // PR güncellemeleri
+  for (const it of normalizedWorkout.items) {
     const canonical = it.canonicalName || normalizeExerciseName(it.name);
-    ensureExercise(canonical);
+    await ensureExercise(canonical);
     const maxW = it.sets.reduce((m, s) => Math.max(m, Number(s.w || 0)), 0);
     const maxR = it.sets.reduce((m, s) => Math.max(m, Number(s.r || 0)), 0);
-    updateExercisePR(canonical, maxW, maxR);
-  });
+    await updateExercisePR(canonical, maxW, maxR);
+  }
+  
+  console.log('saveWorkout tamamlandı:', normalizedWorkout.dateISO);
 }
 
 export function resolveWeightValue(weightInput, exerciseName, dateISO) {
@@ -478,10 +798,18 @@ export function resolveWeightValue(weightInput, exerciseName, dateISO) {
   const isBodyWeightKeyword = BODY_WEIGHT_KEYWORDS.some((keyword) => lower.startsWith(keyword));
   const isBodyWeightExercise = normalizedName.toLowerCase() === 'pull up';
 
+  console.log('resolveWeightValue:', { 
+    raw, 
+    exerciseName, 
+    normalizedName, 
+    lower, 
+    isBodyWeightKeyword, 
+    isBodyWeightExercise 
+  });
+
   if (isBodyWeightKeyword || isBodyWeightExercise || lower.startsWith('+')) {
-    const bodyWeight = getBodyWeight(dateISO);
-    const hasBodyWeight = Number.isFinite(bodyWeight) && bodyWeight > 0;
-    const baseWeight = hasBodyWeight ? bodyWeight : 0;
+    // NOT: Bu fonksiyon sync olduğu için burada await kullanamıyoruz
+    // Body weight hesaplamaları için normalizeWorkoutItems içinde çözülmeli
     const plusIndex = raw.indexOf('+');
     let additional = 0;
 
@@ -490,27 +818,11 @@ export function resolveWeightValue(weightInput, exerciseName, dateISO) {
       const parsedExtra = parseFloat(extraPart);
       if (Number.isFinite(parsedExtra)) {
         additional = parsedExtra;
-      }
-    }
-
-    const total = baseWeight + additional;
-    if (hasBodyWeight || additional > 0) {
-      value = Number(total.toFixed(1));
-    }
-
-    if (hasBodyWeight) {
-      const baseLabel = formatNumber(bodyWeight);
-      if (additional > 0) {
-        display = `${baseLabel}+${formatNumber(additional)}`;
-      } else {
-        display = baseLabel;
+        value = additional;
+        display = `BW+${formatNumber(additional)}`;
       }
     } else {
-      if (additional > 0) {
-        display = `BW+${formatNumber(additional)}`;
-      } else {
-        display = 'Body Weight';
-      }
+      display = 'Body Weight';
     }
     return { value, display };
   }
@@ -528,28 +840,26 @@ export function resolveWeightValue(weightInput, exerciseName, dateISO) {
   return { value, display: display || raw };
 }
 
-export function deleteWorkout(dateISO) {
-  const all = getWorkouts();
+export async function deleteWorkout(dateISO) {
+  const all = await getWorkouts();
   delete all[dateISO];
-  localStorage.setItem(STORAGE.WORKOUTS, JSON.stringify(all));
+  await setFirebaseData(STORAGE.WORKOUTS, all);
 }
 
-export function exportAllData() {
-  if (typeof window === 'undefined') {
-    return null;
-  }
-
+export async function exportAllData() {
   try {
-    const exercisesRaw = window.localStorage.getItem(STORAGE.EXERCISES);
-    const workoutsRaw = window.localStorage.getItem(STORAGE.WORKOUTS);
-    const bodyWeightRaw = window.localStorage.getItem(STORAGE.BODY_WEIGHT);
+    const exercises = await getFirebaseData(STORAGE.EXERCISES);
+    const workouts = await getFirebaseData(STORAGE.WORKOUTS);
+    const bodyWeight = await getFirebaseData(STORAGE.BODY_WEIGHT);
+    const improvements = await getFirebaseData(STORAGE.IMPROVEMENTS);
 
     const payload = {
-      version: 1,
+      version: 2,
       exportedAt: new Date().toISOString(),
-      exercises: exercisesRaw ? JSON.parse(exercisesRaw) : [],
-      workouts: workoutsRaw ? JSON.parse(workoutsRaw) : {},
-      bodyWeight: bodyWeightRaw ? JSON.parse(bodyWeightRaw) : {},
+      exercises: exercises || [],
+      workouts: workouts || {},
+      bodyWeight: bodyWeight || {},
+      improvements: improvements || {},
     };
 
     return payload;
@@ -559,22 +869,18 @@ export function exportAllData() {
   }
 }
 
-export function importAllData(payload) {
-  if (typeof window === 'undefined') {
-    throw new Error('Bu işlem tarayıcı ortamında yapılmalı.');
-  }
-
+export async function importAllData(payload) {
   if (!payload || typeof payload !== 'object') {
     throw new Error('Geçersiz veri paketi.');
   }
 
-  const { exercises, workouts, bodyWeight } = payload;
+  const { exercises, workouts, bodyWeight, improvements } = payload;
 
   if (exercises !== undefined) {
     if (!Array.isArray(exercises)) {
       throw new Error('Exercises listesi geçersiz.');
     }
-    saveExercises(exercises);
+    await saveExercises(exercises);
   }
 
   if (workouts !== undefined) {
@@ -582,18 +888,28 @@ export function importAllData(payload) {
       throw new Error('Workouts verisi geçersiz.');
     }
     const normalized = normalizeWorkoutCollection(workouts);
-    window.localStorage.setItem(STORAGE.WORKOUTS, JSON.stringify(normalized));
+    await setFirebaseData(STORAGE.WORKOUTS, normalized);
   }
 
   if (bodyWeight !== undefined) {
     if (!bodyWeight || typeof bodyWeight !== 'object') {
       throw new Error('Body weight verisi geçersiz.');
     }
-    setBodyWeightMap(bodyWeight);
+    await setBodyWeightMap(bodyWeight);
+  }
+
+  if (improvements !== undefined) {
+    if (!improvements || typeof improvements !== 'object') {
+      throw new Error('Geliştirmeler verisi geçersiz.');
+    }
+    await setImprovementsMap(improvements);
   }
 }
 
-// Tarih yardımcıları
+// =====================================================================
+// DATE HELPERS
+// =====================================================================
+
 const pad = (n) => String(n).padStart(2, '0');
 
 export function toISODate(d) {
@@ -626,4 +942,56 @@ export function formatDateTRShort(date) {
   const day = d.getDate();
   const month = turkishMonths[d.getMonth()];
   return `${day} ${month}`;
+}
+
+// =====================================================================
+// REALTIME LISTENERS (Opsiyonel - canlı senkronizasyon için)
+// =====================================================================
+
+export function subscribeToExercises(callback) {
+  const exercisesRef = ref(database, STORAGE.EXERCISES);
+  return onValue(exercisesRef, (snapshot) => {
+    const data = snapshot.val();
+    if (data) {
+      const normalized = normalizeExerciseList(data);
+      updateCache(STORAGE.EXERCISES, normalized);
+      callback(normalized);
+    }
+  });
+}
+
+export function subscribeToWorkouts(callback) {
+  const workoutsRef = ref(database, STORAGE.WORKOUTS);
+  return onValue(workoutsRef, (snapshot) => {
+    const data = snapshot.val();
+    if (data) {
+      const normalized = normalizeWorkoutCollection(data);
+      updateCache(STORAGE.WORKOUTS, normalized);
+      callback(normalized);
+    }
+  });
+}
+
+export function subscribeToBodyWeight(callback) {
+  const bodyWeightRef = ref(database, STORAGE.BODY_WEIGHT);
+  return onValue(bodyWeightRef, (snapshot) => {
+    const data = snapshot.val();
+    if (data) {
+      updateCache(STORAGE.BODY_WEIGHT, data);
+      callback(data);
+    }
+  });
+}
+
+export function subscribeToImprovements(callback) {
+  const improvementsRef = ref(database, STORAGE.IMPROVEMENTS);
+  return onValue(improvementsRef, (snapshot) => {
+    const data = snapshot.val();
+    const map = data && typeof data === 'object' ? data : {};
+    updateCache(STORAGE.IMPROVEMENTS, map);
+    const list = Object.values(map)
+      .filter((item) => item && typeof item === 'object' && item.id)
+      .sort((a, b) => (b.updatedAt || 0) - (a.updatedAt || 0));
+    callback(list);
+  });
 }
