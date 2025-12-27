@@ -134,15 +134,15 @@ export default function WeekStrip({ selectedDate, onDateSelect, refreshKey }) {
   const selectedDateDisplay = selectedDateLabelFull.split(', ')[0] || selectedDateLabelFull;
 
   return (
-    <div className="sticky top-[57px] md:top-[65px] z-10 bg-background-dark/95 backdrop-blur-sm border-b border-gray-700/50">
+    <div className="sticky top-[57px] md:top-[65px] z-10 bg-background-dark/80 backdrop-blur-md border-b border-white/5">
       <div className="px-2 md:px-4 py-3 md:py-4 max-w-4xl mx-auto">
         <div className="flex items-center gap-1 md:gap-2">
           <button
             onClick={handlePrevDay}
-            className="p-1 md:p-1.5 hover:bg-gray-700 active:bg-gray-600 rounded-lg transition flex-shrink-0"
+            className="p-2 md:p-2.5 hover:bg-white/5 active:bg-white/10 rounded-lg transition flex-shrink-0"
             aria-label="Önceki gün"
           >
-            <span className="material-symbols-outlined text-gray-400 text-lg md:text-xl">chevron_left</span>
+            <span className="material-symbols-outlined text-gray-200 text-xl md:text-2xl">chevron_left</span>
           </button>
 
           <div
@@ -158,17 +158,17 @@ export default function WeekStrip({ selectedDate, onDateSelect, refreshKey }) {
               const typeMeta = workoutType ? WORKOUT_TYPE_META[workoutType] : null;
               const hasWorkout = Boolean(workout);
 
-              let paletteClasses = 'bg-transparent text-gray-300 hover:bg-gray-800/60 active:bg-gray-700/60 border border-transparent';
+              let paletteClasses = 'bg-transparent text-gray-400 hover:bg-white/5 active:bg-white/10 border border-transparent';
               if (typeMeta) {
                 paletteClasses = `${typeMeta.buttonClass} hover:brightness-110 active:brightness-125 transition`;
               } else if (hasWorkout) {
-                paletteClasses = 'bg-primary/25 text-primary font-semibold border border-primary/40 hover:bg-primary/35 active:bg-primary/45';
+                paletteClasses = 'bg-primary/10 text-primary font-semibold border border-primary/20 hover:bg-primary/20 active:bg-primary/30';
               }
 
               if (isSelected) {
-                paletteClasses = 'bg-primary text-background-dark border border-primary/90 hover:bg-primary/90 active:bg-primary/80 ring-2 ring-white/80 scale-105';
+                paletteClasses = 'bg-primary text-background-dark border border-primary shadow-lg shadow-primary/40 ring-2 ring-white/20';
               } else if (isToday) {
-                paletteClasses += ' ring-1 ring-primary/60';
+                paletteClasses += ' ring-1 ring-primary/50';
               }
 
               return (
@@ -177,25 +177,28 @@ export default function WeekStrip({ selectedDate, onDateSelect, refreshKey }) {
                   data-day={iso}
                   onClick={() => onDateSelect(iso)}
                   className={`
-                    flex min-w-[68px] flex-col items-center justify-center text-center p-2 md:p-2.5 rounded-2xl transition-all border border-transparent min-h-[3.5rem] snap-start
+                    flex min-w-[68px] flex-col items-center justify-center text-center p-2 md:p-2.5 rounded-2xl transition-all border border-transparent min-h-[3.5rem] snap-start relative
                     ${paletteClasses}
                   `}
                 >
-                  <span className="text-[10px] md:text-xs font-medium uppercase tracking-wide">
+                  <span className="text-[10px] md:text-xs font-bold uppercase tracking-wide opacity-80">
                     {turkishWeekdaysShort[d.getDay()]}
                   </span>
-                  <span className="mt-0.5 md:mt-1 text-base md:text-lg font-semibold">
+                  <span className="mt-0.5 md:mt-1 text-lg md:text-xl font-bold">
                     {d.getDate()}
                   </span>
-                  {typeMeta && (
-                    <span className="mt-0.5 text-[10px] font-semibold uppercase tracking-wide opacity-90">
+                  {typeMeta && !isSelected && (
+                    <span className="mt-0.5 text-[9px] font-bold uppercase tracking-wide opacity-90">
                       {typeMeta.label}
                     </span>
                   )}
-                  {!typeMeta && hasWorkout && (
-                    <span className="mt-0.5 text-[10px] font-semibold uppercase tracking-wide text-primary/80">
+                  {!typeMeta && hasWorkout && !isSelected && (
+                    <span className="mt-0.5 text-[9px] font-bold uppercase tracking-wide opacity-90">
                       Workout
                     </span>
+                  )}
+                  {isSelected && (
+                    <span className="absolute bottom-1.5 h-1 w-1 rounded-full bg-background-dark/60"></span>
                   )}
                 </button>
               );
@@ -204,10 +207,10 @@ export default function WeekStrip({ selectedDate, onDateSelect, refreshKey }) {
 
           <button
             onClick={handleNextDay}
-            className="p-1 md:p-1.5 hover:bg-gray-700 active:bg-gray-600 rounded-lg transition flex-shrink-0"
+            className="p-2 md:p-2.5 hover:bg-white/5 active:bg-white/10 rounded-lg transition flex-shrink-0"
             aria-label="Sonraki gün"
           >
-            <span className="material-symbols-outlined text-gray-400 text-lg md:text-xl">chevron_right</span>
+            <span className="material-symbols-outlined text-gray-200 text-xl md:text-2xl">chevron_right</span>
           </button>
 
         </div>

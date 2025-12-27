@@ -2,9 +2,9 @@ export const WORKOUT_TYPE_META = {
   push: {
     label: 'PUSH',
     badgeLabel: 'Push Day',
-    buttonClass: 'bg-orange-500/25 text-orange-100 border border-orange-400/40 font-semibold',
-    badgeClass: 'bg-orange-500/15 text-orange-100 border border-orange-500/40 font-semibold',
-    dotClass: 'bg-orange-400',
+    buttonClass: 'bg-orange-500/20 text-orange-300 border border-orange-500/50 font-bold shadow-[0_0_10px_rgba(249,115,22,0.2)]',
+    badgeClass: 'bg-orange-500/20 text-orange-300 border border-orange-500/50 font-bold',
+    dotClass: 'bg-orange-500',
   },
   pull: {
     label: 'PULL',

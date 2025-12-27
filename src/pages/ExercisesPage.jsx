@@ -311,8 +311,8 @@ export default function ExercisesPage() {
   }
 
   return (
-    <div className="relative flex h-auto min-h-screen w-full flex-col bg-background-dark">
-      <header className="sticky top-0 z-20 flex items-center justify-between bg-background-dark/95 backdrop-blur-sm px-4 py-3 border-b border-gray-800/60">
+    <div className="relative flex h-auto min-h-screen w-full flex-col bg-background-dark bg-[radial-gradient(ellipse_80%_80%_at_50%_-20%,rgba(13,242,147,0.15),rgba(16,34,27,0))]">
+      <header className="sticky top-0 z-20 flex items-center justify-between bg-background-dark/50 backdrop-blur-md px-4 py-3 border-b border-white/5">
         <button type="button" onClick={() => navigate(-1)} className="flex size-10 md:size-12 shrink-0 items-center justify-start rounded-lg hover:bg-white/5">
           <span className="material-symbols-outlined text-white text-xl md:text-2xl">arrow_back</span>
         </button>
@@ -324,46 +324,44 @@ export default function ExercisesPage() {
 
       <main className="flex-1 px-4 pb-28 md:pb-8 max-w-4xl mx-auto w-full">
         {/* Sticky search & filters */}
-        <div className="sticky top-[64px] z-10 -mx-4 px-4 pb-3 bg-gradient-to-b from-background-dark via-background-dark to-transparent">
-          <div className="rounded-3xl border border-white/10 bg-gradient-to-r from-white/10 via-white/5 to-transparent backdrop-blur px-4 py-5 md:px-5 shadow-2xl">
-            <div className="flex items-center gap-3 rounded-2xl bg-black/40 border border-white/10 px-3 py-2.5 shadow-inner shadow-black/30">
-              <span className="material-symbols-outlined text-primary text-lg md:text-xl">search</span>
-              <input
-                value={search}
-                autoComplete="off"
-                onChange={(e) => setSearch(e.target.value)}
-                placeholder="Egzersiz ara..."
-                className="flex-1 bg-transparent text-sm md:text-base text-white placeholder:text-white/60 focus:outline-none"
-              />
-              {search && (
+        <div className="sticky top-[64px] z-10 -mx-4 px-4 py-3 bg-background-dark/50 backdrop-blur-xl border-b border-white/5">
+          <div className="flex items-center gap-3 rounded-2xl bg-white/5 border border-white/10 px-4 py-3 transition-all focus-within:border-primary/50 focus-within:bg-white/10 focus-within:shadow-lg focus-within:shadow-primary/10">
+            <span className="material-symbols-outlined text-white/50 text-lg md:text-xl">search</span>
+            <input
+              value={search}
+              autoComplete="off"
+              onChange={(e) => setSearch(e.target.value)}
+              placeholder="Egzersiz ara..."
+              className="flex-1 bg-transparent text-sm md:text-base text-white placeholder:text-white/40 focus:outline-none"
+            />
+            {search && (
+              <button
+                type="button"
+                onClick={() => setSearch('')}
+                className="flex size-8 items-center justify-center rounded-full bg-white/5 text-white/70 hover:bg-white/10"
+                aria-label="Aramayı temizle"
+              >
+                <span className="material-symbols-outlined text-base">close</span>
+              </button>
+            )}
+          </div>
+          <div className="mt-3 flex gap-2 overflow-x-auto no-scrollbar pb-1">
+            {categoryFilterChips.map((filter) => {
+              const isActive = selectedCategoryFilter === filter.key;
+              return (
                 <button
                   type="button"
-                  onClick={() => setSearch('')}
-                  className="flex size-8 items-center justify-center rounded-full bg-white/5 text-white/70 hover:bg-white/10"
-                  aria-label="Aramayı temizle"
+                  key={filter.key}
+                  onClick={() => setSelectedCategoryFilter(filter.key)}
+                  className={`px-4 py-2 rounded-xl text-xs md:text-sm font-medium transition-all border ${isActive
+                    ? 'bg-primary border-primary text-background-dark shadow-lg shadow-primary/20'
+                    : 'bg-white/5 border-white/5 text-white/70 hover:bg-white/10 hover:border-white/10'
+                  }`}
                 >
-                  <span className="material-symbols-outlined text-base">close</span>
+                  {filter.label}
                 </button>
-              )}
-            </div>
-            <div className="mt-4 flex gap-2 overflow-x-auto no-scrollbar">
-              {categoryFilterChips.map((filter) => {
-                const isActive = selectedCategoryFilter === filter.key;
-                return (
-                  <button
-                    type="button"
-                    key={filter.key}
-                    onClick={() => setSelectedCategoryFilter(filter.key)}
-                    className={`px-3.5 py-1.5 rounded-full text-xs md:text-sm font-medium transition ${isActive
-                      ? 'bg-primary text-background-dark shadow-lg shadow-primary/30'
-                      : 'bg-white/10 text-white/80 hover:bg-white/20'
-                    }`}
-                  >
-                    {filter.label}
-                  </button>
-                );
-              })}
-            </div>
+              );
+            })}
           </div>
         </div>
 
@@ -385,7 +383,7 @@ export default function ExercisesPage() {
                 type="button"
                 key={canonicalName}
                 onClick={() => navigate(`/exercise/${encodeURIComponent(displayName)}`)}
-                className="flex w-full items-center justify-between gap-3 md:gap-4 rounded-2xl border border-white/10 bg-gradient-to-br from-white/10 via-white/5 to-transparent px-3 py-3 md:px-4 md:py-4 text-left transition hover:border-primary/40 hover:bg-white/10"
+                className="flex w-full items-center justify-between gap-3 md:gap-4 rounded-2xl border border-white/10 bg-white/5 px-3 py-3 md:px-4 md:py-4 text-left transition hover:border-primary/40 hover:bg-white/10"
               >
                 <div className="flex flex-1 flex-col min-w-0 gap-2">
                   <div className="flex items-center gap-2">

@@ -1,5 +1,5 @@
 import { useState, useEffect, useMemo } from 'react';
-import { useNavigate, useParams } from 'react-router-dom';
+import { useNavigate, useParams, useLocation } from 'react-router-dom';
 import { getWorkoutByDate, getWorkouts, saveWorkout, deleteWorkout, formatDateTRFull, resolveWeightValue, getExercises, saveExercises, renameExerciseEverywhere, normalizeExerciseName } from '../utils/storage';
 import { getExerciseInfo, EXERCISE_CATEGORY_META, MUSCLE_OPTIONS } from '../utils/exerciseMetadata';
 
@@ -9,6 +9,7 @@ const canonicalKeyFromParts = (canonical, name) => canonicalFromParts(canonical,
 
 export default function WorkoutDetailPage() {
   const navigate = useNavigate();
+  const location = useLocation();
   const { date } = useParams();
   const [workout, setWorkout] = useState({ dateISO: date, items: [], notes: '', workoutFuel: '', workoutName: '', workoutFocus: [] });
   const [exerciseLibrary, setExerciseLibrary] = useState([]);
@@ -91,8 +92,6 @@ export default function WorkoutDetailPage() {
         return info.muscleLabels.some((label) => label.toLowerCase().includes(query));
       })
       .sort((a, b) => {
-        const categoryDiff = CATEGORY_ORDER.indexOf(a.info.category) - CATEGORY_ORDER.indexOf(b.info.category);
-        if (categoryDiff !== 0) return categoryDiff;
         return a.displayName.localeCompare(b.displayName, 'tr');
       });
   }, [exerciseLibrary, pickerSearch]);
@@ -176,6 +175,14 @@ export default function WorkoutDetailPage() {
     }
     loadWorkout();
   }, [date]);
+
+  useEffect(() => {
+    if (isLoading) return;
+    if (location.state?.openPicker) {
+      openExercisePicker();
+      navigate('.', { replace: true, state: {} });
+    }
+  }, [isLoading, location.state]);
 
   useEffect(() => {
     let isMounted = true;
@@ -514,7 +521,7 @@ export default function WorkoutDetailPage() {
   };
 
   const adjustWeight = (current, delta) => {
-    const normalized = typeof current === 'string' ? current.trim() : '';
+    const normalized = String(current ?? '').trim();
     const lower = normalized.toLowerCase();
     
     // Body Weight veya BW ile başlıyorsa
@@ -669,14 +676,14 @@ export default function WorkoutDetailPage() {
 
   return (
     <div className="relative flex min-h-screen w-full flex-col bg-background-dark">
-      <div className="flex items-center p-4 pb-2 justify-between sticky top-0 z-10 bg-background-dark/95 backdrop-blur-sm border-b border-gray-700/50">
-        <button onClick={() => navigate(-1)} className="flex size-10 md:size-12 items-center justify-center hover:bg-gray-700 active:bg-gray-600 rounded-lg transition -ml-2">
+      <div className="flex items-center p-4 pb-2 justify-between sticky top-0 z-10 bg-background-dark/95 backdrop-blur-sm border-b border-white/5">
+        <button onClick={() => navigate(-1)} className="flex size-10 md:size-12 items-center justify-center hover:bg-white/5 active:bg-white/10 rounded-xl transition -ml-2">
           <span className="material-symbols-outlined text-white text-xl md:text-2xl">arrow_back</span>
         </button>
         <h2 className="text-white text-base md:text-lg font-bold flex-1 text-center px-2">Antrenman Detayı</h2>
         <button 
           onClick={handleDelete}
-          className="flex size-10 md:size-12 items-center justify-center hover:bg-red-900/20 active:bg-red-900/30 rounded-lg transition text-red-400"
+          className="flex size-10 md:size-12 items-center justify-center hover:bg-red-500/10 active:bg-red-500/20 rounded-xl transition text-red-400"
           aria-label="Antrenmanı sil"
         >
           <span className="material-symbols-outlined text-xl md:text-2xl">delete</span>
@@ -687,50 +694,49 @@ export default function WorkoutDetailPage() {
         <h1 className="text-white text-xl md:text-[28px] font-bold pb-3 pt-4">{formatDateTRFull(date)}</h1>
 
         {/* Antrenman Adı */}
-        <div className="mb-4">
-          <label className="block text-sm font-medium text-gray-300 mb-2">Antrenman Türü</label>
-          <div className="grid grid-cols-3 gap-2 md:gap-3">
+        <div className="mb-6">
+          <div className="grid grid-cols-3 gap-3">
             <button
               type="button"
               onClick={() => selectWorkoutTemplate('Pull Day')}
-              className={`p-3 rounded-lg text-sm md:text-base font-semibold transition ${
+              className={`p-3 rounded-xl text-sm font-bold transition border tracking-wide ${
                 workout.workoutName === 'Pull Day'
-                  ? 'bg-primary text-background-dark'
-                  : 'bg-gray-800/50 border border-gray-700 text-gray-300 hover:bg-gray-700/50'
+                  ? 'bg-primary text-background-dark border-primary shadow-[0_0_15px_rgba(13,242,147,0.3)]'
+                  : 'bg-[#1C1C1E] border-white/5 text-gray-400 hover:bg-white/5 hover:text-white'
               }`}
             >
-              Pull
+              PULL
             </button>
             <button
               type="button"
               onClick={() => selectWorkoutTemplate('Push Day')}
-              className={`p-3 rounded-lg text-sm md:text-base font-semibold transition ${
+              className={`p-3 rounded-xl text-sm font-bold transition border tracking-wide ${
                 workout.workoutName === 'Push Day'
-                  ? 'bg-primary text-background-dark'
-                  : 'bg-gray-800/50 border border-gray-700 text-gray-300 hover:bg-gray-700/50'
+                  ? 'bg-primary text-background-dark border-primary shadow-[0_0_15px_rgba(13,242,147,0.3)]'
+                  : 'bg-[#1C1C1E] border-white/5 text-gray-400 hover:bg-white/5 hover:text-white'
               }`}
             >
-              Push
+              PUSH
             </button>
             <button
               type="button"
               onClick={() => selectWorkoutTemplate('Leg Day')}
-              className={`p-3 rounded-lg text-sm md:text-base font-semibold transition ${
+              className={`p-3 rounded-xl text-sm font-bold transition border tracking-wide ${
                 workout.workoutName === 'Leg Day'
-                  ? 'bg-primary text-background-dark'
-                  : 'bg-gray-800/50 border border-gray-700 text-gray-300 hover:bg-gray-700/50'
+                  ? 'bg-primary text-background-dark border-primary shadow-[0_0_15px_rgba(13,242,147,0.3)]'
+                  : 'bg-[#1C1C1E] border-white/5 text-gray-400 hover:bg-white/5 hover:text-white'
               }`}
             >
-              Leg
+              LEG
             </button>
           </div>
         </div>
 
         <button
           onClick={openExercisePicker}
-          className="mb-4 w-full flex items-center justify-center gap-2 py-2.5 md:py-3 bg-gray-800 text-white rounded-xl font-bold hover:bg-gray-700 active:bg-gray-600 transition text-sm md:text-base"
+          className="mb-6 w-full flex items-center justify-center gap-2 py-3 bg-primary text-background-dark rounded-xl font-bold hover:bg-primary/90 active:bg-primary/80 transition text-sm shadow-lg shadow-primary/20"
         >
-          <span className="material-symbols-outlined text-lg md:text-xl">add</span>
+          <span className="material-symbols-outlined text-lg">add</span>
           Egzersiz Ekle
         </button>
 
@@ -740,7 +746,7 @@ export default function WorkoutDetailPage() {
               {/* Header */}
               <div className="flex items-start justify-between mb-6">
                 <div>
-                  <p className="text-[11px] font-bold text-emerald-500 uppercase tracking-widest mb-1">
+                  <p className="text-[11px] font-bold text-primary uppercase tracking-widest mb-1">
                     EGZERSİZ {exerciseIdx + 1}
                   </p>
                   <div className="flex items-center gap-2">
@@ -765,84 +771,88 @@ export default function WorkoutDetailPage() {
               </div>
 
               {/* Sets */}
-              <div className="space-y-3">
+              <div className="space-y-2">
                 {item.sets.map((set, setIdx) => (
-                  <div key={setIdx} className="flex items-end gap-3">
+                  <div key={setIdx} className="flex items-end gap-2">
                     {/* Set Number & Duplicate */}
-                    <div className="flex flex-col items-center gap-2 pb-1.5 w-10 shrink-0">
-                      <span className="text-gray-400 font-medium text-sm">{setIdx + 1}</span>
+                    <div className="flex flex-col items-center gap-1 pb-0.5 w-8 shrink-0">
+                      <span className="text-gray-500 font-bold text-xs">{setIdx + 1}</span>
                       <button
                         type="button"
                         onClick={() => handleDuplicateSet(exerciseIdx, setIdx)}
-                        className="flex items-center justify-center size-8 rounded-lg bg-emerald-500/10 text-emerald-500 hover:bg-emerald-500/20 transition"
+                        className="flex items-center justify-center size-7 rounded-md bg-white/5 text-primary hover:bg-primary/20 transition border border-white/5"
                       >
-                        <span className="material-symbols-outlined text-lg">add</span>
+                        <span className="material-symbols-outlined text-base font-bold">add</span>
                       </button>
                     </div>
 
                     {/* Weight */}
                     <div className="flex-1">
-                      <label className="block text-center text-xs text-gray-500 mb-1.5">kg</label>
-                      <div className="flex items-center bg-black/40 rounded-xl p-1 border border-white/5">
+                      <label className="block text-center text-[9px] font-bold text-gray-500 mb-1 uppercase tracking-wide">kg</label>
+                      <div className="flex items-center gap-1">
                         <button
                           type="button"
                           onClick={() => handleSetChange(exerciseIdx, setIdx, 'w', adjustWeight(set.w, -2.5))}
-                          className="p-2 text-gray-400 hover:text-white transition hover:bg-white/5 rounded-lg"
+                          className="flex items-center justify-center w-7 h-8 rounded-md bg-white/5 text-gray-400 hover:text-white hover:bg-white/10 transition"
                         >
-                          <span className="material-symbols-outlined text-lg">remove</span>
+                          <span className="material-symbols-outlined text-base">remove</span>
                         </button>
-                        <input
-                          type="text"
-                          value={set.w}
-                          onChange={(e) => handleSetChange(exerciseIdx, setIdx, 'w', e.target.value)}
-                          className="w-full bg-transparent text-center text-white font-bold text-lg focus:outline-none"
-                          placeholder="0"
-                        />
+                        <div className="flex-1 h-8 bg-black/40 flex items-center justify-center rounded-md border border-white/5">
+                          <input
+                            type="text"
+                            value={set.w}
+                            onChange={(e) => handleSetChange(exerciseIdx, setIdx, 'w', e.target.value)}
+                            className="w-full bg-transparent text-center text-white font-bold text-base focus:outline-none"
+                            placeholder="0"
+                          />
+                        </div>
                         <button
                           type="button"
                           onClick={() => handleSetChange(exerciseIdx, setIdx, 'w', adjustWeight(set.w, 2.5))}
-                          className="p-2 text-gray-400 hover:text-white transition hover:bg-white/5 rounded-lg"
+                          className="flex items-center justify-center w-7 h-8 rounded-md bg-white/5 text-gray-400 hover:text-white hover:bg-white/10 transition"
                         >
-                          <span className="material-symbols-outlined text-lg">add</span>
+                          <span className="material-symbols-outlined text-base">add</span>
                         </button>
                       </div>
                     </div>
 
                     {/* Reps */}
                     <div className="flex-1">
-                      <label className="block text-center text-xs text-gray-500 mb-1.5">Tekrar</label>
-                      <div className="flex items-center bg-black/40 rounded-xl p-1 border border-white/5">
+                      <label className="block text-center text-[9px] font-bold text-gray-500 mb-1 uppercase tracking-wide">Tekrar</label>
+                      <div className="flex items-center gap-1">
                         <button
                           type="button"
                           onClick={() => handleSetChange(exerciseIdx, setIdx, 'r', Math.max(0, Number(set.r || 0) - 1))}
-                          className="p-2 text-gray-400 hover:text-white transition hover:bg-white/5 rounded-lg"
+                          className="flex items-center justify-center w-7 h-8 rounded-md bg-white/5 text-gray-400 hover:text-white hover:bg-white/10 transition"
                         >
-                          <span className="material-symbols-outlined text-lg">remove</span>
+                          <span className="material-symbols-outlined text-base">remove</span>
                         </button>
-                        <input
-                          type="number"
-                          value={set.r}
-                          onChange={(e) => handleSetChange(exerciseIdx, setIdx, 'r', e.target.value)}
-                          className="w-full bg-transparent text-center text-white font-bold text-lg focus:outline-none"
-                          placeholder="0"
-                        />
+                        <div className="flex-1 h-8 bg-black/40 flex items-center justify-center rounded-md border border-white/5">
+                          <input
+                            type="number"
+                            value={set.r}
+                            onChange={(e) => handleSetChange(exerciseIdx, setIdx, 'r', e.target.value)}
+                            className="w-full bg-transparent text-center text-white font-bold text-base focus:outline-none"
+                            placeholder="0"
+                          />
+                        </div>
                         <button
                           type="button"
                           onClick={() => handleSetChange(exerciseIdx, setIdx, 'r', Number(set.r || 0) + 1)}
-                          className="p-2 text-gray-400 hover:text-white transition hover:bg-white/5 rounded-lg"
+                          className="flex items-center justify-center w-7 h-8 rounded-md bg-white/5 text-gray-400 hover:text-white hover:bg-white/10 transition"
                         >
-                          <span className="material-symbols-outlined text-lg">add</span>
+                          <span className="material-symbols-outlined text-base">add</span>
                         </button>
                       </div>
                     </div>
 
                     {/* Delete */}
-                    <div className="pb-1.5">
+                    <div className="pb-0.5">
                       <button
                         onClick={() => handleDeleteSet(exerciseIdx, setIdx)}
-                        className="flex items-center justify-center size-10 rounded-lg text-red-400 hover:bg-red-500/10 transition"
+                        className="flex items-center justify-center size-8 rounded-md text-red-400/70 hover:text-red-400 hover:bg-red-500/10 transition"
                       >
-                        <span className="material-symbols-outlined text-xl">delete</span>
+                        <span className="material-symbols-outlined text-lg">delete</span>
                       </button>
                     </div>
                   </div>
@@ -852,19 +862,19 @@ export default function WorkoutDetailPage() {
               {/* Add Set Button */}
               <button
                 onClick={() => handleAddSet(exerciseIdx)}
-                className="mt-6 w-full py-3 rounded-xl border border-dashed border-white/20 text-gray-300 font-semibold hover:bg-white/5 hover:text-white hover:border-white/40 transition flex items-center justify-center gap-2"
+                className="mt-4 w-full py-3 rounded-xl border border-dashed border-white/10 bg-transparent text-gray-500 font-bold hover:bg-white/5 hover:text-gray-300 hover:border-white/20 transition flex items-center justify-center gap-2 text-xs"
               >
-                <span className="material-symbols-outlined">add</span>
+                <span className="material-symbols-outlined text-base">add</span>
                 Yeni Set Ekle
               </button>
             </div>
           ))}
         </div>
 
-        <div className="mt-6 space-y-4">
+        <div className="mt-8 space-y-6">
           {/* Antrenman Yakıtı */}
-          <div>
-            <label className="flex items-center gap-2 text-base md:text-lg font-bold text-white mb-2">
+          <div className="rounded-3xl bg-[#1C1C1E] p-5 shadow-lg border border-white/5">
+            <label className="flex items-center gap-2 text-lg font-bold text-white mb-3">
               <span className="text-primary">⚡</span>
               Antrenman Yakıtı
             </label>
@@ -872,20 +882,20 @@ export default function WorkoutDetailPage() {
               type="text"
               value={workout.workoutFuel || ''}
               onChange={(e) => setWorkout({ ...workout, workoutFuel: e.target.value })}
-              className="w-full p-3 bg-primary/10 border border-primary/30 rounded-xl text-gray-300 text-sm md:text-base focus:ring-2 focus:ring-primary focus:border-transparent"
+              className="w-full p-4 bg-black/40 border border-white/5 rounded-2xl text-white text-base focus:ring-2 focus:ring-primary focus:border-transparent placeholder:text-gray-600"
               placeholder="örn: 2 Yumurta, 1 Muz, Kafein (200mg)"
             />
           </div>
 
           {/* Genel Notlar */}
-          <div>
-            <label className="block text-base md:text-lg font-bold text-white mb-2">
+          <div className="rounded-3xl bg-[#1C1C1E] p-5 shadow-lg border border-white/5">
+            <label className="block text-lg font-bold text-white mb-3">
               Antrenman Notları
             </label>
             <textarea
               value={workout.notes || ''}
               onChange={(e) => setWorkout({ ...workout, notes: e.target.value })}
-              className="w-full h-28 md:h-32 p-3 bg-gray-800/30 text-gray-300 rounded-xl border-transparent focus:ring-2 focus:ring-primary text-sm md:text-base resize-none"
+              className="w-full h-32 p-4 bg-black/40 text-white rounded-2xl border border-white/5 focus:ring-2 focus:ring-primary text-base resize-none placeholder:text-gray-600"
               placeholder="Bugünkü antrenman nasıl geçti? Enerji seviyen, motivasyonun veya karşılaştığın zorluklar hakkında notlar al."
             />
           </div>
@@ -893,65 +903,76 @@ export default function WorkoutDetailPage() {
       </main>
 
       {editExerciseModal.isOpen && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 px-4">
-          <div className="w-full max-w-md rounded-xl bg-background-dark border border-white/10 p-5 md:p-6 shadow-xl">
-            <div className="flex items-center justify-between mb-4">
-              <h2 className="text-white text-base md:text-lg font-semibold">Egzersizi Düzenle</h2>
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 backdrop-blur-sm px-4">
+          <div className="w-full max-w-md rounded-3xl bg-[#1C1C1E] border border-white/10 p-6 shadow-2xl">
+            <div className="flex items-center justify-between mb-6">
+              <h2 className="text-white text-xl font-bold">Egzersizi Düzenle</h2>
               <button
                 type="button"
                 onClick={closeExerciseEditModal}
-                className="text-gray-400 hover:text-white transition"
+                className="text-gray-400 hover:text-white transition p-1 hover:bg-white/5 rounded-full"
               >
-                <span className="material-symbols-outlined text-xl">close</span>
+                <span className="material-symbols-outlined text-2xl">close</span>
               </button>
             </div>
 
-            <div className="flex flex-col gap-4">
-              <label className="flex flex-col gap-1">
-                <span className="text-sm text-gray-300">Egzersiz Adı</span>
+            <div className="flex flex-col gap-5">
+              <label className="flex flex-col gap-2">
+                <span className="text-xs font-bold text-gray-500 uppercase tracking-widest">Egzersiz Adı</span>
                 <input
                   value={editExerciseModal.form.name}
                   onChange={(e) => updateExerciseEditForm({ name: e.target.value })}
-                  className="rounded-lg border border-gray-700 bg-black/40 px-3 py-2 text-sm md:text-base text-white focus:outline-none focus:ring-2 focus:ring-primary"
+                  className="rounded-xl border border-white/10 bg-black/40 px-4 py-3 text-base text-white focus:outline-none focus:ring-2 focus:ring-primary placeholder:text-gray-600"
+                  placeholder="Egzersiz adı girin"
                 />
               </label>
 
-              <label className="flex flex-col gap-1">
-                <span className="text-sm text-gray-300">Etiket / Gün</span>
-                <select
-                  value={editExerciseModal.form.category}
-                  onChange={(e) => updateExerciseEditForm({ category: e.target.value })}
-                  className="rounded-lg border border-gray-700 bg-black/40 px-3 py-2 text-sm md:text-base text-white focus:outline-none focus:ring-2 focus:ring-primary"
-                >
-                  {['push', 'pull', 'leg', 'other'].map((key) => (
-                    <option key={key} value={key}>
-                      {EXERCISE_CATEGORY_META[key]?.label || key}
-                    </option>
-                  ))}
-                </select>
+              <label className="flex flex-col gap-2">
+                <span className="text-xs font-bold text-gray-500 uppercase tracking-widest">Etiket / Gün</span>
+                <div className="relative">
+                  <select
+                    value={editExerciseModal.form.category}
+                    onChange={(e) => updateExerciseEditForm({ category: e.target.value })}
+                    className="w-full appearance-none rounded-xl border border-white/10 bg-black/40 px-4 py-3 text-base text-white focus:outline-none focus:ring-2 focus:ring-primary"
+                  >
+                    {['push', 'pull', 'leg', 'other'].map((key) => (
+                      <option key={key} value={key} className="bg-[#1C1C1E]">
+                        {EXERCISE_CATEGORY_META[key]?.label || key}
+                      </option>
+                    ))}
+                  </select>
+                  <span className="material-symbols-outlined absolute right-4 top-1/2 -translate-y-1/2 text-gray-400 pointer-events-none">
+                    expand_more
+                  </span>
+                </div>
               </label>
 
               <div className="flex flex-col gap-2">
-                <span className="text-sm text-gray-300">Çalışan Kaslar</span>
-                <div className="grid grid-cols-2 gap-2">
+                <span className="text-xs font-bold text-gray-500 uppercase tracking-widest">Çalışan Kaslar</span>
+                <div className="grid grid-cols-2 gap-2 max-h-48 overflow-y-auto pr-1 custom-scrollbar">
                   {MUSCLE_OPTIONS.map((option) => {
                     const checked = editExerciseModal.form.muscles.includes(option.key);
                     return (
                       <label
                         key={option.key}
-                        className={`flex items-center gap-2 rounded-lg border px-3 py-2 text-xs md:text-sm ${
+                        className={`flex items-center gap-3 rounded-xl border px-3 py-2.5 text-sm cursor-pointer transition ${
                           checked
-                            ? 'border-primary bg-primary/20 text-white'
-                            : 'border-gray-700 bg-black/40 text-gray-300'
+                            ? 'border-primary bg-primary/10 text-white'
+                            : 'border-white/5 bg-black/40 text-gray-400 hover:bg-white/5'
                         }`}
                       >
+                        <div className={`flex items-center justify-center size-5 rounded border ${
+                          checked ? 'bg-primary border-primary' : 'border-gray-600 bg-transparent'
+                        }`}>
+                          {checked && <span className="material-symbols-outlined text-sm text-black font-bold">check</span>}
+                        </div>
                         <input
                           type="checkbox"
                           checked={checked}
                           onChange={() => toggleExerciseEditMuscle(option.key)}
-                          className="accent-primary"
+                          className="hidden"
                         />
-                        <span>{option.label}</span>
+                        <span className="font-medium">{option.label}</span>
                       </label>
                     );
                   })}
@@ -959,11 +980,11 @@ export default function WorkoutDetailPage() {
               </div>
             </div>
 
-            <div className="mt-5 flex justify-end gap-3">
+            <div className="mt-8 flex justify-end gap-3">
               <button
                 type="button"
                 onClick={closeExerciseEditModal}
-                className="rounded-lg border border-gray-700 px-4 py-2 text-sm md:text-base font-semibold text-gray-300 hover:bg-gray-700/40 transition"
+                className="rounded-xl border border-white/10 px-6 py-3 text-sm font-bold text-gray-300 hover:bg-white/5 transition"
               >
                 İptal
               </button>
@@ -971,9 +992,9 @@ export default function WorkoutDetailPage() {
                 type="button"
                 onClick={handleExerciseEditSave}
                 disabled={isSavingExerciseEdit}
-                className="rounded-lg bg-primary px-4 py-2 text-sm md:text-base font-semibold text-background-dark hover:bg-primary/90 disabled:cursor-not-allowed disabled:opacity-60 transition"
+                className="rounded-xl bg-primary px-6 py-3 text-sm font-bold text-background-dark hover:bg-primary/90 disabled:cursor-not-allowed disabled:opacity-60 transition shadow-lg shadow-primary/20"
               >
-                Kaydet
+                {isSavingExerciseEdit ? 'Kaydediliyor...' : 'Kaydet'}
               </button>
             </div>
           </div>
@@ -981,123 +1002,86 @@ export default function WorkoutDetailPage() {
       )}
 
       {isPickerOpen && (
-        <div className="fixed inset-0 z-40 flex items-end md:items-center justify-center bg-black/60 backdrop-blur-sm px-0 md:px-4">
-          <div className="w-full md:max-w-3xl bg-background-dark border border-gray-700/60 rounded-t-3xl md:rounded-3xl shadow-2xl shadow-black/50 max-h-[85vh] md:max-h-[80vh] overflow-hidden flex flex-col">
-            <div className="flex items-start justify-between px-4 md:px-6 pt-4 pb-3 border-b border-gray-700/60">
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 backdrop-blur-sm p-4">
+          <div className="w-full max-w-md bg-[#1C1C1E] border border-white/10 rounded-3xl shadow-2xl shadow-black/50 h-[80vh] flex flex-col overflow-hidden">
+            {/* Header */}
+            <div className="flex items-center justify-between px-5 pt-5 pb-3 border-b border-white/5">
               <div>
-                <h3 className="text-white text-lg md:text-xl font-bold">Egzersiz Seç</h3>
-                <p className="text-gray-400 text-xs md:text-sm">Kütüphaneden egzersiz seç veya manuel ekle.</p>
+                <h3 className="text-white text-lg font-bold uppercase tracking-wide">EGZERSİZ SEÇ</h3>
+                <p className="text-gray-400 text-xs">Listeden seç veya yeni ekle</p>
               </div>
               <button
                 onClick={closeExercisePicker}
-                className="text-gray-400 hover:text-white active:text-primary transition p-1"
-                aria-label="Egzersiz seçim ekranını kapat"
+                className="flex items-center justify-center size-8 rounded-full bg-white/10 text-gray-400 hover:text-white hover:bg-white/20 transition"
+                aria-label="Kapat"
               >
-                <span className="material-symbols-outlined text-xl md:text-2xl">close</span>
+                <span className="material-symbols-outlined text-lg">close</span>
               </button>
             </div>
 
-            <div className="flex-1 overflow-hidden flex flex-col">
-              <div className="flex-1 overflow-y-auto">
-                <div className="sticky top-0 z-10 px-4 md:px-6 pt-3 pb-4 border-b border-gray-700/40 bg-background-dark/95 backdrop-blur">
-                  <label className="block text-xs md:text-sm font-medium text-gray-400 mb-2">Egzersiz Ara</label>
-                  <div className="relative">
-                    <span className="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-gray-500 text-base md:text-lg">search</span>
-                    <input
-                      type="text"
-                      value={pickerSearch}
-                      onChange={(e) => setPickerSearch(e.target.value)}
-                      className="w-full pl-10 pr-3 py-2 md:py-2.5 bg-gray-900/60 border border-gray-700 rounded-xl text-white text-sm md:text-base focus:ring-2 focus:ring-primary focus:border-transparent"
-                      placeholder="İsim, kas grubu veya etikete göre ara"
-                      autoFocus
-                    />
-                  </div>
-                </div>
-                <div className="px-4 md:px-6 py-4 space-y-5">
-                  {filteredLibrary.length === 0 ? (
-                    <div className="text-center text-gray-400 text-sm md:text-base">
-                      Aradığın kriterlere uygun egzersiz bulunamadı. Manuel olarak ekleyebilirsin.
-                    </div>
-                  ) : (
-                    <>
-                      {CATEGORY_ORDER.map((category) => {
-                        const items = filteredLibrary.filter((entry) => entry.info.category === category);
-                        if (!items.length) return null;
-                        const meta = EXERCISE_CATEGORY_META[category];
-                        return (
-                          <section key={category}>
-                            <div className="flex items-center justify-between">
-                              <h4 className="text-white text-sm md:text-base font-semibold">
-                                {meta?.label || 'Diğer'}
-                              </h4>
-                              {meta?.subtitle ? (
-                                <span className="text-gray-500 text-xs md:text-sm">{meta.subtitle}</span>
-                              ) : null}
-                            </div>
-                            <div className="mt-2 flex flex-col gap-2">
-                              {items.map(({ displayName, canonical, info }) => (
-                                <button
-                                  key={canonical}
-                                  onClick={() => handleSelectExercise({ displayName, canonical })}
-                                  className="w-full text-left bg-gray-800/40 hover:bg-primary/10 active:bg-primary/20 transition rounded-xl px-4 py-3 md:py-3.5 border border-gray-700/40"
-                                >
-                                  <div className="flex items-center justify-between gap-3">
-                                    <span className="text-white text-sm md:text-base font-semibold">{displayName}</span>
-                                    <span className="text-xs md:text-sm text-primary uppercase tracking-wider font-medium">
-                                      {meta?.shortLabel || meta?.label || info.category}
-                                    </span>
-                                  </div>
-                                  {info.muscleLabels.length > 0 ? (
-                                    <p className="text-gray-400 text-xs md:text-sm mt-1">
-                                      {info.muscleLabels.join(', ')}
-                                    </p>
-                                  ) : null}
-                                </button>
-                              ))}
-                            </div>
-                          </section>
-                        );
-                      })}
-                      {filteredLibrary.filter((entry) => !CATEGORY_ORDER.includes(entry.info.category)).length > 0 && (
-                        <section key="misc">
-                          <h4 className="text-white text-sm md:text-base font-semibold">Diğer</h4>
-                          <div className="mt-2 flex flex-col gap-2">
-                            {filteredLibrary
-                              .filter((entry) => !CATEGORY_ORDER.includes(entry.info.category))
-                              .map(({ displayName, canonical, info }) => (
-                                <button
-                                  key={canonical}
-                                  onClick={() => handleSelectExercise({ displayName, canonical })}
-                                  className="w-full text-left bg-gray-800/40 hover:bg-primary/10 active:bg-primary/20 transition rounded-xl px-4 py-3 md:py-3.5 border border-gray-700/40"
-                                >
-                                  <div className="flex items-center justify-between gap-3">
-                                    <span className="text-white text-sm md:text-base font-semibold">{displayName}</span>
-                                    <span className="text-xs md:text-sm text-primary uppercase tracking-wider font-medium">
-                                      {info.category}
-                                    </span>
-                                  </div>
-                                  {info.muscleLabels.length > 0 ? (
-                                    <p className="text-gray-400 text-xs md:text-sm mt-1">
-                                      {info.muscleLabels.join(', ')}
-                                    </p>
-                                  ) : null}
-                                </button>
-                              ))}
-                          </div>
-                        </section>
-                      )}
-                    </>
-                  )}
-                </div>
+            {/* Search */}
+            <div className="px-5 py-3 border-b border-white/5 bg-[#1C1C1E]">
+              <div className="relative">
+                <span className="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-gray-500 text-xl">search</span>
+                <input
+                  type="text"
+                  value={pickerSearch}
+                  onChange={(e) => setPickerSearch(e.target.value)}
+                  className="w-full pl-10 pr-4 py-3 bg-black/40 border border-white/10 rounded-xl text-white text-sm focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary placeholder:text-gray-600 transition"
+                  placeholder="Egzersiz ara..."
+                  autoFocus
+                />
               </div>
-              <div className="px-4 md:px-6 py-4 border-t border-gray-700/60 bg-background-dark/90">
-                <button
-                  onClick={handleManualAddExercise}
-                  className="w-full py-2.5 md:py-3 border border-dashed border-gray-600 text-gray-200 rounded-xl font-semibold hover:border-primary hover:text-primary active:bg-primary/10 transition text-sm md:text-base"
-                >
-                  Manuel Egzersiz Ekle
-                </button>
-              </div>
+            </div>
+
+            {/* List */}
+            <div className="flex-1 overflow-y-auto custom-scrollbar">
+              {filteredLibrary.length === 0 ? (
+                <div className="p-8 text-center">
+                  <p className="text-gray-400 text-sm mb-4">Aradığın kriterlere uygun egzersiz bulunamadı.</p>
+                  <button
+                     onClick={handleManualAddExercise}
+                     className="text-primary text-sm font-bold hover:underline"
+                  >
+                    Manuel Ekle
+                  </button>
+                </div>
+              ) : (
+                <div className="divide-y divide-white/5">
+                  {filteredLibrary.map(({ displayName, canonical, info }) => (
+                    <button
+                      key={canonical}
+                      onClick={() => handleSelectExercise({ displayName, canonical })}
+                      className="w-full flex items-center justify-between px-5 py-4 hover:bg-white/5 transition text-left group"
+                    >
+                      <div className="flex flex-col gap-1">
+                        <span className="text-white text-base font-bold group-hover:text-primary transition">{displayName}</span>
+                        <div className="flex items-center gap-2 text-xs text-gray-500">
+                          <span className="uppercase font-bold tracking-wider">{info.category}</span>
+                          {info.muscleLabels.length > 0 && (
+                            <>
+                              <span className="size-1 rounded-full bg-gray-600"></span>
+                              <span>{info.muscleLabels.join(', ')}</span>
+                            </>
+                          )}
+                        </div>
+                      </div>
+                      <div className="flex items-center justify-center size-8 rounded-full border border-white/10 text-gray-400 group-hover:border-primary group-hover:text-primary transition">
+                        <span className="material-symbols-outlined text-xl">add</span>
+                      </div>
+                    </button>
+                  ))}
+                  
+                  {/* Manual Add Button at the end of list */}
+                   <button
+                    onClick={handleManualAddExercise}
+                    className="w-full flex items-center justify-center gap-2 px-5 py-4 text-primary hover:bg-white/5 transition font-semibold text-sm"
+                  >
+                    <span className="material-symbols-outlined">add</span>
+                    Yeni Egzersiz Ekle
+                  </button>
+                </div>
+              )}
             </div>
           </div>
         </div>
@@ -1106,9 +1090,9 @@ export default function WorkoutDetailPage() {
       <div className="fixed bottom-0 left-0 right-0 p-4 bg-gradient-to-t from-background-dark via-background-dark to-transparent z-20">
         <button
           onClick={handleSave}
-          className="w-full max-w-4xl mx-auto py-3 md:py-4 bg-primary text-background-dark text-base md:text-lg font-bold rounded-xl shadow-lg shadow-primary/30 hover:bg-primary/90 active:bg-primary/80 transition"
+          className="w-full max-w-4xl mx-auto py-4 bg-primary text-background-dark text-lg font-bold rounded-2xl shadow-lg shadow-primary/20 hover:bg-primary/90 active:bg-primary/80 transition"
         >
-          Değişiklikleri Kaydet
+          Antrenmanı Kaydet
         </button>
       </div>
     </div>

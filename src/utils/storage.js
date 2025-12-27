@@ -344,6 +344,7 @@ export async function saveImprovement(note) {
     id,
     title: typeof note.title === 'string' ? note.title.trim() : '',
     content: typeof note.content === 'string' ? note.content.trim() : '',
+    isCompleted: typeof note.isCompleted === 'boolean' ? note.isCompleted : (existing?.isCompleted || false),
     createdAt: existing?.createdAt || now,
     updatedAt: now,
   };
@@ -361,6 +362,8 @@ export async function deleteImprovement(id) {
     await setImprovementsMap(map);
   }
 }
+
+export const updateImprovement = saveImprovement;
 
 // =====================================================================
 // EXERCISE NORMALIZATION
@@ -484,21 +487,26 @@ function normalizeWorkoutItems(items) {
 
     console.log(`normalizeWorkoutItems: ${rawName} - ${normalizedSets.length} set kabul edildi`);
 
-    if (normalizedSets.length === 0) return;
-
     const { dateISO: _ignoreDateISO, dateIso: _ignoreDateIso, date: _ignoreDate, ...restItem } = item;
     const cleanedItem = {
       ...restItem,
       name: rawName,
       displayName: rawName,
       canonicalName: canonical,
+      // Egzersiz seti olmasa bile (örn. planlandı ama yapılmadı) kayıtta tutuyoruz.
       sets: normalizedSets,
     };
 
     if (!map[key]) {
       map[key] = cleanedItem;
     } else {
-      map[key].sets = map[key].sets.concat(normalizedSets);
+      const existing = map[key];
+      const mergedSets = [...(existing.sets || []), ...normalizedSets];
+      map[key] = {
+        ...existing,
+        ...cleanedItem,
+        sets: mergedSets,
+      };
     }
   });
   return Object.values(map);
