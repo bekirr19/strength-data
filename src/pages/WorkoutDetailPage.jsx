@@ -734,118 +734,128 @@ export default function WorkoutDetailPage() {
           Egzersiz Ekle
         </button>
 
-        <div className="flex flex-col gap-3 md:gap-4">
+        <div className="flex flex-col gap-4 md:gap-6">
           {workout.items.map((item, exerciseIdx) => (
-            <div key={exerciseIdx} className="rounded-xl bg-gray-800/30 p-3 md:p-4">
-              <div className="flex items-center justify-between gap-2 mb-3">
-                <div className="w-full min-w-0">
-                  <p
-                    className={`text-base md:text-lg font-bold truncate ${item.name ? 'text-white' : 'text-gray-500 italic'}`}
-                    title={item.name || 'Egzersiz adını düzenle butonuyla belirleyin'}
-                  >
-                    {item.name || 'Egzersiz adı henüz seçilmedi'}
+            <div key={exerciseIdx} className="rounded-3xl bg-[#1C1C1E] p-5 shadow-lg border border-white/5">
+              {/* Header */}
+              <div className="flex items-start justify-between mb-6">
+                <div>
+                  <p className="text-[11px] font-bold text-emerald-500 uppercase tracking-widest mb-1">
+                    EGZERSİZ {exerciseIdx + 1}
                   </p>
+                  <div className="flex items-center gap-2">
+                    <h3 className="text-xl md:text-2xl font-bold text-white">
+                      {item.name || 'İsimsiz Egzersiz'}
+                    </h3>
+                    <button
+                      type="button"
+                      onClick={() => openExerciseEditModal(exerciseIdx)}
+                      className="text-gray-500 hover:text-white transition"
+                    >
+                      <span className="material-symbols-outlined text-lg">edit</span>
+                    </button>
+                  </div>
                 </div>
-                <div className="flex items-center gap-1">
-                  <button
-                    type="button"
-                    onClick={() => openExerciseEditModal(exerciseIdx)}
-                    className="flex size-9 md:size-10 items-center justify-center rounded-lg text-white/80 hover:text-white hover:bg-white/10 transition"
-                    title="Egzersizi düzenle"
-                  >
-                    <span className="material-symbols-outlined text-base md:text-lg">edit</span>
-                  </button>
-                  <button onClick={() => handleDeleteExercise(exerciseIdx)} className="flex size-9 md:size-10 items-center justify-center rounded-lg text-gray-400 hover:text-red-400 active:text-red-300 hover:bg-red-500/10 transition" title="Egzersizi sil">
-                    <span className="material-symbols-outlined text-base md:text-lg">delete</span>
-                  </button>
-                </div>
+                <button
+                  onClick={() => handleDeleteExercise(exerciseIdx)}
+                  className="text-gray-500 hover:text-red-500 transition p-2 hover:bg-white/5 rounded-full"
+                >
+                  <span className="material-symbols-outlined text-xl">delete</span>
+                </button>
               </div>
 
-              <div className="flex flex-col gap-2 md:gap-3">
+              {/* Sets */}
+              <div className="space-y-3">
                 {item.sets.map((set, setIdx) => (
-                  <div key={setIdx} className="grid grid-cols-12 gap-1.5 md:gap-2 items-center">
-                    <span className="col-span-1 text-gray-400 text-xs md:text-sm font-medium">{setIdx + 1}.</span>
-                    <div className="col-span-1 flex items-center justify-center">
+                  <div key={setIdx} className="flex items-end gap-3">
+                    {/* Set Number & Duplicate */}
+                    <div className="flex flex-col items-center gap-2 pb-1.5 w-10 shrink-0">
+                      <span className="text-gray-400 font-medium text-sm">{setIdx + 1}</span>
                       <button
                         type="button"
                         onClick={() => handleDuplicateSet(exerciseIdx, setIdx)}
-                        className="flex h-9 w-9 items-center justify-center rounded-lg bg-primary/20 text-primary border border-primary/40 hover:bg-primary/30 active:bg-primary/40 transition"
-                        aria-label="Seti kopyala"
+                        className="flex items-center justify-center size-8 rounded-lg bg-emerald-500/10 text-emerald-500 hover:bg-emerald-500/20 transition"
                       >
-                        <span className="material-symbols-outlined text-base">add</span>
+                        <span className="material-symbols-outlined text-lg">add</span>
                       </button>
                     </div>
-                    <div className="col-span-4">
-                      <label className="text-[10px] md:text-xs text-gray-500 mb-0.5 block">Ağırlık (kg)</label>
-                      <div className="flex items-center justify-between gap-1">
+
+                    {/* Weight */}
+                    <div className="flex-1">
+                      <label className="block text-center text-xs text-gray-500 mb-1.5">kg</label>
+                      <div className="flex items-center bg-black/40 rounded-xl p-1 border border-white/5">
                         <button
                           type="button"
                           onClick={() => handleSetChange(exerciseIdx, setIdx, 'w', adjustWeight(set.w, -2.5))}
-                          className="flex h-9 w-9 items-center justify-center rounded-lg bg-gray-900/60 border border-gray-700 text-gray-200 hover:bg-gray-800 active:bg-gray-700 transition"
-                          aria-label="Ağırlığı azalt"
+                          className="p-2 text-gray-400 hover:text-white transition hover:bg-white/5 rounded-lg"
                         >
-                          <span className="material-symbols-outlined text-base">remove</span>
+                          <span className="material-symbols-outlined text-lg">remove</span>
                         </button>
                         <input
-                          className="w-full bg-gray-900/50 border border-gray-700 rounded-lg px-2 py-1.5 md:py-2 text-white text-sm md:text-base focus:ring-1 focus:ring-primary text-center"
                           type="text"
                           value={set.w}
                           onChange={(e) => handleSetChange(exerciseIdx, setIdx, 'w', e.target.value)}
-                          placeholder="70, BW, BW+10"
+                          className="w-full bg-transparent text-center text-white font-bold text-lg focus:outline-none"
+                          placeholder="0"
                         />
                         <button
                           type="button"
                           onClick={() => handleSetChange(exerciseIdx, setIdx, 'w', adjustWeight(set.w, 2.5))}
-                          className="flex h-9 w-9 items-center justify-center rounded-lg bg-gray-900/60 border border-gray-700 text-gray-200 hover:bg-gray-800 active:bg-gray-700 transition"
-                          aria-label="Ağırlığı artır"
+                          className="p-2 text-gray-400 hover:text-white transition hover:bg-white/5 rounded-lg"
                         >
-                          <span className="material-symbols-outlined text-base">add</span>
+                          <span className="material-symbols-outlined text-lg">add</span>
                         </button>
                       </div>
                     </div>
-                    <div className="col-span-5">
-                      <label className="text-[10px] md:text-xs text-gray-500 mb-0.5 block">Tekrar</label>
-                      <div className="flex items-center justify-between gap-1">
+
+                    {/* Reps */}
+                    <div className="flex-1">
+                      <label className="block text-center text-xs text-gray-500 mb-1.5">Tekrar</label>
+                      <div className="flex items-center bg-black/40 rounded-xl p-1 border border-white/5">
                         <button
                           type="button"
                           onClick={() => handleSetChange(exerciseIdx, setIdx, 'r', Math.max(0, Number(set.r || 0) - 1))}
-                          className="flex h-9 w-9 items-center justify-center rounded-lg bg-gray-900/60 border border-gray-700 text-gray-200 hover:bg-gray-800 active:bg-gray-700 transition"
-                          aria-label="Tekrar azalt"
+                          className="p-2 text-gray-400 hover:text-white transition hover:bg-white/5 rounded-lg"
                         >
-                          <span className="material-symbols-outlined text-base">remove</span>
+                          <span className="material-symbols-outlined text-lg">remove</span>
                         </button>
                         <input
-                          className="w-full bg-gray-900/50 border border-gray-700 rounded-lg px-2 py-1.5 md:py-2 text-white text-sm md:text-base focus:ring-1 focus:ring-primary text-center"
                           type="number"
-                          min="0"
-                          step="1"
                           value={set.r}
                           onChange={(e) => handleSetChange(exerciseIdx, setIdx, 'r', e.target.value)}
+                          className="w-full bg-transparent text-center text-white font-bold text-lg focus:outline-none"
+                          placeholder="0"
                         />
                         <button
                           type="button"
                           onClick={() => handleSetChange(exerciseIdx, setIdx, 'r', Number(set.r || 0) + 1)}
-                          className="flex h-9 w-9 items-center justify-center rounded-lg bg-gray-900/60 border border-gray-700 text-gray-200 hover:bg-gray-800 active:bg-gray-700 transition"
-                          aria-label="Tekrar artır"
+                          className="p-2 text-gray-400 hover:text-white transition hover:bg-white/5 rounded-lg"
                         >
-                          <span className="material-symbols-outlined text-base">add</span>
+                          <span className="material-symbols-outlined text-lg">add</span>
                         </button>
                       </div>
                     </div>
-                    <div className="col-span-1 flex items-end h-full justify-center">
-                      <button onClick={() => handleDeleteSet(exerciseIdx, setIdx)} className="text-gray-400 hover:text-red-400 active:text-red-300 p-1">
-                        <span className="material-symbols-outlined text-sm md:text-base">delete</span>
+
+                    {/* Delete */}
+                    <div className="pb-1.5">
+                      <button
+                        onClick={() => handleDeleteSet(exerciseIdx, setIdx)}
+                        className="flex items-center justify-center size-10 rounded-lg text-red-400 hover:bg-red-500/10 transition"
+                      >
+                        <span className="material-symbols-outlined text-xl">delete</span>
                       </button>
                     </div>
                   </div>
                 ))}
               </div>
 
+              {/* Add Set Button */}
               <button
                 onClick={() => handleAddSet(exerciseIdx)}
-                className="mt-3 w-full py-2 md:py-2.5 bg-primary/20 text-primary rounded-lg font-bold hover:bg-primary/30 active:bg-primary/40 transition text-sm md:text-base"
+                className="mt-6 w-full py-3 rounded-xl border border-dashed border-white/20 text-gray-300 font-semibold hover:bg-white/5 hover:text-white hover:border-white/40 transition flex items-center justify-center gap-2"
               >
-                Set Ekle
+                <span className="material-symbols-outlined">add</span>
+                Yeni Set Ekle
               </button>
             </div>
           ))}

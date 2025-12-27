@@ -9,22 +9,6 @@ import { detectWorkoutType, WORKOUT_TYPE_META } from '../utils/workoutTypes';
 
 const LAST_SELECTED_DATE_KEY = 'main_last_selected_date';
 
-const generateLocalId = () => (typeof crypto !== 'undefined' && typeof crypto.randomUUID === 'function'
-  ? crypto.randomUUID()
-  : `set-${Date.now()}-${Math.random().toString(36).slice(2, 8)}`);
-
-const formatWeightInput = (set) => {
-  if (!set) return '';
-  if (set.wDisplay && typeof set.wDisplay === 'string' && set.wDisplay.trim().length > 0) {
-    return set.wDisplay;
-  }
-  const weight = Number(set.w || 0);
-  if (Number.isFinite(weight) && weight > 0) {
-    return `${weight % 1 === 0 ? weight : Number(weight.toFixed(1))}`;
-  }
-  return '';
-};
-
 export default function MainPage() {
   const navigate = useNavigate();
   const [selectedDate, setSelectedDate] = useState(() => {
@@ -53,13 +37,6 @@ export default function MainPage() {
     }
     return window.innerWidth < 768;
   });
-  const [exerciseQuickEdit, setExerciseQuickEdit] = useState({
-    isOpen: false,
-    exerciseIndex: null,
-    exerciseName: '',
-    sets: [],
-  });
-  const [isQuickSaving, setIsQuickSaving] = useState(false);
   const editorRef = useRef(null);
   const weightInputRef = useRef(null);
   const touchStateRef = useRef({ startX: 0, startY: 0, lastX: 0, lastY: 0, active: false });
@@ -150,166 +127,6 @@ export default function MainPage() {
   const dateObj = fromISO(selectedDate);
   const dayIndex = dateObj.getDay();
   const weekdayLabel = weekdayFromFull || turkishWeekdays[dayIndex];
-
-  const openExerciseQuickEditor = (exerciseIdx) => {
-    if (!currentWorkout || !Array.isArray(currentWorkout.items)) return;
-    const target = currentWorkout.items[exerciseIdx];
-    if (!target) return;
-
-    const sets = (target.sets || []).map((set) => ({
-      localId: generateLocalId(),
-      weight: formatWeightInput(set),
-      reps: Number.isFinite(Number(set?.r)) && Number(set?.r) > 0 ? String(Number(set.r)) : '',
-    }));
-
-    setExerciseQuickEdit({
-      isOpen: true,
-      exerciseIndex: exerciseIdx,
-      exerciseName: target.displayName || target.name || 'İsimsiz Egzersiz',
-      sets: sets.length > 0 ? sets : [{ localId: generateLocalId(), weight: '', reps: '' }],
-    });
-  };
-
-  const closeExerciseQuickEditor = () => {
-    setIsQuickSaving(false);
-    setExerciseQuickEdit({
-      isOpen: false,
-      exerciseIndex: null,
-      exerciseName: '',
-      sets: [],
-    });
-  };
-
-  const updateQuickSetField = (setIdx, field, value) => {
-    setExerciseQuickEdit((prev) => {
-      if (!prev.sets) {
-        return prev;
-      }
-      const nextSets = prev.sets.map((set, idx) => (idx === setIdx ? { ...set, [field]: value } : set));
-      return { ...prev, sets: nextSets };
-    });
-  };
-
-  const addQuickSet = () => {
-    setExerciseQuickEdit((prev) => {
-      const last = prev.sets?.[prev.sets.length - 1] || { weight: '', reps: '' };
-      const nextSet = {
-        localId: generateLocalId(),
-        weight: last.weight || '',
-        reps: last.reps || '',
-      };
-      const nextSets = Array.isArray(prev.sets) ? [...prev.sets, nextSet] : [nextSet];
-      return { ...prev, sets: nextSets };
-    });
-  };
-
-  const removeQuickSet = (setIdx) => {
-    setExerciseQuickEdit((prev) => {
-      if (!Array.isArray(prev.sets) || prev.sets.length === 0) {
-        return { ...prev, sets: [{ localId: generateLocalId(), weight: '', reps: '' }] };
-      }
-      const filtered = prev.sets.filter((_, idx) => idx !== setIdx);
-      if (filtered.length === 0) {
-        filtered.push({ localId: generateLocalId(), weight: '', reps: '' });
-      }
-      return { ...prev, sets: filtered };
-    });
-  };
-
-  const handleQuickEditorSave = async () => {
-    if (!exerciseQuickEdit.isOpen || exerciseQuickEdit.exerciseIndex === null) {
-      closeExerciseQuickEditor();
-      return;
-    }
-    if (!currentWorkout || !Array.isArray(currentWorkout.items)) {
-      alert('Antrenman verisi bulunamadı.');
-      return;
-    }
-
-    const issues = [];
-    const cleanedSets = [];
-
-    exerciseQuickEdit.sets.forEach((set, idx) => {
-      const repsInput = String(set?.reps ?? '').trim();
-      const weightInput = String(set?.weight ?? '').trim();
-
-      if (!repsInput && !weightInput) {
-        return;
-      }
-
-      if (!repsInput || !weightInput) {
-        issues.push(`Set ${idx + 1} için ağırlık ve tekrar değerlerini birlikte girin.`);
-        return;
-      }
-
-      const reps = Number(repsInput);
-      if (!Number.isFinite(reps) || reps <= 0) {
-        issues.push(`Set ${idx + 1} için geçerli tekrar sayısı girin.`);
-        return;
-      }
-
-      const { value, display } = resolveWeightValue(weightInput, exerciseQuickEdit.exerciseName, selectedDate);
-      const isBodyWeight = Boolean(display) && (display === 'Body Weight' || display.startsWith('BW'));
-      const hasValidWeight = Number.isFinite(value) && value > 0;
-
-      if (!isBodyWeight && !hasValidWeight) {
-        issues.push(`Set ${idx + 1} için geçerli bir ağırlık girin (sayı veya BW yazın).`);
-        return;
-      }
-
-      cleanedSets.push({
-        w: value,
-        wDisplay: display || (Number.isFinite(value) ? String(value) : ''),
-        r: reps,
-      });
-    });
-
-    if (issues.length > 0) {
-      alert(issues.join('\n'));
-      return;
-    }
-
-    if (cleanedSets.length === 0) {
-      alert('Kaydetmek için en az bir set girin.');
-      return;
-    }
-
-    const updatedItems = currentWorkout.items.map((item, idx) => {
-      if (idx !== exerciseQuickEdit.exerciseIndex) {
-        return item;
-      }
-      return {
-        ...item,
-        sets: cleanedSets,
-      };
-    });
-
-    const updatedWorkout = {
-      ...currentWorkout,
-      items: updatedItems,
-    };
-
-    setIsQuickSaving(true);
-    try {
-      await saveWorkout(updatedWorkout);
-      setWorkoutsByDate((prev) => ({
-        ...prev,
-        [selectedDate]: updatedWorkout,
-      }));
-      closeExerciseQuickEditor();
-    } catch (error) {
-      console.error('Hızlı egzersiz düzenleyici kaydedilirken hata:', error);
-      alert('Set değişiklikleri kaydedilemedi. Lütfen tekrar deneyin.');
-    } finally {
-      setIsQuickSaving(false);
-    }
-  };
-
-  const handleQuickEditOverlayClick = (event) => {
-    if (event.target === event.currentTarget) {
-      closeExerciseQuickEditor();
-    }
-  };
 
   useEffect(() => {
     let isMounted = true;
@@ -758,11 +575,9 @@ export default function MainPage() {
                     .join(', ');
 
                   return (
-                    <button
-                      type="button"
+                    <div
                       key={`${displayName}-${idx}`}
-                      onClick={() => openExerciseQuickEditor(idx)}
-                      className="flex w-full items-center justify-between gap-3 md:gap-4 rounded-2xl border border-white/10 bg-white/5 px-3 py-3 md:px-4 md:py-4 text-left transition hover:border-primary/30 hover:bg-white/10"
+                      className="flex w-full items-center justify-between gap-3 md:gap-4 rounded-2xl border border-white/10 bg-white/5 px-3 py-3 md:px-4 md:py-4 text-left"
                     >
                       <div className="flex flex-col min-w-0 gap-2">
                         <div className="flex items-center gap-2">
@@ -773,8 +588,7 @@ export default function MainPage() {
                         </div>
                         <p className="text-xs md:text-sm text-gray-400 truncate">{quickSummary}</p>
                       </div>
-                      <span className="material-symbols-outlined text-gray-200 text-lg md:text-xl flex-shrink-0">chevron_right</span>
-                    </button>
+                    </div>
                   );
                 })}
               </div>
@@ -839,118 +653,6 @@ export default function MainPage() {
           <span className="sm:hidden">Egzersizler</span>
         </button>
       </nav>
-
-      {exerciseQuickEdit.isOpen && (
-        <div
-          className="fixed inset-0 z-40 flex items-end md:items-center justify-center bg-black/70 backdrop-blur-sm px-0 md:px-4"
-          onClick={handleQuickEditOverlayClick}
-        >
-          <div
-            className="w-full max-w-2xl rounded-t-3xl md:rounded-3xl border border-white/15 bg-background-dark shadow-2xl shadow-black/50 overflow-hidden"
-            onClick={(event) => event.stopPropagation()}
-          >
-            <div className="flex items-start justify-between px-4 md:px-6 pt-4 pb-3 border-b border-white/10">
-              <div>
-                <p className="text-[11px] font-semibold uppercase tracking-[0.2em] text-primary/70">Hızlı Set Düzenleme</p>
-                <h3 className="text-lg md:text-xl font-bold text-white mt-1">{exerciseQuickEdit.exerciseName}</h3>
-              </div>
-              <div className="flex items-center gap-2">
-                <button
-                  type="button"
-                  onClick={() => navigate(`/exercise/${encodeURIComponent(exerciseQuickEdit.exerciseName)}`)}
-                  className="inline-flex items-center gap-1 rounded-full border border-white/15 px-3 py-1.5 text-[11px] font-semibold text-white/80 hover:text-white hover:border-primary/50"
-                >
-                  <span className="material-symbols-outlined text-sm">open_in_new</span>
-                  Detay
-                </button>
-                <button
-                  type="button"
-                  onClick={closeExerciseQuickEditor}
-                  className="flex size-9 items-center justify-center rounded-full text-white/70 hover:bg-white/10 hover:text-white"
-                >
-                  <span className="material-symbols-outlined text-lg">close</span>
-                </button>
-              </div>
-            </div>
-
-            <div className="max-h-[70vh] overflow-y-auto px-4 md:px-6 py-4 space-y-4">
-              {exerciseQuickEdit.sets.map((set, idx) => (
-                <div key={set.localId || idx} className="rounded-2xl border border-white/10 bg-white/5 p-4 space-y-4">
-                  <div className="flex items-center justify-between gap-3">
-                    <div className="flex items-center gap-2 text-sm font-semibold text-gray-200">
-                      <span className="inline-flex size-8 items-center justify-center rounded-full bg-white/10 text-white text-xs md:text-sm">
-                        {idx + 1}
-                      </span>
-                      <span>Set {idx + 1}</span>
-                    </div>
-                    <button
-                      type="button"
-                      onClick={() => removeQuickSet(idx)}
-                      className="inline-flex items-center gap-1 rounded-full px-3 py-1 text-xs font-semibold text-red-300 hover:bg-red-500/10 disabled:opacity-40 disabled:cursor-not-allowed"
-                      disabled={exerciseQuickEdit.sets.length <= 1}
-                    >
-                      <span className="material-symbols-outlined text-sm">delete</span>
-                      Sil
-                    </button>
-                  </div>
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-                    <label className="flex flex-col gap-1">
-                      <span className="text-xs font-semibold uppercase tracking-[0.2em] text-primary/70">Ağırlık</span>
-                      <input
-                        value={set.weight}
-                        onChange={(event) => updateQuickSetField(idx, 'weight', event.target.value)}
-                        className="rounded-xl border border-white/10 bg-black/40 px-3 py-2 text-sm text-white placeholder:text-white/30 focus:outline-none focus:ring-2 focus:ring-primary"
-                        placeholder="Örn. 60, BW veya BW+10"
-                        inputMode="decimal"
-                        autoComplete="off"
-                      />
-                    </label>
-                    <label className="flex flex-col gap-1">
-                      <span className="text-xs font-semibold uppercase tracking-[0.2em] text-primary/70">Tekrar</span>
-                      <input
-                        value={set.reps}
-                        onChange={(event) => updateQuickSetField(idx, 'reps', event.target.value.replace(/[^0-9]/g, ''))}
-                        className="rounded-xl border border-white/10 bg-black/40 px-3 py-2 text-sm text-white placeholder:text-white/30 focus:outline-none focus:ring-2 focus:ring-primary"
-                        placeholder="Örn. 8"
-                        inputMode="numeric"
-                        autoComplete="off"
-                      />
-                    </label>
-                  </div>
-                </div>
-              ))}
-            </div>
-
-            <div className="flex flex-col gap-3 md:flex-row md:items-center md:justify-between px-4 md:px-6 py-4 border-t border-white/10 bg-background-dark/95 backdrop-blur">
-              <button
-                type="button"
-                onClick={addQuickSet}
-                className="inline-flex items-center justify-center gap-2 rounded-full border border-dashed border-white/25 px-4 py-2 text-sm font-semibold text-white/80 hover:border-primary/60 hover:text-primary"
-              >
-                <span className="material-symbols-outlined text-base">add</span>
-                Set Ekle
-              </button>
-              <div className="flex items-center gap-2">
-                <button
-                  type="button"
-                  onClick={closeExerciseQuickEditor}
-                  className="rounded-full border border-white/15 px-5 py-2 text-sm font-semibold text-gray-200 hover:bg-white/10"
-                >
-                  Vazgeç
-                </button>
-                <button
-                  type="button"
-                  onClick={handleQuickEditorSave}
-                  disabled={isQuickSaving}
-                  className="rounded-full bg-primary px-5 py-2 text-sm font-semibold text-background-dark hover:bg-primary/90 disabled:cursor-not-allowed disabled:opacity-60"
-                >
-                  {isQuickSaving ? 'Kaydediliyor...' : 'Kaydet'}
-                </button>
-              </div>
-            </div>
-          </div>
-        </div>
-      )}
 
       {/* Calendar Modal */}
       <CalendarModal
