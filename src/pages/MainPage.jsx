@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useLocation } from 'react-router-dom';
 import { toISODate, formatDateTRFull, fromISO, turkishWeekdays, turkishWeekdaysShort, getWorkouts, getBodyWeightInfo, saveBodyWeight, clearBodyWeight, saveWorkout, resolveWeightValue } from '../utils/storage';
 import WeekStrip from '../components/WeekStrip';
 import CalendarModal from '../components/CalendarModal';
@@ -7,21 +7,29 @@ import ImportWorkoutModal from '../components/ImportWorkoutModal';
 import LoadingSpinner from '../components/LoadingSpinner';
 import { detectWorkoutType, WORKOUT_TYPE_META } from '../utils/workoutTypes';
 
-const LAST_SELECTED_DATE_KEY = 'main_last_selected_date';
+// SPA içinde gezinirken tarihi hatırlamak için modül seviyesinde değişken.
+// Sayfa yenilendiğinde (refresh) bu değişken sıfırlanır.
+let sessionLastSelectedDate = null;
 
 export default function MainPage() {
   const navigate = useNavigate();
+  const location = useLocation();
+  
   const [selectedDate, setSelectedDate] = useState(() => {
-    const todayISO = toISODate(new Date());
-    if (typeof window === 'undefined') return todayISO;
-    try {
-      const stored = window.localStorage.getItem(LAST_SELECTED_DATE_KEY);
-      return stored || todayISO;
-    } catch (err) {
-      console.warn('Son seçilen tarih okunamadı', err);
-      return todayISO;
+    // 1. Eğer navigasyon ile gelen bir tarih varsa onu kullan (Örn: Egzersiz detayından gelindi)
+    if (location.state?.date) {
+      return location.state.date;
     }
+    // 2. Eğer oturum içinde bir tarih seçildiyse onu kullan
+    // 3. Hiçbiri yoksa bugünü seç
+    return sessionLastSelectedDate || toISODate(new Date());
   });
+
+  // Seçilen tarihi oturum değişkenine kaydet
+  useEffect(() => {
+    sessionLastSelectedDate = selectedDate;
+  }, [selectedDate]);
+
   const [isCalendarOpen, setIsCalendarOpen] = useState(false);
   const [isImportOpen, setIsImportOpen] = useState(false);
   const [refreshKey, setRefreshKey] = useState(0);

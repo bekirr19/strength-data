@@ -324,8 +324,13 @@ export default function ExerciseDetailPage() {
         const sessionPeakOneRm = Math.max(...validSets.map(s => estimateOneRepMax(s.weight, s.reps)));
 
         // Check for PR
-        const isPr = maxWeight > runningMaxWeight;
-        if (isPr) runningMaxWeight = maxWeight;
+        let prStatus = 'none'; // 'new', 'equal', 'none'
+        if (maxWeight > runningMaxWeight) {
+          prStatus = 'new';
+          runningMaxWeight = maxWeight;
+        } else if (maxWeight === runningMaxWeight && runningMaxWeight > 0) {
+          prStatus = 'equal';
+        }
 
         // Update Hall of Fame
         if (sessionPeakOneRm > max1RM.value) {
@@ -343,7 +348,7 @@ export default function ExerciseDetailPage() {
           when,
           maxWeight,
           totalVolume: sessionVolume,
-          isPr,
+          prStatus,
           sets: setsData,
           previousMax: runningMaxWeight // Snapshot of max before this workout (approx)
         });
@@ -587,7 +592,11 @@ export default function ExerciseDetailPage() {
           <h3 className="text-sm font-bold text-gray-400 mb-4 px-1 uppercase tracking-wider">Geçmiş Antrenmanlar</h3>
           <div className="space-y-1">
             {history.map((entry) => (
-              <div key={entry.iso} className="group relative flex flex-col py-3 border-b border-white/5 last:border-0">
+              <div 
+                key={entry.iso} 
+                onClick={() => navigate('/', { state: { date: entry.iso } })}
+                className="group relative flex flex-col py-3 border-b border-white/5 last:border-0 cursor-pointer hover:bg-white/5 transition px-2 rounded-lg"
+              >
                 {/* Row Header: Date & Total Volume */}
                 <div className="flex items-center justify-between mb-1.5">
                     <span className="text-xs font-bold text-gray-400 w-24 shrink-0">
@@ -600,12 +609,25 @@ export default function ExerciseDetailPage() {
                 {/* Sets Row */}
                 <div className="flex flex-wrap items-center justify-end gap-x-3 gap-y-1 pl-8">
                     {entry.sets.map((set, sIdx) => {
-                        const isPrSet = entry.isPr && set.weight === entry.maxWeight;
+                        const isMaxSet = set.weight === entry.maxWeight;
+                        let textColor = 'text-white';
+                        let iconColor = '';
+                        
+                        if (isMaxSet) {
+                            if (entry.prStatus === 'new') {
+                                textColor = 'text-yellow-400';
+                                iconColor = 'text-yellow-500';
+                            } else if (entry.prStatus === 'equal') {
+                                textColor = 'text-cyan-400';
+                                iconColor = 'text-cyan-500';
+                            }
+                        }
+
                         return (
                             <div key={sIdx} className="flex items-baseline gap-1">
-                                <span className={`text-sm font-bold ${isPrSet ? 'text-yellow-400' : 'text-white'}`}>{set.weight}</span>
+                                <span className={`text-sm font-bold ${textColor}`}>{set.weight}</span>
                                 <span className="text-xs font-medium text-gray-400">x{set.reps}</span>
-                                {isPrSet && <span className="material-symbols-outlined text-[10px] text-yellow-500">trophy</span>}
+                                {isMaxSet && entry.prStatus !== 'none' && <span className={`material-symbols-outlined text-[10px] ${iconColor}`}>trophy</span>}
                                 {sIdx < entry.sets.length - 1 && <span className="text-gray-700 text-xs mx-1">/</span>}
                             </div>
                         );

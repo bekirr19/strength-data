@@ -1,4 +1,4 @@
-import { database } from './firebase';
+import { database } from '../firebase';
 import { ref, set, get, update, remove, onValue } from 'firebase/database';
 
 const STORAGE = {

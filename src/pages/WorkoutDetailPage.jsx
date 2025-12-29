@@ -750,7 +750,14 @@ export default function WorkoutDetailPage() {
                     EGZERSİZ {exerciseIdx + 1}
                   </p>
                   <div className="flex items-center gap-2">
-                    <h3 className="text-xl md:text-2xl font-bold text-white">
+                    <h3 
+                      className="text-xl md:text-2xl font-bold text-white cursor-pointer hover:text-primary transition"
+                      onClick={() => {
+                        if (item.name) {
+                          navigate(`/exercise/${encodeURIComponent(item.name)}`);
+                        }
+                      }}
+                    >
                       {item.name || 'İsimsiz Egzersiz'}
                     </h3>
                     <button

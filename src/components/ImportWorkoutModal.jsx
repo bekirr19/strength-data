@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { saveWorkout, toISODate, ensureExercise, resolveWeightValue, saveExercises, saveBodyWeight, clearCache, exportAllData } from '../utils/storage';
+import { saveWorkout, toISODate, ensureExercise, resolveWeightValue, saveExercises, saveBodyWeight, clearCache, exportAllData, importAllData } from '../utils/storage';
 
 export default function ImportWorkoutModal({ isOpen, onClose, selectedDate, onSuccess }) {
   const [jsonText, setJsonText] = useState('');
@@ -61,79 +61,17 @@ export default function ImportWorkoutModal({ isOpen, onClose, selectedDate, onSu
       console.log('JSON parse başarılı, data:', data);
 
       if (data && typeof data === 'object' && data.version && data.workouts) {
-        console.log('Bulk import modu - workouts sayısı:', Object.keys(data.workouts).length);
-        if (!data.workouts || typeof data.workouts !== 'object') {
-          throw new Error('Geçersiz workouts yapısı.');
-        }
-
-        const entries = Object.entries(data.workouts).filter(([dateISO, workoutPayload]) => {
-          return typeof dateISO === 'string' && dateISO && workoutPayload && typeof workoutPayload === 'object';
-        });
-
-        if (entries.length === 0) {
-          setError('Aktarılacak antrenman bulunamadı.');
-          return;
-        }
-
-        const confirmed = confirm('Bu işlem içe aktarılan günlerdeki mevcut antrenmanları siler ve yerlerine yeni verileri ekler. Egzersiz listesi ve varsa vücut ağırlığı kayıtları da güncellenecek. Devam edilsin mi?');
+        console.log('Bulk import modu (Tam Geri Yükleme)');
+        
+        const confirmed = confirm('DİKKAT: Bu işlem mevcut TÜM verileri (antrenmanlar, egzersizler, vücut ağırlığı, geliştirmeler) silebilecek ve yedek dosyasındaki verilerle değiştirecektir. Devam edilsin mi?');
         if (!confirmed) {
-          console.log('Kullanıcı import işlemini iptal etti');
           return;
         }
 
         console.log('Import onaylandı, işlem başlıyor...');
-
-        if (Array.isArray(data.exercises)) {
-          console.log('Exercises kaydediliyor:', data.exercises.length);
-          await saveExercises(data.exercises);
-        }
-
-        if (data.bodyWeight && typeof data.bodyWeight === 'object') {
-          console.log('Body weight kaydediliyor:', Object.keys(data.bodyWeight).length, 'gün');
-          for (const [dateISO, value] of Object.entries(data.bodyWeight)) {
-            if (!dateISO) continue;
-            await saveBodyWeight(dateISO, value);
-          }
-        }
-
-        let workoutCount = 0;
-        let setCount = 0;
-
-        console.log('Workouts kaydediliyor...');
-        for (const [dateISO, workoutPayload] of entries) {
-          const mergedWorkout = {
-            ...workoutPayload,
-            dateISO,
-          };
-
-          if (Array.isArray(mergedWorkout.items)) {
-            setCount += mergedWorkout.items.reduce((total, item) => {
-              if (!item || !Array.isArray(item.sets)) return total;
-              return total + item.sets.length;
-            }, 0);
-          }
-
-          console.log(`Kaydediliyor: ${dateISO}`, mergedWorkout);
-          const result = await saveWorkout(mergedWorkout);
-          console.log(`Kaydedildi: ${dateISO}`, result);
-          workoutCount += 1;
-        }
-
-        console.log(`Import tamamlandı: ${workoutCount} workout, ${setCount} set`);
-
-        const extraMessages = [];
-        if (Array.isArray(data.exercises)) {
-          extraMessages.push(`${data.exercises.length} egzersiz kaydı güncellendi`);
-        }
-        if (data.bodyWeight && typeof data.bodyWeight === 'object') {
-          const bwCount = Object.keys(data.bodyWeight).length;
-          if (bwCount > 0) {
-            extraMessages.push(`${bwCount} gün için vücut ağırlığı kaydı güncellendi`);
-          }
-        }
-
-        const extraText = extraMessages.length > 0 ? `\n${extraMessages.join('\n')}` : '';
-        alert(`✅ ${workoutCount} gün güncellendi. Toplam ${setCount} set içe aktarıldı.${extraText}`);
+        await importAllData(data);
+        
+        alert('✅ Tüm veriler başarıyla içe aktarıldı ve senkronize edildi.');
         
         // Cache'i temizle
         console.log('Import tamamlandı, cache temizleniyor...');
