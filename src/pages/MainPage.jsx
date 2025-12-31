@@ -1,11 +1,14 @@
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect, useRef, useMemo } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
-import { toISODate, formatDateTRFull, fromISO, turkishWeekdays, turkishWeekdaysShort, getWorkouts, getBodyWeightInfo, saveBodyWeight, clearBodyWeight, saveWorkout, resolveWeightValue } from '../utils/storage';
+import { toISODate, formatDateTRFull, fromISO, turkishWeekdays, turkishWeekdaysShort, getWorkouts, getBodyWeightInfo, saveBodyWeight, clearBodyWeight, saveWorkout, resolveWeightValue, getExercises, normalizeExerciseName } from '../utils/storage';
 import WeekStrip from '../components/WeekStrip';
 import CalendarModal from '../components/CalendarModal';
 import ImportWorkoutModal from '../components/ImportWorkoutModal';
 import LoadingSpinner from '../components/LoadingSpinner';
 import { detectWorkoutType, WORKOUT_TYPE_META } from '../utils/workoutTypes';
+import { getExerciseInfo } from '../utils/exerciseMetadata';
+
+const canonicalFromParts = (canonical, name) => normalizeExerciseName(canonical || name || '');
 
 // SPA içinde gezinirken tarihi hatırlamak için modül seviyesinde değişken.
 // Sayfa yenilendiğinde (refresh) bu değişken sıfırlanır.
@@ -49,8 +52,139 @@ export default function MainPage() {
   const weightInputRef = useRef(null);
   const touchStateRef = useRef({ startX: 0, startY: 0, lastX: 0, lastY: 0, active: false });
 
+  // Exercise Picker State
+  const [isPickerOpen, setIsPickerOpen] = useState(false);
+  const [pickerSearch, setPickerSearch] = useState('');
+  const [exerciseLibrary, setExerciseLibrary] = useState([]);
+
   // Exercise Quick Edit State
   const [editingExercise, setEditingExercise] = useState(null);
+
+  const filteredLibrary = useMemo(() => {
+    const query = pickerSearch.trim().toLowerCase();
+
+    return exerciseLibrary
+      .map((exercise) => {
+        const displayName = exercise.displayName || exercise.name;
+        const canonical = canonicalFromParts(exercise.canonicalName, displayName);
+        const info = getExerciseInfo(displayName, exercise);
+        return {
+          exercise,
+          displayName,
+          canonical,
+          info,
+        };
+      })
+      .filter(({ displayName, canonical, info }) => {
+        if (!query) return true;
+        const nameLower = displayName.toLowerCase();
+        const canonicalLower = canonical.toLowerCase();
+        if (nameLower.includes(query) || canonicalLower.includes(query)) return true;
+        return info.muscleLabels.some((label) => label.toLowerCase().includes(query));
+      })
+      .sort((a, b) => {
+        return a.displayName.localeCompare(b.displayName, 'tr');
+      });
+  }, [exerciseLibrary, pickerSearch]);
+
+  const openExercisePicker = async () => {
+    const exercisesData = await getExercises();
+    setExerciseLibrary(exercisesData);
+    setPickerSearch('');
+    setIsPickerOpen(true);
+  };
+
+  const closeExercisePicker = () => {
+    setIsPickerOpen(false);
+    setPickerSearch('');
+  };
+
+  const handleSelectExercise = async ({ displayName, canonical }) => {
+    // 1. Get or create workout
+    let workout = workoutsByDate[selectedDate];
+    if (!workout) {
+      workout = {
+        dateISO: selectedDate,
+        items: [],
+        workoutName: '',
+        workoutFocus: [],
+        workoutFuel: '',
+        notes: ''
+      };
+    }
+
+    // 2. Add new item
+    const newItem = {
+      name: displayName,
+      displayName: displayName,
+      canonicalName: canonical,
+      sets: [{ w: '', r: '' }]
+    };
+    
+    const updatedItems = [...(workout.items || []), newItem];
+    const updatedWorkout = { ...workout, items: updatedItems };
+
+    try {
+      // 3. Save
+      await saveWorkout(updatedWorkout);
+      
+      // 4. Update local state immediately
+      setWorkoutsByDate(prev => ({
+        ...prev,
+        [selectedDate]: updatedWorkout
+      }));
+      
+      // 5. Close Picker
+      setIsPickerOpen(false);
+
+      // 6. Open Quick Edit with AutoFocus
+      const newIndex = updatedItems.length - 1;
+      openQuickEdit(newItem, newIndex, true);
+    } catch (error) {
+      console.error('Egzersiz eklenirken hata:', error);
+      alert('Egzersiz eklenirken bir hata oluştu.');
+    }
+  };
+
+  const handleManualAddExercise = async () => {
+    // 1. Get or create workout
+    let workout = workoutsByDate[selectedDate];
+    if (!workout) {
+      workout = {
+        dateISO: selectedDate,
+        items: [],
+        workoutName: '',
+        workoutFocus: [],
+        workoutFuel: '',
+        notes: ''
+      };
+    }
+
+    // 2. Add new item
+    const newItem = {
+      name: '',
+      displayName: '',
+      canonicalName: '',
+      sets: [{ w: '', r: '' }]
+    };
+    
+    const updatedItems = [...(workout.items || []), newItem];
+    const updatedWorkout = { ...workout, items: updatedItems };
+
+    try {
+      await saveWorkout(updatedWorkout);
+      setWorkoutsByDate(prev => ({
+        ...prev,
+        [selectedDate]: updatedWorkout
+      }));
+      
+      setIsPickerOpen(false);
+      const newIndex = updatedItems.length - 1;
+      openQuickEdit(newItem, newIndex, true);
+    } catch (error) {
+      console.error('Manuel egzersiz eklenirken hata:', error);
+    }
+  };
 
   const adjustWeight = (current, delta) => {
     const normalized = String(current ?? '').trim();
@@ -80,10 +214,11 @@ export default function MainPage() {
     return clamped % 1 === 0 ? String(clamped) : clamped.toFixed(1);
   };
 
-  const openQuickEdit = (item, index) => {
+  const openQuickEdit = (item, index, autoFocus = false) => {
     setEditingExercise({
       index,
-      data: JSON.parse(JSON.stringify(item))
+      data: JSON.parse(JSON.stringify(item)),
+      autoFocus
     });
   };
 
@@ -106,8 +241,10 @@ export default function MainPage() {
     setEditingExercise(prev => {
       if (!prev) return null;
       const newData = { ...prev.data };
-      const lastSet = newData.sets[newData.sets.length - 1] || { w: '', r: '' };
-      newData.sets.push({ w: lastSet.w || '', r: lastSet.r || '' });
+      const newSets = [...newData.sets];
+      const lastSet = newSets[newSets.length - 1] || { w: '', r: '' };
+      newSets.push({ w: lastSet.w || '', r: lastSet.r || '' });
+      newData.sets = newSets;
       return { ...prev, data: newData };
     });
   };
@@ -116,7 +253,9 @@ export default function MainPage() {
     setEditingExercise(prev => {
       if (!prev) return null;
       const newData = { ...prev.data };
-      newData.sets.splice(setIdx, 1);
+      const newSets = [...newData.sets];
+      newSets.splice(setIdx, 1);
+      newData.sets = newSets;
       return { ...prev, data: newData };
     });
   };
@@ -125,8 +264,10 @@ export default function MainPage() {
     setEditingExercise(prev => {
       if (!prev) return null;
       const newData = { ...prev.data };
-      const source = newData.sets[setIdx];
-      newData.sets.splice(setIdx + 1, 0, { ...source });
+      const newSets = [...newData.sets];
+      const source = newSets[setIdx];
+      newSets.push({ ...source });
+      newData.sets = newSets;
       return { ...prev, data: newData };
     });
   };
@@ -817,7 +958,7 @@ export default function MainPage() {
         </button>
 
         <button
-          onClick={() => navigate('/workout/' + selectedDate, { state: { openPicker: true } })}
+          onClick={openExercisePicker}
           className="inline-flex flex-1 items-center justify-center gap-2 rounded-full bg-primary text-background-dark px-6 py-3 font-bold shadow-xl shadow-primary/25 hover:shadow-primary/40 hover:bg-primary/90 transition text-base"
         >
           <span className="material-symbols-outlined text-2xl">add</span>
@@ -834,6 +975,93 @@ export default function MainPage() {
         }}
         onSelectDate={handleSelectDate}
       />
+
+      {/* Exercise Picker Modal */}
+      {isPickerOpen && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 backdrop-blur-sm p-4">
+          <div className="w-full max-w-md bg-[#1C1C1E] border border-white/10 rounded-3xl shadow-2xl shadow-black/50 h-[80vh] flex flex-col overflow-hidden">
+            {/* Header */}
+            <div className="flex items-center justify-between px-5 pt-5 pb-3 border-b border-white/5">
+              <div>
+                <h3 className="text-white text-lg font-bold uppercase tracking-wide">EGZERSİZ SEÇ</h3>
+                <p className="text-gray-400 text-xs">Listeden seç veya yeni ekle</p>
+              </div>
+              <button
+                onClick={closeExercisePicker}
+                className="flex items-center justify-center size-8 rounded-full bg-white/10 text-gray-400 hover:text-white hover:bg-white/20 transition"
+                aria-label="Kapat"
+              >
+                <span className="material-symbols-outlined text-lg">close</span>
+              </button>
+            </div>
+
+            {/* Search */}
+            <div className="px-5 py-3 border-b border-white/5 bg-[#1C1C1E]">
+              <div className="relative">
+                <span className="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-gray-500 text-xl">search</span>
+                <input
+                  type="text"
+                  value={pickerSearch}
+                  onChange={(e) => setPickerSearch(e.target.value)}
+                  className="w-full pl-10 pr-4 py-3 bg-black/40 border border-white/10 rounded-xl text-white text-sm focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary placeholder:text-gray-600 transition"
+                  placeholder="Egzersiz ara..."
+                  autoFocus
+                />
+              </div>
+            </div>
+
+            {/* List */}
+            <div className="flex-1 overflow-y-auto custom-scrollbar">
+              {filteredLibrary.length === 0 ? (
+                <div className="p-8 text-center">
+                  <p className="text-gray-400 text-sm mb-4">Aradığın kriterlere uygun egzersiz bulunamadı.</p>
+                  <button
+                     onClick={handleManualAddExercise}
+                     className="text-primary text-sm font-bold hover:underline"
+                  >
+                    Manuel Ekle
+                  </button>
+                </div>
+              ) : (
+                <div className="divide-y divide-white/5">
+                  {filteredLibrary.map(({ displayName, canonical, info }) => (
+                    <button
+                      key={canonical}
+                      onClick={() => handleSelectExercise({ displayName, canonical })}
+                      className="w-full flex items-center justify-between px-5 py-4 hover:bg-white/5 transition text-left group"
+                    >
+                      <div className="flex flex-col gap-1">
+                        <span className="text-white text-base font-bold group-hover:text-primary transition">{displayName}</span>
+                        <div className="flex items-center gap-2 text-xs text-gray-500">
+                          <span className="uppercase font-bold tracking-wider">{info.category}</span>
+                          {info.muscleLabels.length > 0 && (
+                            <>
+                              <span className="size-1 rounded-full bg-gray-600"></span>
+                              <span>{info.muscleLabels.join(', ')}</span>
+                            </>
+                          )}
+                        </div>
+                      </div>
+                      <div className="flex items-center justify-center size-8 rounded-full border border-white/10 text-gray-400 group-hover:border-primary group-hover:text-primary transition">
+                        <span className="material-symbols-outlined text-xl">add</span>
+                      </div>
+                    </button>
+                  ))}
+                  
+                  {/* Manual Add Button at the end of list */}
+                   <button
+                    onClick={handleManualAddExercise}
+                    className="w-full flex items-center justify-center gap-2 px-5 py-4 text-primary hover:bg-white/5 transition font-semibold text-sm"
+                  >
+                    <span className="material-symbols-outlined">add</span>
+                    Yeni Egzersiz Ekle
+                  </button>
+                </div>
+              )}
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* Import Modal */}
       <ImportWorkoutModal
@@ -912,6 +1140,8 @@ export default function MainPage() {
                           onChange={(e) => handleQuickEditSetChange(setIdx, 'w', e.target.value)}
                           className="w-full bg-transparent text-center text-white font-bold text-base focus:outline-none"
                           placeholder="0"
+                          autoFocus={setIdx === 0 && editingExercise.autoFocus}
+                          onFocus={(e) => e.target.select()}
                         />
                       </div>
                       <button

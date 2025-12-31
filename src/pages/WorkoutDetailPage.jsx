@@ -29,6 +29,7 @@ export default function WorkoutDetailPage() {
     },
   });
   const [isSavingExerciseEdit, setIsSavingExerciseEdit] = useState(false);
+  const [focusTarget, setFocusTarget] = useState(null); // { exerciseIdx, setIdx, field: 'w' | 'r' }
 
   const normalizeWorkoutLabel = (name) => {
     const lower = (name || '').toLowerCase();
@@ -277,10 +278,11 @@ export default function WorkoutDetailPage() {
   };
 
   const handleManualAddExercise = () => {
-    setWorkout({
-      ...workout,
-      items: [...workout.items, { name: '', displayName: '', canonicalName: '', sets: [{ w: '', r: '' }] }],
-    });
+    setWorkout((prev) => ({
+      ...prev,
+      items: [...prev.items, { name: '', displayName: '', canonicalName: '', sets: [{ w: '', r: '' }] }],
+    }));
+    setFocusTarget({ exerciseIdx: workout.items.length, setIdx: 0, field: 'w' });
     closeExercisePicker();
   };
 
@@ -472,6 +474,7 @@ export default function WorkoutDetailPage() {
       ...prev,
       items: [...prev.items, { name: displayName, displayName, canonicalName: canonical, sets: [{ w: '', r: '' }] }],
     }));
+    setFocusTarget({ exerciseIdx: workout.items.length, setIdx: 0, field: 'w' });
     closeExercisePicker();
   };
 
@@ -513,7 +516,7 @@ export default function WorkoutDetailPage() {
       const sets = [...(target.sets || [])];
       const source = sets[setIdx];
       if (!source) return prev;
-      sets.splice(setIdx + 1, 0, { ...source });
+      sets.push({ ...source });
       target.sets = sets;
       items[exerciseIdx] = target;
       return { ...prev, items };
@@ -811,6 +814,8 @@ export default function WorkoutDetailPage() {
                             onChange={(e) => handleSetChange(exerciseIdx, setIdx, 'w', e.target.value)}
                             className="w-full bg-transparent text-center text-white font-bold text-base focus:outline-none"
                             placeholder="0"
+                            autoFocus={focusTarget?.exerciseIdx === exerciseIdx && focusTarget?.setIdx === setIdx && focusTarget?.field === 'w'}
+                            onFocus={(e) => e.target.select()}
                           />
                         </div>
                         <button
