@@ -166,7 +166,16 @@ export default function WeekStrip({ selectedDate, onDateSelect, refreshKey }) {
               }
 
               if (isSelected) {
-                paletteClasses = 'bg-primary text-background-dark border border-primary shadow-lg shadow-primary/40 ring-2 ring-white/20';
+                if (typeMeta) {
+                  // Seçili gün ve antrenman var: Kendi rengini koru ama seçili olduğunu belli et (parlak border + shadow)
+                  paletteClasses = `${typeMeta.buttonClass} ring-2 ring-white/50 shadow-lg shadow-black/50 scale-105 z-10`;
+                } else if (hasWorkout) {
+                  // Antrenman var ama tipi yok (Generic): Primary tonunu koru
+                  paletteClasses = 'bg-primary/20 text-primary font-bold border border-primary/50 ring-2 ring-white/50 shadow-lg shadow-primary/20 scale-105 z-10';
+                } else {
+                  // Boş gün seçili: Yeşil yapma, nötr gri/beyaz tonlarında seçili olduğunu göster
+                  paletteClasses = 'bg-white/10 text-white border border-white/20 ring-2 ring-white/50 shadow-lg shadow-black/50 scale-105 z-10';
+                }
               } else if (isToday) {
                 paletteClasses += ' ring-1 ring-primary/50';
               }
@@ -187,7 +196,7 @@ export default function WeekStrip({ selectedDate, onDateSelect, refreshKey }) {
                   <span className="mt-0.5 md:mt-1 text-lg md:text-xl font-bold">
                     {d.getDate()}
                   </span>
-                  {typeMeta && !isSelected && (
+                  {typeMeta && (
                     <span className="mt-0.5 text-[9px] font-bold uppercase tracking-wide opacity-90">
                       {typeMeta.label}
                     </span>
@@ -197,7 +206,7 @@ export default function WeekStrip({ selectedDate, onDateSelect, refreshKey }) {
                       Workout
                     </span>
                   )}
-                  {isSelected && (
+                  {isSelected && !typeMeta && (
                     <span className="absolute bottom-1.5 h-1 w-1 rounded-full bg-background-dark/60"></span>
                   )}
                 </button>

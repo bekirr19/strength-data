@@ -1,11 +1,12 @@
-import { database } from '../firebase';
+import { database, auth } from '../firebase';
 import { ref, set, get, update, remove, onValue } from 'firebase/database';
+import { DEFAULT_EXERCISES } from '../data/defaultExercises';
 
 const STORAGE = {
-  EXERCISES: 'gym_exercises_v1',
-  WORKOUTS: 'gym_workouts_v1',
-  BODY_WEIGHT: 'gym_body_weight_v1',
-  IMPROVEMENTS: 'gym_improvements_v1',
+  EXERCISES: 'exercises',
+  WORKOUTS: 'workouts',
+  BODY_WEIGHT: 'body_weight',
+  IMPROVEMENTS: 'improvements',
 };
 
 const EXERCISE_SYNONYMS = {
@@ -101,9 +102,18 @@ let cachedData = {
 
 const CACHE_DURATION = 5000; // 5 saniye cache
 
+function getUserPath(key) {
+  const user = auth.currentUser;
+  if (!user) {
+    throw new Error('Kullanıcı oturumu açık değil.');
+  }
+  return `users/${user.uid}/${key}`;
+}
+
 // Firebase'den veri okuma helper fonksiyonu
-async function getFirebaseData(path) {
+async function getFirebaseData(key) {
   try {
+    const path = getUserPath(key);
     console.log(`Firebase'den okunuyor: ${path}`);
     const dataRef = ref(database, path);
     const snapshot = await get(dataRef);
@@ -112,52 +122,51 @@ async function getFirebaseData(path) {
     console.log(`Firebase okuma sonucu (${path}): exists=${exists}, data=`, data);
     return data;
   } catch (error) {
-    console.error(`Firebase'den veri okunurken hata (${path}):`, error);
-    // Fallback: LocalStorage'dan oku
-    return getFallbackFromLocalStorage(path);
+    console.error(`Firebase'den veri okunurken hata (${key}):`, error);
+    return null;
   }
 }
 
 // Firebase'e veri yazma helper fonksiyonu
-async function setFirebaseData(path, data) {
+async function setFirebaseData(key, data) {
   try {
+    const path = getUserPath(key);
     console.log(`Firebase'e yazılıyor: ${path}`, data);
     const dataRef = ref(database, path);
     await set(dataRef, data);
     console.log(`Firebase yazma başarılı: ${path}`);
     // Cache'i güncelle
-    updateCache(path, data);
-    console.log(`Cache güncellendi: ${path}`);
+    updateCache(key, data);
+    console.log(`Cache güncellendi: ${key}`);
   } catch (error) {
-    console.error(`Firebase'e veri yazılırken hata (${path}):`, error);
-    // Fallback: LocalStorage'a yaz
-    setFallbackToLocalStorage(path, data);
+    console.error(`Firebase'e veri yazılırken hata (${key}):`, error);
   }
 }
 
 // Firebase'den veri silme
-async function removeFirebaseData(path) {
+async function removeFirebaseData(key) {
   try {
+    const path = getUserPath(key);
     const dataRef = ref(database, path);
     await remove(dataRef);
   } catch (error) {
-    console.error(`Firebase'den veri silinirken hata (${path}):`, error);
+    console.error(`Firebase'den veri silinirken hata (${key}):`, error);
   }
 }
 
 // Cache güncelleme
-function updateCache(path, data) {
+function updateCache(key, data) {
   const now = Date.now();
-  if (path.includes(STORAGE.EXERCISES)) {
+  if (key === STORAGE.EXERCISES) {
     cachedData.exercises = data;
     cachedData.lastFetch.exercises = now;
-  } else if (path.includes(STORAGE.WORKOUTS)) {
+  } else if (key === STORAGE.WORKOUTS) {
     cachedData.workouts = data;
     cachedData.lastFetch.workouts = now;
-  } else if (path.includes(STORAGE.BODY_WEIGHT)) {
+  } else if (key === STORAGE.BODY_WEIGHT) {
     cachedData.bodyWeight = data;
     cachedData.lastFetch.bodyWeight = now;
-  } else if (path.includes(STORAGE.IMPROVEMENTS)) {
+  } else if (key === STORAGE.IMPROVEMENTS) {
     cachedData.improvements = data;
     cachedData.lastFetch.improvements = now;
   }
@@ -475,7 +484,8 @@ function normalizeWorkoutItems(items) {
       
       // Ağırlık kontrolü - Body Weight veya geçerli sayı olmalı
       const isBodyWeight = set.wDisplay && (set.wDisplay === 'Body Weight' || set.wDisplay.startsWith('BW'));
-      const hasValidWeight = Number.isFinite(set.w) && set.w > 0;
+      // Ağırlık 0 olabilir (vücut ağırlığı veya sadece tekrar takibi için)
+      const hasValidWeight = Number.isFinite(set.w) && set.w >= 0;
       
       if (!isBodyWeight && !hasValidWeight) {
         console.warn(`Set filtrelendi (geçersiz ağırlık): ${rawName}`, set);
@@ -553,13 +563,7 @@ export async function getExercises() {
   }
 
   // İlk kez çalıştırılıyorsa seed data ekle
-  const seed = [
-    { name: 'Bench Press', displayName: 'Bench Press', canonicalName: 'Bench Press', createdAt: Date.now(), used: 0, pr: 100 },
-    { name: 'Squat', displayName: 'Squat', canonicalName: 'Squat', createdAt: Date.now(), used: 0, pr: 120 },
-    { name: 'Deadlift', displayName: 'Deadlift', canonicalName: 'Deadlift', createdAt: Date.now(), used: 0, pr: 150 },
-    { name: 'Overhead Press', displayName: 'Overhead Press', canonicalName: 'Overhead Press', createdAt: Date.now(), used: 0, pr: 60 },
-    { name: 'Pull Up', displayName: 'Pull Up', canonicalName: 'Pull Up', createdAt: Date.now(), used: 0, pr: 0, prReps: 12 },
-  ];
+  const seed = DEFAULT_EXERCISES;
   await setFirebaseData(STORAGE.EXERCISES, seed);
   updateCache(STORAGE.EXERCISES, seed);
   return seed;
@@ -656,7 +660,8 @@ export async function getWorkouts() {
   // Cache kontrolü
   if (cachedData.workouts && isCacheValid('workouts')) {
     console.log('getWorkouts: Cache\'den döndürülüyor, sayı:', Object.keys(cachedData.workouts || {}).length);
-    return cachedData.workouts;
+    // Return a deep copy to prevent in-place mutation bugs
+    return JSON.parse(JSON.stringify(cachedData.workouts));
   }
 
   console.log('getWorkouts: Firebase\'den çekiliyor...');
@@ -667,7 +672,7 @@ export async function getWorkouts() {
     const normalized = normalizeWorkoutCollection(data);
     console.log('getWorkouts: Normalize edildi:', Object.keys(normalized).length, 'gün');
     updateCache(STORAGE.WORKOUTS, normalized);
-    return normalized;
+    return JSON.parse(JSON.stringify(normalized));
   }
 
   console.log('getWorkouts: Veri yok, seed data oluşturuluyor...');
@@ -724,11 +729,11 @@ export async function saveWorkout(workout) {
     ...item,
     sets: item.sets.map(set => {
       // Body Weight set'i mi?
-      if (set.wDisplay === 'Body Weight') {
+      if (set.wDisplay === 'Body Weight' || set.wDisplay === 'BW') {
         return {
           ...set,
           w: bodyWeightKg,
-          wDisplay: 'Body Weight',
+          wDisplay: 'BW',
         };
       }
       // BW+X formatı mı?
@@ -776,6 +781,31 @@ export async function saveWorkout(workout) {
   }
   
   console.log('saveWorkout tamamlandı:', normalizedWorkout.dateISO);
+}
+
+export async function moveWorkout(oldDateISO, newDateISO) {
+  if (!oldDateISO || !newDateISO || oldDateISO === newDateISO) return;
+
+  const all = await getWorkouts();
+  const workout = all[oldDateISO];
+
+  if (!workout) return;
+
+  // Yeni tarihte zaten veri varsa, üzerine yazılacak (veya birleştirilebilir, şimdilik üzerine yazıyoruz)
+  // Ancak kullanıcı deneyimi açısından bunu UI tarafında kontrol etmek daha iyi olabilir.
+  // Burada direkt taşıma yapıyoruz.
+
+  const newWorkout = {
+    ...workout,
+    dateISO: newDateISO,
+    items: (workout.items || []).map(item => ({ ...item, dateISO: newDateISO }))
+  };
+
+  all[newDateISO] = newWorkout;
+  delete all[oldDateISO];
+
+  await setFirebaseData(STORAGE.WORKOUTS, all);
+  updateCache(STORAGE.WORKOUTS, all);
 }
 
 export function resolveWeightValue(weightInput, exerciseName, dateISO) {
@@ -830,7 +860,7 @@ export function resolveWeightValue(weightInput, exerciseName, dateISO) {
         display = `BW+${formatNumber(additional)}`;
       }
     } else {
-      display = 'Body Weight';
+      display = 'BW';
     }
     return { value, display };
   }
@@ -957,49 +987,73 @@ export function formatDateTRShort(date) {
 // =====================================================================
 
 export function subscribeToExercises(callback) {
-  const exercisesRef = ref(database, STORAGE.EXERCISES);
-  return onValue(exercisesRef, (snapshot) => {
-    const data = snapshot.val();
-    if (data) {
-      const normalized = normalizeExerciseList(data);
-      updateCache(STORAGE.EXERCISES, normalized);
-      callback(normalized);
-    }
-  });
+  try {
+    const path = getUserPath(STORAGE.EXERCISES);
+    const exercisesRef = ref(database, path);
+    return onValue(exercisesRef, (snapshot) => {
+      const data = snapshot.val();
+      if (data) {
+        const normalized = normalizeExerciseList(data);
+        updateCache(STORAGE.EXERCISES, normalized);
+        callback(normalized);
+      }
+    });
+  } catch (error) {
+    console.warn('subscribeToExercises: Kullanıcı oturumu yok.', error);
+    return () => {};
+  }
 }
 
 export function subscribeToWorkouts(callback) {
-  const workoutsRef = ref(database, STORAGE.WORKOUTS);
-  return onValue(workoutsRef, (snapshot) => {
-    const data = snapshot.val();
-    if (data) {
-      const normalized = normalizeWorkoutCollection(data);
-      updateCache(STORAGE.WORKOUTS, normalized);
-      callback(normalized);
-    }
-  });
+  try {
+    const path = getUserPath(STORAGE.WORKOUTS);
+    const workoutsRef = ref(database, path);
+    return onValue(workoutsRef, (snapshot) => {
+      const data = snapshot.val();
+      if (data) {
+        const normalized = normalizeWorkoutCollection(data);
+        updateCache(STORAGE.WORKOUTS, normalized);
+        callback(normalized);
+      }
+    });
+  } catch (error) {
+    console.warn('subscribeToWorkouts: Kullanıcı oturumu yok.', error);
+    return () => {};
+  }
 }
 
 export function subscribeToBodyWeight(callback) {
-  const bodyWeightRef = ref(database, STORAGE.BODY_WEIGHT);
-  return onValue(bodyWeightRef, (snapshot) => {
-    const data = snapshot.val();
-    if (data) {
-      updateCache(STORAGE.BODY_WEIGHT, data);
-      callback(data);
-    }
-  });
+  try {
+    const path = getUserPath(STORAGE.BODY_WEIGHT);
+    const bodyWeightRef = ref(database, path);
+    return onValue(bodyWeightRef, (snapshot) => {
+      const data = snapshot.val();
+      if (data) {
+        updateCache(STORAGE.BODY_WEIGHT, data);
+        callback(data);
+      }
+    });
+  } catch (error) {
+    console.warn('subscribeToBodyWeight: Kullanıcı oturumu yok.', error);
+    return () => {};
+  }
 }
 
 export function subscribeToImprovements(callback) {
-  const improvementsRef = ref(database, STORAGE.IMPROVEMENTS);
-  return onValue(improvementsRef, (snapshot) => {
-    const data = snapshot.val();
-    const map = data && typeof data === 'object' ? data : {};
-    updateCache(STORAGE.IMPROVEMENTS, map);
-    const list = Object.values(map)
-      .filter((item) => item && typeof item === 'object' && item.id)
-      .sort((a, b) => (b.updatedAt || 0) - (a.updatedAt || 0));
-    callback(list);
-  });
+  try {
+    const path = getUserPath(STORAGE.IMPROVEMENTS);
+    const improvementsRef = ref(database, path);
+    return onValue(improvementsRef, (snapshot) => {
+      const data = snapshot.val();
+      const map = data && typeof data === 'object' ? data : {};
+      updateCache(STORAGE.IMPROVEMENTS, map);
+      const list = Object.values(map)
+        .filter((item) => item && typeof item === 'object' && item.id)
+        .sort((a, b) => (b.updatedAt || 0) - (a.updatedAt || 0));
+      callback(list);
+    });
+  } catch (error) {
+    console.warn('subscribeToImprovements: Kullanıcı oturumu yok.', error);
+    return () => {};
+  }
 }

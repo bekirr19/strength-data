@@ -76,6 +76,8 @@ const EXERCISE_LIBRARY = [
   { name: 'Push Up', category: 'push', muscles: ['chest', 'shoulders', 'triceps', 'core'] },
   // Push - Shoulders
   { name: 'Overhead Press', category: 'push', muscles: ['shoulders', 'triceps'] },
+  { name: 'Barbell Overhead Press', category: 'push', muscles: ['shoulders', 'triceps'] },
+  { name: 'Dumbbell Overhead Press', category: 'push', muscles: ['shoulders', 'triceps'] },
   { name: 'Front Shoulder', category: 'push', muscles: ['shoulders'] },
   { name: 'Lateral Raise', category: 'push', muscles: ['shoulders'] },
   { name: 'Face Pull', category: 'push', muscles: ['shoulders', 'rearShoulders', 'back'] },

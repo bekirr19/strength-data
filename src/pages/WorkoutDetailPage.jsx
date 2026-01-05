@@ -1,9 +1,30 @@
-import { useState, useEffect, useMemo } from 'react';
+import { useState, useEffect, useMemo, useRef } from 'react';
 import { useNavigate, useParams, useLocation } from 'react-router-dom';
-import { getWorkoutByDate, getWorkouts, saveWorkout, deleteWorkout, formatDateTRFull, resolveWeightValue, getExercises, saveExercises, renameExerciseEverywhere, normalizeExerciseName } from '../utils/storage';
+import { getWorkoutByDate, getWorkouts, saveWorkout, deleteWorkout, moveWorkout, formatDateTRFull, resolveWeightValue, getExercises, saveExercises, renameExerciseEverywhere, normalizeExerciseName } from '../utils/storage';
 import { getExerciseInfo, EXERCISE_CATEGORY_META, MUSCLE_OPTIONS } from '../utils/exerciseMetadata';
 
 const CATEGORY_ORDER = ['push', 'pull', 'leg', 'other'];
+
+const normalizeFocus = (focusArray = []) =>
+  Array.from(
+    new Set(
+      focusArray
+        .filter(Boolean)
+        .map((f) => f.trim())
+        .filter(Boolean)
+    )
+  ).sort((a, b) => a.localeCompare(b, 'tr'));
+
+const focusKey = (focusArray = []) => normalizeFocus(focusArray).join('|').toLowerCase();
+
+const inferFocusFromName = (name = '') => {
+  const lower = name.toLowerCase();
+  const set = new Set();
+  if (lower.includes('push')) set.add('Push');
+  if (lower.includes('pull')) set.add('Pull');
+  if (lower.includes('leg') || lower.includes('bacak')) set.add('Leg');
+  return normalizeFocus(Array.from(set));
+};
 const canonicalFromParts = (canonical, name) => normalizeExerciseName(canonical || name || '');
 const canonicalKeyFromParts = (canonical, name) => canonicalFromParts(canonical, name).toLowerCase();
 
@@ -30,6 +51,7 @@ export default function WorkoutDetailPage() {
   });
   const [isSavingExerciseEdit, setIsSavingExerciseEdit] = useState(false);
   const [focusTarget, setFocusTarget] = useState(null); // { exerciseIdx, setIdx, field: 'w' | 'r' }
+  const dateInputRef = useRef(null);
 
   const normalizeWorkoutLabel = (name) => {
     const lower = (name || '').toLowerCase();
@@ -37,6 +59,13 @@ export default function WorkoutDetailPage() {
     if (lower.includes('pull')) return 'Pull Day';
     if (lower.includes('leg') || lower.includes('bacak')) return 'Leg Day';
     return '';
+  };
+
+  const labelFromFocus = (focusArray = []) => {
+    const normalized = normalizeFocus(focusArray);
+    if (normalized.length === 0) return '';
+    if (normalized.length === 1) return `${normalized[0]} Day`;
+    return normalized.join(' + ');
   };
 
   const inferWorkoutTypeFromHistory = async (targetDate, cachedWorkouts) => {
@@ -139,10 +168,14 @@ export default function WorkoutDetailPage() {
         
         if (existing) {
           const normalizedName = normalizeWorkoutLabel(existing.workoutName);
+          const inferredFocus = Array.isArray(existing.workoutFocus) && existing.workoutFocus.length > 0
+            ? normalizeFocus(existing.workoutFocus)
+            : inferFocusFromName(existing.workoutName || normalizedName);
+
           setWorkout({
             ...existing,
             workoutName: normalizedName,
-            workoutFocus: Array.isArray(existing.workoutFocus) ? existing.workoutFocus : [],
+            workoutFocus: inferredFocus,
             items: (existing.items || []).map((item) => ({
               ...item,
               name: item.displayName || item.name,
@@ -162,7 +195,7 @@ export default function WorkoutDetailPage() {
           setWorkout({
             dateISO: date,
             workoutName: inferredType || '',
-            workoutFocus: [],
+            workoutFocus: inferFocusFromName(inferredType || ''),
             workoutFuel: '',
             items: [],
             notes: '',
@@ -222,7 +255,11 @@ export default function WorkoutDetailPage() {
     }));
   };
 
-  const selectWorkoutTemplate = async (nextWorkoutName) => {
+  const selectWorkoutTemplateByFocus = async (nextFocus) => {
+    const normalizedFocus = normalizeFocus(nextFocus);
+    const targetKey = focusKey(normalizedFocus);
+    const targetLabel = labelFromFocus(normalizedFocus);
+
     try {
       const all = await getWorkouts();
       setWorkoutsByDate(all || {});
@@ -232,31 +269,36 @@ export default function WorkoutDetailPage() {
         .map(([dateKey]) => dateKey)
         .filter((dateKey) => dateKey !== workout.dateISO)
         .sort((a, b) => (a > b ? -1 : 1));
-      const normalizedTarget = (nextWorkoutName || '').toLowerCase();
 
       const latestMatch = sortedDates.find((dateKey) => {
         const candidate = all[dateKey];
         if (!candidate) return false;
 
-        const candidateName = (candidate.workoutName || '').toLowerCase();
-        const candidateType = candidateName.replace(' day', '');
-        const targetType = normalizedTarget.replace(' day', '');
+        const candidateFocus = Array.isArray(candidate.workoutFocus) ? candidate.workoutFocus : [];
+        const candidateKey = focusKey(candidateFocus);
         const hasExercises = Array.isArray(candidate.items) && candidate.items.length > 0;
 
-        return hasExercises && (candidateName === normalizedTarget || candidateType === targetType);
+        if (hasExercises && candidateKey === targetKey) return true;
+
+        // Fallback: eski kayıtlar sadece isim içeriyorsa, isimde tüm etiketler geçiyorsa eşleştir
+        const nameLower = (candidate.workoutName || '').toLowerCase();
+        const allNamesMatch = normalizedFocus.every((f) => nameLower.includes(f.toLowerCase()));
+        return hasExercises && normalizedFocus.length > 0 && allNamesMatch;
       });
 
       if (latestMatch) {
         const template = all[latestMatch];
         setWorkout((prev) => ({
           ...prev,
-          workoutName: nextWorkoutName,
+          workoutName: targetLabel,
+          workoutFocus: normalizedFocus,
           items: mapTemplateItems(template.items),
         }));
       } else {
         setWorkout((prev) => ({
           ...prev,
-          workoutName: nextWorkoutName,
+          workoutName: targetLabel,
+          workoutFocus: normalizedFocus,
           items: [{ name: '', displayName: '', canonicalName: '', sets: [{ w: '', r: '' }] }],
         }));
       }
@@ -264,7 +306,8 @@ export default function WorkoutDetailPage() {
       console.error('Antrenman şablonu seçilirken hata:', error);
       setWorkout((prev) => ({
         ...prev,
-        workoutName: nextWorkoutName,
+        workoutName: targetLabel,
+        workoutFocus: normalizedFocus,
         items: [{ name: '', displayName: '', canonicalName: '', sets: [{ w: '', r: '' }] }],
       }));
     }
@@ -284,6 +327,31 @@ export default function WorkoutDetailPage() {
     }));
     setFocusTarget({ exerciseIdx: workout.items.length, setIdx: 0, field: 'w' });
     closeExercisePicker();
+  };
+
+  const handleToggleFocus = async (label) => {
+    const nextFocus = normalizeFocus(
+      (workout.workoutFocus || []).includes(label)
+        ? (workout.workoutFocus || []).filter((f) => f !== label)
+        : [...(workout.workoutFocus || []), label]
+    );
+
+    const nextLabel = labelFromFocus(nextFocus);
+
+    setWorkout((prev) => ({
+      ...prev,
+      workoutFocus: nextFocus,
+      workoutName: nextLabel,
+    }));
+  };
+
+  const handleLoadTemplateFromHistory = async () => {
+    const currentFocus = normalizeFocus(workout.workoutFocus || []);
+    if (currentFocus.length === 0) {
+      alert('Lütfen önce en az bir tür seçin.');
+      return;
+    }
+    await selectWorkoutTemplateByFocus(currentFocus);
   };
 
   const openExerciseEditModal = async (exerciseIdx) => {
@@ -572,6 +640,37 @@ export default function WorkoutDetailPage() {
     }
   };
 
+  const handleDateChange = async (e) => {
+    const newDate = e.target.value;
+    if (!newDate || newDate === date) return;
+
+    try {
+      const targetWorkout = await getWorkoutByDate(newDate);
+      if (targetWorkout && Array.isArray(targetWorkout.items) && targetWorkout.items.length > 0) {
+        alert(`Seçilen tarihte (${newDate}) zaten bir antrenman kaydı mevcut. Lütfen başka bir tarih seçin.`);
+        if (dateInputRef.current) {
+          dateInputRef.current.value = date;
+        }
+        return;
+      }
+
+      if (confirm(`Antrenmanı ${newDate} tarihine taşımak istediğinize emin misiniz?`)) {
+        await moveWorkout(date, newDate);
+        navigate(`/workout/${newDate}`, { replace: true });
+      } else {
+        if (dateInputRef.current) {
+          dateInputRef.current.value = date;
+        }
+      }
+    } catch (error) {
+      console.error('Tarih değiştirilirken hata:', error);
+      alert('Tarih değiştirilemedi.');
+      if (dateInputRef.current) {
+        dateInputRef.current.value = date;
+      }
+    }
+  };
+
   const handleSave = async () => {
     const issues = [];
 
@@ -661,9 +760,15 @@ export default function WorkoutDetailPage() {
       items: cleanedItems,
     };
 
-    await saveWorkout(cleaned);
-    alert('Antrenman kaydedildi!');
-    navigate('/');
+    // Hızlı çıkış: önce navigasyon, kaydı arka planda yap
+    navigate('/', { state: { updatedWorkout: cleaned } });
+
+    try {
+      await saveWorkout(cleaned);
+    } catch (error) {
+      console.error('Antrenman kaydedilirken hata:', error);
+      alert('Antrenman kaydedilirken bir hata oluştu.');
+    }
   };
 
   if (isLoading) {
@@ -694,16 +799,33 @@ export default function WorkoutDetailPage() {
       </div>
 
       <main className="flex-grow px-4 pb-24 md:pb-8 max-w-4xl mx-auto w-full">
-        <h1 className="text-white text-xl md:text-[28px] font-bold pb-3 pt-4">{formatDateTRFull(date)}</h1>
+        <div className="flex items-center gap-3 pb-3 pt-4">
+          <h1 className="text-white text-xl md:text-[28px] font-bold">{formatDateTRFull(date)}</h1>
+          <div className="relative">
+            <button 
+              onClick={() => dateInputRef.current?.showPicker()}
+              className="p-2 hover:bg-white/10 rounded-full text-gray-400 hover:text-white transition"
+            >
+              <span className="material-symbols-outlined text-xl">edit_calendar</span>
+            </button>
+            <input
+              ref={dateInputRef}
+              type="date"
+              className="absolute inset-0 opacity-0 w-0 h-0"
+              onChange={handleDateChange}
+              defaultValue={date}
+            />
+          </div>
+        </div>
 
         {/* Antrenman Adı */}
         <div className="mb-6">
           <div className="grid grid-cols-3 gap-3">
             <button
               type="button"
-              onClick={() => selectWorkoutTemplate('Pull Day')}
+              onClick={() => handleToggleFocus('Pull')}
               className={`p-3 rounded-xl text-sm font-bold transition border tracking-wide ${
-                workout.workoutName === 'Pull Day'
+                (workout.workoutFocus || []).includes('Pull')
                   ? 'bg-primary text-background-dark border-primary shadow-[0_0_15px_rgba(13,242,147,0.3)]'
                   : 'bg-[#1C1C1E] border-white/5 text-gray-400 hover:bg-white/5 hover:text-white'
               }`}
@@ -712,9 +834,9 @@ export default function WorkoutDetailPage() {
             </button>
             <button
               type="button"
-              onClick={() => selectWorkoutTemplate('Push Day')}
+              onClick={() => handleToggleFocus('Push')}
               className={`p-3 rounded-xl text-sm font-bold transition border tracking-wide ${
-                workout.workoutName === 'Push Day'
+                (workout.workoutFocus || []).includes('Push')
                   ? 'bg-primary text-background-dark border-primary shadow-[0_0_15px_rgba(13,242,147,0.3)]'
                   : 'bg-[#1C1C1E] border-white/5 text-gray-400 hover:bg-white/5 hover:text-white'
               }`}
@@ -723,9 +845,9 @@ export default function WorkoutDetailPage() {
             </button>
             <button
               type="button"
-              onClick={() => selectWorkoutTemplate('Leg Day')}
+              onClick={() => handleToggleFocus('Leg')}
               className={`p-3 rounded-xl text-sm font-bold transition border tracking-wide ${
-                workout.workoutName === 'Leg Day'
+                (workout.workoutFocus || []).includes('Leg')
                   ? 'bg-primary text-background-dark border-primary shadow-[0_0_15px_rgba(13,242,147,0.3)]'
                   : 'bg-[#1C1C1E] border-white/5 text-gray-400 hover:bg-white/5 hover:text-white'
               }`}
@@ -733,16 +855,19 @@ export default function WorkoutDetailPage() {
               LEG
             </button>
           </div>
+          <div className="mt-3 flex items-center justify-between gap-2">
+            <div className="text-xs text-gray-500 truncate">
+              {(workout.workoutFocus || []).length > 0 ? labelFromFocus(workout.workoutFocus) : 'Tür seçilmedi'}
+            </div>
+            <button
+              type="button"
+              onClick={handleLoadTemplateFromHistory}
+              className="text-[11px] font-semibold text-gray-400 hover:text-white px-2 py-1 rounded-lg border border-white/10 bg-white/5 transition"
+            >
+              Geçmişten getir
+            </button>
+          </div>
         </div>
-
-        <button
-          onClick={openExercisePicker}
-          className="mb-6 w-full flex items-center justify-center gap-2 py-3 bg-primary text-background-dark rounded-xl font-bold hover:bg-primary/90 active:bg-primary/80 transition text-sm shadow-lg shadow-primary/20"
-        >
-          <span className="material-symbols-outlined text-lg">add</span>
-          Egzersiz Ekle
-        </button>
-
         <div className="flex flex-col gap-4 md:gap-6">
           {workout.items.map((item, exerciseIdx) => (
             <div key={exerciseIdx} className="rounded-3xl bg-[#1C1C1E] p-5 shadow-lg border border-white/5">
@@ -881,6 +1006,16 @@ export default function WorkoutDetailPage() {
               </button>
             </div>
           ))}
+        </div>
+
+        <div className="mt-4 mb-2">
+          <button
+            onClick={openExercisePicker}
+            className="w-full flex items-center justify-center gap-2 py-3 bg-primary text-background-dark rounded-xl font-bold hover:bg-primary/90 active:bg-primary/80 transition text-sm shadow-lg shadow-primary/20"
+          >
+            <span className="material-symbols-outlined text-lg">add</span>
+            Egzersiz Ekle
+          </button>
         </div>
 
         <div className="mt-8 space-y-6">

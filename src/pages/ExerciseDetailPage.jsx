@@ -13,6 +13,8 @@ import {
 import { getExerciseInfo, MUSCLE_OPTIONS } from '../utils/exerciseMetadata';
 import { Area, AreaChart, CartesianGrid, Tooltip, ResponsiveContainer, XAxis, YAxis, ReferenceLine } from 'recharts';
 
+const BODYWEIGHT_KEYWORDS = ['pull up', 'pull-up', 'chin up', 'chin-up', 'dip', 'dips', 'muscle up', 'muscle-up', 'barfix'];
+
 const canonicalKeyFromParts = (canonical, name) => {
   const normalized = normalizeExerciseName(canonical || name || '');
   return (normalized || '').toLowerCase();
@@ -30,7 +32,7 @@ export default function ExerciseDetailPage() {
   const [bodyWeights, setBodyWeights] = useState({});
   
   // Chart State
-  const [chartMetric, setChartMetric] = useState('weight'); // 'weight' | 'volume'
+  const [chartMetric, setChartMetric] = useState('oneRm'); // 'weight' | 'volume' | 'oneRm'
   const [timeRange, setTimeRange] = useState('monthly'); // 'weekly' | 'monthly' | 'yearly' | 'all'
 
   // Edit Modal State
@@ -289,10 +291,22 @@ export default function ExerciseDetailPage() {
       return 0;
     };
 
-    const estimateOneRepMax = (weight, reps) => {
-      const w = Number(weight);
+    const estimateOneRepMax = (weight, reps, dateISO) => {
+      let w = Number(weight);
       const r = Number(reps);
-      if (!Number.isFinite(w) || w <= 0 || !Number.isFinite(r) || r <= 0) return 0;
+      
+      if (!Number.isFinite(w) || w < 0 || !Number.isFinite(r) || r <= 0) return 0;
+
+      const isBodyWeight = BODYWEIGHT_KEYWORDS.some(kw => canonicalName.toLowerCase().includes(kw));
+      
+      if (isBodyWeight) {
+        const dates = Object.keys(bodyWeights).sort();
+        const relevantDate = dates.filter(d => d <= dateISO).pop();
+        const bw = relevantDate ? bodyWeights[relevantDate] : 0;
+        if (bw > 0) w += bw;
+      }
+
+      if (w === 0) return 0;
       return Number((w * (1 + r / 30)).toFixed(1));
     };
 
@@ -316,12 +330,14 @@ export default function ExerciseDetailPage() {
           originalSet: s
         }));
 
-        const validSets = setsData.filter(s => s.weight > 0 && s.reps > 0);
+        const isBodyWeight = BODYWEIGHT_KEYWORDS.some(kw => canonicalName.toLowerCase().includes(kw));
+        const validSets = setsData.filter(s => s.reps > 0 && (isBodyWeight ? s.weight >= 0 : s.weight > 0));
+        
         if (validSets.length === 0) return;
 
         const maxWeight = Math.max(...validSets.map(s => s.weight));
         const sessionVolume = validSets.reduce((acc, s) => acc + (s.weight * s.reps), 0);
-        const sessionPeakOneRm = Math.max(...validSets.map(s => estimateOneRepMax(s.weight, s.reps)));
+        const sessionPeakOneRm = Math.max(...validSets.map(s => estimateOneRepMax(s.weight, s.reps, iso)));
 
         // Check for PR
         let prStatus = 'none'; // 'new', 'equal', 'none'
@@ -348,6 +364,7 @@ export default function ExerciseDetailPage() {
           when,
           maxWeight,
           totalVolume: sessionVolume,
+          oneRm: sessionPeakOneRm,
           prStatus,
           sets: setsData,
           previousMax: runningMaxWeight // Snapshot of max before this workout (approx)
@@ -355,23 +372,27 @@ export default function ExerciseDetailPage() {
       }
     });
 
-    // Calculate Volume Trend (Last workout vs Avg of previous 2)
-    let volumeTrend = null;
+    // Calculate 1RM Trend (Last workout vs Avg of previous 3)
+    let oneRmTrend = null;
     if (historyData.length > 0) {
         const current = historyData[historyData.length - 1];
         const prevWorkouts = [];
-        if (historyData.length >= 2) prevWorkouts.push(historyData[historyData.length - 2]);
-        if (historyData.length >= 3) prevWorkouts.push(historyData[historyData.length - 3]);
+        // Get up to 3 previous workouts
+        for (let i = 2; i <= 4; i++) {
+            if (historyData.length >= i) {
+                prevWorkouts.push(historyData[historyData.length - i]);
+            }
+        }
         
         if (prevWorkouts.length > 0) {
-             const avgVol = prevWorkouts.reduce((sum, w) => sum + w.totalVolume, 0) / prevWorkouts.length;
-             if (avgVol > 0) {
-                 const diff = current.totalVolume - avgVol;
-                 const percent = (diff / avgVol) * 100;
-                 volumeTrend = {
+             const avgOneRm = prevWorkouts.reduce((sum, w) => sum + (w.oneRm || 0), 0) / prevWorkouts.length;
+             if (avgOneRm > 0) {
+                 const diff = (current.oneRm || 0) - avgOneRm;
+                 const percent = (diff / avgOneRm) * 100;
+                 oneRmTrend = {
                      percent: Math.round(percent),
-                     currentVolume: current.totalVolume,
-                     avgVolume: Math.round(avgVol)
+                     currentOneRm: current.oneRm,
+                     avgOneRm: Math.round(avgOneRm)
                  };
              }
         }
@@ -399,7 +420,8 @@ export default function ExerciseDetailPage() {
       date: h.iso,
       label: new Date(h.iso).getDate() + '/' + (new Date(h.iso).getMonth() + 1),
       weight: h.maxWeight,
-      volume: Math.round(h.totalVolume)
+      volume: Math.round(h.totalVolume),
+      oneRm: Math.round(h.oneRm || 0)
     }));
 
     return {
@@ -408,7 +430,7 @@ export default function ExerciseDetailPage() {
         oneRm: max1RM,
         volume: maxVolume,
         maxWeight: maxWeightRecord,
-        volumeTrend
+        oneRmTrend
       },
       chartData
     };
@@ -471,18 +493,18 @@ export default function ExerciseDetailPage() {
                     </p>
                  )}
             </div>
-            {/* Volume Trend Card */}
+            {/* OneRM Trend Card */}
             <div className="relative overflow-hidden rounded-2xl border border-white/10 bg-white/5 p-3">
                  <div className="flex items-center gap-2">
-                    <span className="material-symbols-outlined text-gray-300 text-lg">trending_up</span>
-                    <span className="text-[10px] font-bold uppercase tracking-wider text-gray-400">Hacim Değişimi</span>
+                    <span className="material-symbols-outlined text-rose-400 text-lg">trending_up</span>
+                    <span className="text-[10px] font-bold uppercase tracking-wider text-gray-400">Güç Değişimi (1RM)</span>
                  </div>
-                 {hallOfFame.volumeTrend ? (
+                 {hallOfFame.oneRmTrend ? (
                     <>
-                        <p className={`mt-1 text-xl font-bold ${hallOfFame.volumeTrend.percent >= 0 ? 'text-green-400' : 'text-red-400'}`}>
-                            {hallOfFame.volumeTrend.percent > 0 ? '+' : ''}{hallOfFame.volumeTrend.percent}%
+                        <p className={`mt-1 text-xl font-bold ${hallOfFame.oneRmTrend.percent >= 0 ? 'text-green-400' : 'text-red-400'}`}>
+                            {hallOfFame.oneRmTrend.percent > 0 ? '+' : ''}{hallOfFame.oneRmTrend.percent}%
                         </p>
-                        <p className="text-[10px] text-gray-500 mt-0.5">Son 2 antrenman ort.</p>
+                        <p className="text-[10px] text-gray-500 mt-0.5">Son 3 antrenman ort.</p>
                     </>
                  ) : (
                     <p className="mt-1 text-sm text-gray-500">Yeterli veri yok</p>
@@ -496,19 +518,32 @@ export default function ExerciseDetailPage() {
             <div className="flex items-center justify-between">
                 <h3 className="text-sm font-bold text-gray-300">İlerleme</h3>
                  {/* Metric Toggle */}
-                <div className="flex bg-black/40 rounded-lg p-1 border border-white/5">
-                  <button 
-                    onClick={() => setChartMetric('weight')}
-                    className={`px-3 py-1 rounded-md text-xs font-bold transition ${chartMetric === 'weight' ? 'bg-yellow-400 text-black shadow-lg' : 'text-gray-500 hover:text-gray-300'}`}
-                  >
-                    Ağırlık
-                  </button>
-                  <button 
-                    onClick={() => setChartMetric('volume')}
-                    className={`px-3 py-1 rounded-md text-xs font-bold transition ${chartMetric === 'volume' ? 'bg-white text-black shadow-lg' : 'text-gray-500 hover:text-gray-300'}`}
-                  >
-                    Hacim
-                  </button>
+                <div className="flex flex-col items-end gap-1">
+                  <div className="flex bg-black/40 rounded-lg p-1 border border-white/5">
+                    <button 
+                      onClick={() => setChartMetric('weight')}
+                      className={`px-3 py-1 rounded-md text-xs font-bold transition ${chartMetric === 'weight' ? 'bg-yellow-400 text-black shadow-lg' : 'text-gray-500 hover:text-gray-300'}`}
+                    >
+                      Ağırlık
+                    </button>
+                    <button 
+                      onClick={() => setChartMetric('oneRm')}
+                      className={`px-3 py-1 rounded-md text-xs font-bold transition ${chartMetric === 'oneRm' ? 'bg-rose-500 text-white shadow-lg' : 'text-gray-500 hover:text-gray-300'}`}
+                    >
+                      1RM (Güç)
+                    </button>
+                    <button 
+                      onClick={() => setChartMetric('volume')}
+                      className={`px-3 py-1 rounded-md text-xs font-bold transition ${chartMetric === 'volume' ? 'bg-white text-black shadow-lg' : 'text-gray-500 hover:text-gray-300'}`}
+                    >
+                      Hacim
+                    </button>
+                  </div>
+                  {chartMetric === 'oneRm' && BODYWEIGHT_KEYWORDS.some(kw => canonicalName.toLowerCase().includes(kw)) && (
+                    <span className="text-[10px] text-gray-500 italic px-1">
+                      *Vücut ağırlığı dahil
+                    </span>
+                  )}
                 </div>
             </div>
             
@@ -531,8 +566,8 @@ export default function ExerciseDetailPage() {
               <AreaChart data={chartData}>
                 <defs>
                   <linearGradient id="colorMetric" x1="0" y1="0" x2="0" y2="1">
-                    <stop offset="5%" stopColor={chartMetric === 'weight' ? '#FACC15' : '#FFFFFF'} stopOpacity={0.3}/>
-                    <stop offset="95%" stopColor={chartMetric === 'weight' ? '#FACC15' : '#FFFFFF'} stopOpacity={0}/>
+                    <stop offset="5%" stopColor={chartMetric === 'weight' ? '#FACC15' : chartMetric === 'oneRm' ? '#F43F5E' : '#FFFFFF'} stopOpacity={0.3}/>
+                    <stop offset="95%" stopColor={chartMetric === 'weight' ? '#FACC15' : chartMetric === 'oneRm' ? '#F43F5E' : '#FFFFFF'} stopOpacity={0}/>
                   </linearGradient>
                 </defs>
                 <CartesianGrid strokeDasharray="3 3" stroke="#333" vertical={false} />
@@ -550,7 +585,16 @@ export default function ExerciseDetailPage() {
                   tickLine={false}
                   axisLine={false}
                   tickFormatter={(val) => val >= 1000 ? `${(val/1000).toFixed(1)}k` : val}
-                  domain={[(min) => Math.floor(min * 0.75), 'auto']}
+                  domain={[
+                    (dataMin) => {
+                      // Hacim için 0'dan başlasın
+                      if (chartMetric === 'volume') return 0;
+                      // Ağırlık/1RM için en düşük değerin 5 birim altından başlasın
+                      // Bu sayede gelişim eğrisi daha belirgin olur
+                      return Math.max(0, Math.floor(dataMin - 5));
+                    }, 
+                    'auto'
+                  ]}
                 />
                 <Tooltip 
                   contentStyle={{ backgroundColor: '#1C1C1E', borderColor: '#333', borderRadius: '12px' }}
@@ -560,7 +604,7 @@ export default function ExerciseDetailPage() {
                 <Area 
                   type="monotone" 
                   dataKey={chartMetric} 
-                  stroke={chartMetric === 'weight' ? '#FACC15' : '#FFFFFF'} 
+                  stroke={chartMetric === 'weight' ? '#FACC15' : chartMetric === 'oneRm' ? '#F43F5E' : '#FFFFFF'} 
                   strokeWidth={3}
                   fillOpacity={1} 
                   fill="url(#colorMetric)" 
@@ -572,6 +616,14 @@ export default function ExerciseDetailPage() {
                     stroke="#FACC15" 
                     strokeDasharray="3 3" 
                     label={{ value: 'Max Kilo', position: 'right', fill: '#FACC15', fontSize: 10 }} 
+                  />
+                )}
+                {chartMetric === 'oneRm' && hallOfFame.oneRm.value > 0 && (
+                  <ReferenceLine 
+                    y={hallOfFame.oneRm.value} 
+                    stroke="#F43F5E" 
+                    strokeDasharray="3 3" 
+                    label={{ value: 'Max Güç', position: 'right', fill: '#F43F5E', fontSize: 10 }} 
                   />
                 )}
                 {chartMetric === 'volume' && hallOfFame.volume.value > 0 && (

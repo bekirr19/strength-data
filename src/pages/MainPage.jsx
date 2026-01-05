@@ -1,14 +1,55 @@
 import { useState, useEffect, useRef, useMemo } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
+import { User, LogOut } from 'lucide-react';
+import { useAuth } from '../contexts/AuthContext';
 import { toISODate, formatDateTRFull, fromISO, turkishWeekdays, turkishWeekdaysShort, getWorkouts, getBodyWeightInfo, saveBodyWeight, clearBodyWeight, saveWorkout, resolveWeightValue, getExercises, normalizeExerciseName } from '../utils/storage';
 import WeekStrip from '../components/WeekStrip';
 import CalendarModal from '../components/CalendarModal';
 import ImportWorkoutModal from '../components/ImportWorkoutModal';
+import BodyWeightModal from '../components/BodyWeightModal';
 import LoadingSpinner from '../components/LoadingSpinner';
 import { detectWorkoutType, WORKOUT_TYPE_META } from '../utils/workoutTypes';
 import { getExerciseInfo } from '../utils/exerciseMetadata';
 
 const canonicalFromParts = (canonical, name) => normalizeExerciseName(canonical || name || '');
+const CATEGORY_PRIORITY = {
+  leg: 0,
+  chest: 1,
+  back: 2,
+  shoulder: 3,
+  arm: 4,
+  core: 5,
+  other: 6,
+};
+
+const detectCategoryKey = (item, library = []) => {
+  const name = item?.displayName || item?.name || '';
+  const canonical = item?.canonicalName || normalizeExerciseName(name);
+  const key = canonical.toLowerCase();
+
+  // Custom library lookup
+  const customExercise = library.find((ex) => {
+    const exKey = (ex.canonicalName || normalizeExerciseName(ex.name)).toLowerCase();
+    return exKey === key;
+  });
+
+  const overrides = { ...item, ...customExercise };
+  const info = getExerciseInfo(name, overrides);
+  const cat = (info?.category || '').toLowerCase();
+  const muscles = Array.isArray(info?.muscleLabels)
+    ? info.muscleLabels.map((m) => m.toLowerCase())
+    : [];
+
+  const matches = (keyword) => cat.includes(keyword) || muscles.some((m) => m.includes(keyword));
+
+  if (matches('chest') || matches('gogus') || matches('göğüs')) return 'chest';
+  if (matches('back') || matches('sirt') || matches('sırt')) return 'back';
+  if (matches('shoulder') || matches('omuz') || matches('deltoid')) return 'shoulder';
+  if (matches('arm') || matches('kol') || matches('bicep') || matches('tricep')) return 'arm';
+  if (matches('leg') || matches('bacak') || matches('quad') || matches('hamstring') || matches('glute')) return 'leg';
+  if (matches('core') || matches('abs') || matches('karin') || matches('karın')) return 'core';
+  return 'other';
+};
 
 // SPA içinde gezinirken tarihi hatırlamak için modül seviyesinde değişken.
 // Sayfa yenilendiğinde (refresh) bu değişken sıfırlanır.
@@ -17,6 +58,7 @@ let sessionLastSelectedDate = null;
 export default function MainPage() {
   const navigate = useNavigate();
   const location = useLocation();
+  const { logout, currentUser } = useAuth();
   
   const [selectedDate, setSelectedDate] = useState(() => {
     // 1. Eğer navigasyon ile gelen bir tarih varsa onu kullan (Örn: Egzersiz detayından gelindi)
@@ -35,11 +77,14 @@ export default function MainPage() {
 
   const [isCalendarOpen, setIsCalendarOpen] = useState(false);
   const [isImportOpen, setIsImportOpen] = useState(false);
+  const [isProfileMenuOpen, setIsProfileMenuOpen] = useState(false);
+  const [showWelcomeToast, setShowWelcomeToast] = useState(false);
   const [refreshKey, setRefreshKey] = useState(0);
   const [bodyWeightInput, setBodyWeightInput] = useState('');
   const [bodyWeightMeta, setBodyWeightMeta] = useState({ value: null, isFallback: false, sourceDate: null });
   const [workoutsByDate, setWorkoutsByDate] = useState({});
   const [isPrefetching, setIsPrefetching] = useState(true);
+  const [isBodyWeightModalOpen, setIsBodyWeightModalOpen] = useState(false);
   const [isWeightEditorOpen, setIsWeightEditorOpen] = useState(false);
   const [bodyWeightDraft, setBodyWeightDraft] = useState('');
   const [isMobileViewport, setIsMobileViewport] = useState(() => {
@@ -49,13 +94,56 @@ export default function MainPage() {
     return window.innerWidth < 768;
   });
   const editorRef = useRef(null);
+  const profileMenuRef = useRef(null);
   const weightInputRef = useRef(null);
   const touchStateRef = useRef({ startX: 0, startY: 0, lastX: 0, lastY: 0, active: false });
+
+  useEffect(() => {
+    if (location.state?.loginSuccess) {
+      setShowWelcomeToast(true);
+      // Clear state so it doesn't show again on refresh
+      window.history.replaceState({}, document.title);
+      const timer = setTimeout(() => setShowWelcomeToast(false), 5000);
+      return () => clearTimeout(timer);
+    }
+  }, [location.state]);
 
   // Exercise Picker State
   const [isPickerOpen, setIsPickerOpen] = useState(false);
   const [pickerSearch, setPickerSearch] = useState('');
   const [exerciseLibrary, setExerciseLibrary] = useState([]);
+
+  useEffect(() => {
+    async function loadLibrary() {
+      try {
+        const data = await getExercises();
+        setExerciseLibrary(data);
+      } catch (err) {
+        console.error('Egzersiz listesi yüklenemedi', err);
+      }
+    }
+    loadLibrary();
+  }, []);
+
+  const exerciseUsageMap = useMemo(() => {
+    const map = {};
+    exerciseLibrary.forEach((exercise) => {
+      const key = canonicalFromParts(exercise.canonicalName, exercise.name).toLowerCase();
+      map[key] = exercise.used || 0;
+    });
+    return map;
+  }, [exerciseLibrary]);
+
+  const workoutUsageMap = useMemo(() => {
+    const map = {};
+    Object.values(workoutsByDate || {}).forEach((wo) => {
+      (wo.items || []).forEach((it) => {
+        const key = canonicalFromParts(it.canonicalName, it.displayName || it.name).toLowerCase();
+        map[key] = (map[key] || 0) + 1;
+      });
+    });
+    return map;
+  }, [workoutsByDate]);
 
   // Exercise Quick Edit State
   const [editingExercise, setEditingExercise] = useState(null);
@@ -124,25 +212,23 @@ export default function MainPage() {
     const updatedItems = [...(workout.items || []), newItem];
     const updatedWorkout = { ...workout, items: updatedItems };
 
-    try {
-      // 3. Save
-      await saveWorkout(updatedWorkout);
-      
-      // 4. Update local state immediately
-      setWorkoutsByDate(prev => ({
-        ...prev,
-        [selectedDate]: updatedWorkout
-      }));
-      
-      // 5. Close Picker
-      setIsPickerOpen(false);
+    // Optimistic Update: Update UI immediately
+    setWorkoutsByDate(prev => ({
+      ...prev,
+      [selectedDate]: updatedWorkout
+    }));
+    
+    setIsPickerOpen(false);
+    // const newIndex = updatedItems.length - 1;
+    // openQuickEdit(newItem, newIndex, true);
 
-      // 6. Open Quick Edit with AutoFocus
-      const newIndex = updatedItems.length - 1;
-      openQuickEdit(newItem, newIndex, true);
+    try {
+      // Save in background
+      await saveWorkout(updatedWorkout);
     } catch (error) {
       console.error('Egzersiz eklenirken hata:', error);
       alert('Egzersiz eklenirken bir hata oluştu.');
+      // Revert state if needed (optional, but recommended for robustness)
     }
   };
 
@@ -171,16 +257,18 @@ export default function MainPage() {
     const updatedItems = [...(workout.items || []), newItem];
     const updatedWorkout = { ...workout, items: updatedItems };
 
+    // Optimistic Update
+    setWorkoutsByDate(prev => ({
+      ...prev,
+      [selectedDate]: updatedWorkout
+    }));
+    
+    setIsPickerOpen(false);
+    // const newIndex = updatedItems.length - 1;
+    // openQuickEdit(newItem, newIndex, true);
+
     try {
       await saveWorkout(updatedWorkout);
-      setWorkoutsByDate(prev => ({
-        ...prev,
-        [selectedDate]: updatedWorkout
-      }));
-      
-      setIsPickerOpen(false);
-      const newIndex = updatedItems.length - 1;
-      openQuickEdit(newItem, newIndex, true);
     } catch (error) {
       console.error('Manuel egzersiz eklenirken hata:', error);
     }
@@ -215,9 +303,30 @@ export default function MainPage() {
   };
 
   const openQuickEdit = (item, index, autoFocus = false) => {
+    const data = JSON.parse(JSON.stringify(item));
+    
+    // Eğer setlerde wDisplay varsa ve BW içeriyorsa, w değerini display değeri ile güncelle
+    // Böylece input içinde 0 yerine BW veya BW+5 yazar
+    if (data.sets) {
+      data.sets = data.sets.map(s => {
+        if (s.wDisplay && (
+          s.wDisplay.toLowerCase().includes('body') || 
+          s.wDisplay.toLowerCase().includes('bw') ||
+          s.wDisplay.toLowerCase().includes('vücut')
+        )) {
+          let val = s.wDisplay;
+          if (val === 'Body Weight' || val === 'Vücut Ağırlığı' || val === 'BW') {
+            val = 'BW';
+          }
+          return { ...s, w: val };
+        }
+        return s;
+      });
+    }
+
     setEditingExercise({
       index,
-      data: JSON.parse(JSON.stringify(item)),
+      data,
       autoFocus
     });
   };
@@ -272,6 +381,31 @@ export default function MainPage() {
     });
   };
 
+  const handleQuickEditDeleteExercise = () => {
+    if (!editingExercise || !currentWorkout) return;
+    const updatedItems = currentWorkout.items.filter((_, i) => i !== editingExercise.index);
+    const updatedWorkout = { ...currentWorkout, items: updatedItems };
+
+    // Optimistic UI update & close immediately
+    setWorkoutsByDate(prev => ({
+      ...prev,
+      [selectedDate]: updatedWorkout,
+    }));
+    closeQuickEdit();
+
+    // Persist in background
+    (async () => {
+      try {
+        await saveWorkout(updatedWorkout);
+        setRefreshKey(prev => prev + 1);
+      } catch (error) {
+        console.error('Egzersiz silinirken hata:', error);
+        alert('Egzersiz silinirken bir hata oluştu.');
+        setRefreshKey(prev => prev + 1);
+      }
+    })();
+  };
+
   const handleQuickEditSave = async () => {
     if (!editingExercise || !currentWorkout) return;
 
@@ -306,14 +440,23 @@ export default function MainPage() {
       items: updatedItems
     };
 
-    try {
-      await saveWorkout(updatedWorkout);
-      setRefreshKey(prev => prev + 1); // Trigger reload
-      closeQuickEdit();
-    } catch (error) {
-      console.error('Hızlı düzenleme kaydedilirken hata:', error);
-      alert('Kaydedilirken bir hata oluştu.');
-    }
+    // Optimistic update & close immediately
+    setWorkoutsByDate(prev => ({
+      ...prev,
+      [selectedDate]: updatedWorkout,
+    }));
+    closeQuickEdit();
+
+    // Persist in background (no full refresh on success)
+    (async () => {
+      try {
+        await saveWorkout(updatedWorkout);
+      } catch (error) {
+        console.error('Hızlı düzenleme kaydedilirken hata:', error);
+        alert('Kaydedilirken bir hata oluştu.');
+        setRefreshKey(prev => prev + 1); // only refresh if failed
+      }
+    })();
   };
 
   const handleSelectDate = (iso) => {
@@ -409,10 +552,23 @@ export default function MainPage() {
     async function prefetchWorkouts() {
       try {
         setIsPrefetching(true);
+
+        // Optimistic update from navigation state
+        if (location.state?.updatedWorkout) {
+          setWorkoutsByDate((prev) => ({
+            ...prev,
+            [location.state.updatedWorkout.dateISO]: location.state.updatedWorkout,
+          }));
+        }
+
         const all = await getWorkouts();
         if (!isMounted) return;
 
         if (all && typeof all === 'object') {
+          // Merge optimistic update into fetched data to prevent overwriting with stale data
+          if (location.state?.updatedWorkout) {
+            all[location.state.updatedWorkout.dateISO] = location.state.updatedWorkout;
+          }
           setWorkoutsByDate(all);
         } else {
           setWorkoutsByDate({});
@@ -432,7 +588,7 @@ export default function MainPage() {
     return () => {
       isMounted = false;
     };
-  }, [refreshKey]);
+  }, [refreshKey, location.state]);
 
   // Firebase'den body weight bilgisi çek
   useEffect(() => {
@@ -492,6 +648,23 @@ export default function MainPage() {
     }, 80);
     return () => clearTimeout(timer);
   }, [isWeightEditorOpen]);
+
+  useEffect(() => {
+    if (!isProfileMenuOpen) return;
+    
+    const handleClickOutside = (event) => {
+      if (profileMenuRef.current && !profileMenuRef.current.contains(event.target)) {
+        setIsProfileMenuOpen(false);
+      }
+    };
+
+    document.addEventListener('mousedown', handleClickOutside);
+    document.addEventListener('touchstart', handleClickOutside);
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside);
+      document.removeEventListener('touchstart', handleClickOutside);
+    };
+  }, [isProfileMenuOpen]);
 
   // Sayfa focus aldığında refresh et
   useEffect(() => {
@@ -564,23 +737,6 @@ export default function MainPage() {
     }
   };
 
-  const handleBodyWeightEditorKeyDown = async (event) => {
-    if (event.key === 'Enter') {
-      event.preventDefault();
-      await commitBodyWeight(bodyWeightDraft);
-      setIsWeightEditorOpen(false);
-    }
-    if (event.key === 'Escape') {
-      event.preventDefault();
-      setBodyWeightDraft(bodyWeightInput);
-      setIsWeightEditorOpen(false);
-    }
-  };
-
-  const handleClearBodyWeight = async () => {
-    await commitBodyWeight('');
-  };
-
   if (isPrefetching) {
     return <LoadingSpinner fullScreen message="Antrenman verileriniz yükleniyor..." />;
   }
@@ -589,146 +745,48 @@ export default function MainPage() {
   const currentWorkoutType = currentWorkout ? detectWorkoutType(currentWorkout) : null;
   const currentWorkoutMeta = currentWorkoutType ? WORKOUT_TYPE_META[currentWorkoutType] : null;
 
-  let bodyWeightDisplay = bodyWeightInput && bodyWeightInput.trim().length > 0
-    ? `${bodyWeightInput} kg`
-    : '—';
-  if (bodyWeightMeta.isFallback && bodyWeightMeta.value !== null) {
-    bodyWeightDisplay = `${bodyWeightDisplay} *`;
-  }
+  const findPreviousSameTypeDate = () => {
+    if (!currentWorkoutType) return null;
+    const keys = Object.keys(workoutsByDate || {})
+      .filter((k) => k < selectedDate)
+      .sort((a, b) => (a > b ? -1 : 1));
+    for (const dateKey of keys) {
+      const wo = workoutsByDate[dateKey];
+      if (!wo) continue;
+      const type = detectWorkoutType(wo);
+      if (type === currentWorkoutType) {
+        return dateKey;
+      }
+    }
+    return null;
+  };
 
-  const toggleWeightEditor = () => {
-    if (isWeightEditorOpen) {
-      setIsWeightEditorOpen(false);
-      setBodyWeightDraft(bodyWeightInput);
+  const handleJumpPrevWorkoutType = () => {
+    const prevDate = findPreviousSameTypeDate();
+    if (prevDate) {
+      handleSelectDate(prevDate);
     } else {
-      setBodyWeightDraft(bodyWeightInput);
-      setIsWeightEditorOpen(true);
+      alert('Önceki aynı tür antrenman bulunamadı.');
     }
   };
 
   const renderBodyWeightBadge = () => {
-    const editorCard = (
-      <div className="rounded-3xl border border-white/10 bg-[#1C1C1E] p-5 shadow-2xl animate-in fade-in zoom-in-95 duration-200">
-        <div className="flex items-center justify-between mb-6">
-          <h3 className="text-lg font-bold text-white">Vücut Ağırlığı</h3>
-          <button
-            type="button"
-            onClick={() => {
-              setIsWeightEditorOpen(false);
-              setBodyWeightDraft(bodyWeightInput);
-            }}
-            className="rounded-full p-1 text-gray-400 hover:bg-white/10 hover:text-white transition"
-          >
-            <span className="material-symbols-outlined text-xl">close</span>
-          </button>
-        </div>
-
-        <div className="flex items-center gap-3 mb-6">
-          <button
-            type="button"
-            onClick={() => {
-               const val = parseFloat(bodyWeightDraft.replace(',', '.')) || 0;
-               setBodyWeightDraft((Math.max(0, val - 0.5)).toFixed(1));
-            }}
-            className="flex h-12 w-12 items-center justify-center rounded-xl bg-white/5 text-white hover:bg-white/10 active:scale-95 transition border border-white/5"
-          >
-            <span className="material-symbols-outlined">remove</span>
-          </button>
-          
-          <div className="relative flex-1">
-            <input
-              ref={weightInputRef}
-              value={bodyWeightDraft}
-              onChange={(e) => setBodyWeightDraft(e.target.value)}
-              onKeyDown={handleBodyWeightEditorKeyDown}
-              inputMode="decimal"
-              className="w-full rounded-xl border border-primary/30 bg-black/40 py-3 text-center text-2xl font-bold text-white focus:border-primary focus:outline-none focus:ring-1 focus:ring-primary placeholder-gray-600"
-              placeholder="0.0"
-            />
-            <span className="absolute right-4 top-1/2 -translate-y-1/2 text-sm font-medium text-gray-500">kg</span>
-          </div>
-
-          <button
-            type="button"
-            onClick={() => {
-               const val = parseFloat(bodyWeightDraft.replace(',', '.')) || 0;
-               setBodyWeightDraft((val + 0.5).toFixed(1));
-            }}
-            className="flex h-12 w-12 items-center justify-center rounded-xl bg-white/5 text-white hover:bg-white/10 active:scale-95 transition border border-white/5"
-          >
-            <span className="material-symbols-outlined">add</span>
-          </button>
-        </div>
-
-        <div className="grid grid-cols-2 gap-3">
-           <button
-            type="button"
-            onClick={async () => {
-              await handleClearBodyWeight();
-              setIsWeightEditorOpen(false);
-            }}
-            className="flex items-center justify-center gap-2 rounded-xl border border-red-500/20 bg-red-500/10 py-3 text-sm font-bold text-red-400 hover:bg-red-500/20 transition"
-          >
-            <span className="material-symbols-outlined text-lg">delete</span>
-            Sil
-          </button>
-          <button
-            type="button"
-            onClick={async () => {
-              await commitBodyWeight(bodyWeightDraft);
-              setIsWeightEditorOpen(false);
-            }}
-            className="flex items-center justify-center gap-2 rounded-xl bg-primary py-3 text-sm font-bold text-background-dark hover:bg-primary/90 transition shadow-lg shadow-primary/20"
-          >
-            <span className="material-symbols-outlined text-lg">check</span>
-            Kaydet
-          </button>
-        </div>
-        
-        {bodyWeightMeta.isFallback && bodyWeightMeta.sourceDate && (
-           <p className="mt-4 text-center text-[10px] text-gray-500">
-             * Otomatik olarak önceki kayıttan ({formatDateTRFull(bodyWeightMeta.sourceDate)}) alındı.
-           </p>
-        )}
-      </div>
-    );
-
-    const handleOverlayClick = (event) => {
-      if (event.target === event.currentTarget) {
-        setIsWeightEditorOpen(false);
-        setBodyWeightDraft(bodyWeightInput);
-      }
-    };
-
+    const hasWeight = bodyWeightMeta.value !== null;
+    const displayValue = hasWeight ? `${bodyWeightMeta.value} kg` : 'Ağırlık Gir';
+    
     return (
-      <div className="relative" ref={editorRef}>
-        <button
-          type="button"
-          onClick={toggleWeightEditor}
-          className="inline-flex items-center justify-center gap-1.5 rounded-lg border border-white/10 bg-white/5 px-3 py-1.5 text-xs font-bold text-white/90 transition hover:bg-white/10 min-w-[80px]"
-          title={bodyWeightMeta.isFallback && bodyWeightMeta.sourceDate ? `${formatDateTRFull(bodyWeightMeta.sourceDate)} değerinden geliyor` : 'Vücut ağırlığını düzenle'}
-        >
-          <span className="material-symbols-outlined text-base text-primary">monitor_weight</span>
-          {bodyWeightDisplay}
-        </button>
-
-        {isWeightEditorOpen && (
-          isMobileViewport ? (
-            <div
-              className="fixed inset-0 z-40 flex items-center justify-center bg-black/60 px-4"
-              onClick={handleOverlayClick}
-            >
-              <div className="w-full max-w-sm">
-                {editorCard}
-              </div>
-            </div>
-          ) : (
-            <div className="absolute right-0 z-30 mt-2 w-64">
-              {editorCard}
-            </div>
-          )
+      <button
+        type="button"
+        onClick={() => setIsBodyWeightModalOpen(true)}
+        className="inline-flex items-center justify-center gap-1.5 rounded-lg border border-white/10 bg-white/5 px-3 py-1.5 text-xs font-bold text-white/90 transition hover:bg-white/10 min-w-[80px]"
+        title={bodyWeightMeta.isFallback && bodyWeightMeta.sourceDate ? `${formatDateTRFull(bodyWeightMeta.sourceDate)} değerinden geliyor` : 'Vücut ağırlığını düzenle'}
+      >
+        <span className="material-symbols-outlined text-base text-primary">monitor_weight</span>
+        {displayValue}
+        {bodyWeightMeta.isFallback && bodyWeightMeta.value !== null && (
+          <span className="text-[10px] text-gray-500 ml-0.5">*</span>
         )}
-      </div>
+      </button>
     );
   };
 
@@ -766,32 +824,82 @@ export default function MainPage() {
           </div>
         </div>
         
-        <div className="flex items-center gap-1">
+        <div className="flex items-center gap-1 relative" ref={profileMenuRef}>
           <button
-            onClick={() => navigate('/gelistirmeler')}
-            className="flex cursor-pointer items-center justify-center rounded-full h-10 w-10 text-gray-400 hover:text-white transition"
-            aria-label="Geliştirmeler"
-            title="Geliştirmeler"
+            onClick={() => setIsProfileMenuOpen(!isProfileMenuOpen)}
+            className={`flex cursor-pointer items-center justify-center rounded-full h-10 w-10 transition overflow-hidden border border-transparent ${isProfileMenuOpen ? 'bg-white/10 text-white border-white/10' : 'text-gray-400 hover:text-white hover:bg-white/5'}`}
+            aria-label="Kullanıcı Menüsü"
           >
-            <span className="material-symbols-outlined text-2xl" style={{ fontVariationSettings: "'FILL' 0, 'wght' 300" }}>lightbulb</span>
+            {currentUser?.photoURL ? (
+              <img 
+                src={currentUser.photoURL} 
+                alt={currentUser.displayName || 'User'} 
+                className="h-full w-full object-cover"
+              />
+            ) : currentUser?.displayName ? (
+              <span className="text-sm font-bold text-white">
+                {currentUser.displayName.charAt(0).toUpperCase()}
+              </span>
+            ) : (
+              <User className="w-6 h-6" />
+            )}
           </button>
-          <button
-            onClick={() => setIsImportOpen(true)}
-            className="flex cursor-pointer items-center justify-center rounded-full h-10 w-10 text-gray-400 hover:text-white transition"
-            aria-label="JSON import"
-            title="Antrenman ekle (JSON)"
-          >
-            <span className="material-symbols-outlined text-2xl" style={{ fontVariationSettings: "'FILL' 0, 'wght' 300" }}>upload</span>
-          </button>
-          <button
-            onClick={() => setIsCalendarOpen(true)}
-            className="flex cursor-pointer items-center justify-center rounded-full h-10 w-10 text-gray-400 hover:text-white transition"
-            aria-label="Takvimi aç"
-          >
-            <span className="material-symbols-outlined text-2xl" style={{ fontVariationSettings: "'FILL' 0, 'wght' 300" }}>calendar_today</span>
-          </button>
+
+          {isProfileMenuOpen && (
+            <div className="absolute right-0 top-12 z-50 w-56 rounded-xl border border-white/10 bg-[#1C1C1E]/95 backdrop-blur-xl shadow-2xl p-1.5 animate-in fade-in zoom-in-95 duration-200 origin-top-right">
+              <button
+                onClick={() => {
+                  setIsCalendarOpen(true);
+                  setIsProfileMenuOpen(false);
+                }}
+                className="flex w-full items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium text-gray-200 hover:bg-white/10 hover:text-white transition-colors"
+              >
+                <span className="material-symbols-outlined text-xl" style={{ fontVariationSettings: "'FILL' 0, 'wght' 300" }}>calendar_today</span>
+                Takvim
+              </button>
+              
+              <button
+                onClick={() => {
+                  navigate('/gelistirmeler');
+                  setIsProfileMenuOpen(false);
+                }}
+                className="flex w-full items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium text-gray-200 hover:bg-white/10 hover:text-white transition-colors"
+              >
+                <span className="material-symbols-outlined text-xl" style={{ fontVariationSettings: "'FILL' 0, 'wght' 300" }}>lightbulb</span>
+                Geliştirmeler
+              </button>
+              
+              <div className="my-1 h-px bg-white/10" />
+
+              <button
+                onClick={() => {
+                  navigate('/profile');
+                  setIsProfileMenuOpen(false);
+                }}
+                className="flex w-full items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium text-gray-200 hover:bg-white/10 hover:text-white transition-colors"
+              >
+                <User className="w-5 h-5" />
+                Profil
+              </button>
+            </div>
+          )}
         </div>
       </header>
+
+      {/* Welcome Toast */}
+      {showWelcomeToast && (
+        <div className="fixed top-24 left-1/2 -translate-x-1/2 z-50 animate-in fade-in slide-in-from-top-4 duration-500">
+          <div className="flex items-center gap-3 rounded-2xl border border-green-500/20 bg-[#1C1C1E]/90 px-6 py-4 shadow-2xl backdrop-blur-xl">
+            <div className="flex h-10 w-10 items-center justify-center rounded-full bg-green-500/20 text-green-400">
+              <span className="material-symbols-outlined">check_circle</span>
+            </div>
+            <div>
+              <h3 className="text-sm font-bold text-white">Giriş Başarılı</h3>
+              <p className="text-xs text-gray-400">Veritabanınız hazırlandı ve senkronize edildi.</p>
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* Week Strip */}
       <WeekStrip selectedDate={selectedDate} onDateSelect={handleSelectDate} refreshKey={refreshKey} />
@@ -804,15 +912,20 @@ export default function MainPage() {
               <div className="flex items-center justify-between gap-2 pb-2 border-b border-white/5">
                 <div className="flex items-center gap-2">
                   {/* Day Badge */}
-                  <span className="inline-flex items-center justify-center rounded-lg bg-white/5 px-3 py-1.5 text-xs font-bold text-white/90 uppercase tracking-wider border border-white/10 min-w-[60px]">
+                  <span className="inline-flex items-center justify-center rounded-lg bg-white/5 px-3 py-1.5 text-xs font-bold text-white/90 uppercase tracking-wider border border-white/10 w-[110px]">
                     {weekdayLabel}
                   </span>
 
                   {/* Workout Type Badge */}
                   {currentWorkoutMeta && (
-                    <span className={`inline-flex items-center justify-center rounded-lg px-3 py-1.5 text-xs font-bold uppercase tracking-wide border ${currentWorkoutMeta.badgeClass.replace('rounded-full', 'rounded-lg').replace('border ', '')} min-w-[70px]`}>
+                    <button
+                      type="button"
+                      onClick={handleJumpPrevWorkoutType}
+                      className={`inline-flex items-center justify-center rounded-lg px-3 py-1.5 text-xs font-bold uppercase tracking-wide border ${currentWorkoutMeta.badgeClass.replace('rounded-full', 'rounded-lg').replace('border ', '')} min-w-[70px] hover:opacity-80 transition`}
+                      title="Önceki aynı gün tipine git"
+                    >
                       {currentWorkoutMeta.label}
-                    </span>
+                    </button>
                   )}
                 </div>
 
@@ -831,62 +944,74 @@ export default function MainPage() {
                 </div>
               </div>
               
-              {currentWorkout.workoutFocus && currentWorkout.workoutFocus.length > 0 && (
-                <div className="flex flex-wrap gap-2 pb-2">
-                  {currentWorkout.workoutFocus.map((focus) => (
-                    <span key={focus} className="inline-flex items-center rounded-md bg-white/5 px-2 py-1 text-[10px] font-medium text-gray-400 border border-white/5">
-                      {focus}
-                    </span>
-                  ))}
-                </div>
-              )}
+              {/* Workout Focus Tags Removed */}
 
-              <div className="space-y-2 md:space-y-3">
-                {currentWorkout.items.map((item, idx) => {
-                  const displayName = item.displayName || item.name;
-                  const setSummary = `${item.sets.length} set`;
-                  const quickSummary = item.sets
-                    .map((s) => {
-                      const numericWeight = Number(s?.w || 0);
-                      let label = s?.wDisplay && s.wDisplay.length > 0
-                        ? s.wDisplay
-                        : (Number.isFinite(numericWeight) && numericWeight > 0 ? `${numericWeight} kg` : '—');
-                      
-                      if (label === 'Body Weight' || label === 'Vücut Ağırlığı') {
-                        label = 'BW';
-                      }
+              {/* Watermark Workout Type Removed */}
 
-                      return (
-                        <span key={Math.random()} className="inline-flex items-center bg-white/5 rounded px-1.5 py-0.5 text-xs mr-1.5 border border-white/5">
-                          <span className="font-bold text-white">{s.r}</span>
-                          <span className="text-gray-500 text-[10px] mx-0.5">×</span>
-                          <span className="text-gray-300 font-medium">{label}</span>
-                        </span>
-                      );
-                    });
+              <div className="space-y-2 md:space-y-3 relative z-10">
+                {(currentWorkout.items || [])
+                  .map((item, idx) => ({
+                    item,
+                    idx,
+                    category: detectCategoryKey(item, exerciseLibrary),
+                    usage: workoutUsageMap[canonicalFromParts(item.canonicalName, item.displayName || item.name).toLowerCase()] || exerciseUsageMap[canonicalFromParts(item.canonicalName, item.displayName || item.name).toLowerCase()] || 0,
+                  }))
+                  .sort((a, b) => {
+                    const pa = CATEGORY_PRIORITY[a.category] ?? CATEGORY_PRIORITY.other;
+                    const pb = CATEGORY_PRIORITY[b.category] ?? CATEGORY_PRIORITY.other;
+                    if (pa !== pb) return pa - pb;
 
-                  return (
-                    <button
-                      type="button"
-                      onClick={() => openQuickEdit(item, idx)}
-                      key={`${displayName}-${idx}`}
-                      className="flex w-full items-center justify-between gap-3 md:gap-4 rounded-2xl border border-white/10 bg-white/5 px-3 py-3 md:px-4 md:py-4 text-left hover:bg-white/10 transition group"
-                    >
-                      <div className="flex flex-col min-w-0 gap-2 flex-1">
-                        <div className="flex items-center justify-between pr-2">
-                          <p className="font-bold text-white text-sm md:text-base truncate capitalize">{displayName}</p>
+                    if (a.usage !== b.usage) return b.usage - a.usage;
+
+                    const nameA = a.item.displayName || a.item.name || '';
+                    const nameB = b.item.displayName || b.item.name || '';
+                    return nameA.localeCompare(nameB, 'tr');
+                  })
+                  .map(({ item, idx }) => {
+                    const displayName = item.displayName || item.name;
+                    const setSummary = `${item.sets.length} set`;
+                    const quickSummary = item.sets
+                      .map((s) => {
+                        const numericWeight = Number(s?.w || 0);
+                        let label = s?.wDisplay && s.wDisplay.length > 0
+                          ? s.wDisplay
+                          : (Number.isFinite(numericWeight) && numericWeight > 0 ? `${numericWeight} kg` : '—');
+                        
+                        if (label === 'Body Weight' || label === 'Vücut Ağırlığı') {
+                          label = 'BW';
+                        }
+
+                        return (
+                          <span key={Math.random()} className="inline-flex items-center bg-white/5 rounded px-1.5 py-0.5 text-xs mr-1.5 border border-white/5">
+                            <span className="font-bold text-white">{s.r}</span>
+                            <span className="text-gray-500 text-[10px] mx-0.5">×</span>
+                            <span className="text-gray-300 font-medium">{label}</span>
+                          </span>
+                        );
+                      });
+
+                    return (
+                      <button
+                        type="button"
+                        onClick={() => openQuickEdit(item, idx)}
+                        key={`${displayName}-${idx}`}
+                        className="flex w-full items-center justify-between gap-3 md:gap-4 rounded-2xl border border-white/10 bg-white/5 px-3 py-3 md:px-4 md:py-4 text-left hover:bg-white/10 transition group"
+                      >
+                        <div className="flex flex-col min-w-0 gap-2 flex-1">
+                          <div className="flex items-center justify-between pr-2">
+                            <p className="font-bold text-white text-sm md:text-base truncate capitalize">{displayName}</p>
+                          </div>
+                          <div className="flex flex-wrap gap-y-1">
+                            {quickSummary}
+                          </div>
                         </div>
-                        <div className="flex flex-wrap gap-y-1">
-                          {quickSummary}
+                        <div className="flex items-center gap-2 text-gray-500">
+                           <span className="text-[10px] font-bold uppercase tracking-wider opacity-60">{item.sets.length} SET</span>
+                           <span className="material-symbols-outlined group-hover:text-white transition">chevron_right</span>
                         </div>
-                      </div>
-                      <div className="flex items-center gap-2 text-gray-500">
-                         <span className="text-[10px] font-bold uppercase tracking-wider opacity-60">{item.sets.length} SET</span>
-                         <span className="material-symbols-outlined group-hover:text-white transition">chevron_right</span>
-                      </div>
-                    </button>
-                  );
-                })}
+                      </button>
+                    );
+                  })}
               </div>
 
               {currentWorkout.workoutFuel && (
@@ -1074,6 +1199,17 @@ export default function MainPage() {
         }}
       />
 
+      {/* Body Weight Modal */}
+      <BodyWeightModal
+        isOpen={isBodyWeightModalOpen}
+        onClose={() => setIsBodyWeightModalOpen(false)}
+        initialWeight={bodyWeightInput}
+        selectedDate={selectedDate}
+        onSave={async (val) => {
+          await commitBodyWeight(val);
+        }}
+      />
+
       {/* Quick Edit Modal */}
       {editingExercise && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 backdrop-blur-sm px-4">
@@ -1197,14 +1333,23 @@ export default function MainPage() {
               ))}
             </div>
 
-            {/* Add Set Button */}
-            <button
-              onClick={handleQuickEditAddSet}
-              className="mt-4 w-full py-3 rounded-xl border border-dashed border-white/10 bg-transparent text-gray-500 font-bold hover:bg-white/5 hover:text-gray-300 hover:border-white/20 transition flex items-center justify-center gap-2 text-xs"
-            >
-              <span className="material-symbols-outlined text-base">add</span>
-              Yeni Set Ekle
-            </button>
+            {/* Delete Exercise & Add Set Row */}
+            <div className="mt-4 flex items-center gap-3">
+              <button
+                type="button"
+                onClick={handleQuickEditDeleteExercise}
+                className="basis-1/4 min-w-[88px] py-3 rounded-xl border border-white/5 bg-white/5 text-gray-500 font-bold hover:bg-red-500/10 hover:text-red-400 hover:border-red-500/20 transition text-xs"
+              >
+                Sil
+              </button>
+              <button
+                onClick={handleQuickEditAddSet}
+                className="basis-3/4 w-full py-3 rounded-xl border border-dashed border-white/10 bg-transparent text-gray-500 font-bold hover:bg-white/5 hover:text-gray-300 hover:border-white/20 transition flex items-center justify-center gap-2 text-xs"
+              >
+                <span className="material-symbols-outlined text-base">add</span>
+                Yeni Set Ekle
+              </button>
+            </div>
 
             {/* Actions */}
             <div className="mt-4 pt-2">

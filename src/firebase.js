@@ -1,6 +1,6 @@
 import { initializeApp } from 'firebase/app';
 import { getDatabase } from 'firebase/database';
-import { getAuth } from 'firebase/auth';
+import { getAuth, GoogleAuthProvider } from 'firebase/auth';
 
 // Firebase yapılandırması
 // Bu bilgileri Firebase Console'dan alacaksınız
@@ -20,4 +20,5 @@ const app = initializeApp(firebaseConfig);
 // Database ve Auth servislerini export et
 export const database = getDatabase(app);
 export const auth = getAuth(app);
+export const googleProvider = new GoogleAuthProvider();
 export default app;

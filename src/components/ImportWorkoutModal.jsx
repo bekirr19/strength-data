@@ -1,9 +1,11 @@
-import { useState } from 'react';
-import { saveWorkout, toISODate, ensureExercise, resolveWeightValue, saveExercises, saveBodyWeight, clearCache, exportAllData, importAllData } from '../utils/storage';
+import { useState, useRef } from 'react';
+import { saveWorkout, toISODate, ensureExercise, resolveWeightValue, saveExercises, saveBodyWeight, clearCache, importAllData } from '../utils/storage';
+import { X, Upload, AlertTriangle, FileText } from 'lucide-react';
 
 export default function ImportWorkoutModal({ isOpen, onClose, selectedDate, onSuccess }) {
   const [jsonText, setJsonText] = useState('');
   const [error, setError] = useState('');
+  const fileInputRef = useRef(null);
 
   if (!isOpen) return null;
 
@@ -28,28 +30,22 @@ export default function ImportWorkoutModal({ isOpen, onClose, selectedDate, onSu
     return selectedDate; // Fallback
   };
 
-  const handleExportAll = async () => {
-    try {
-      const payload = await exportAllData();
-      if (!payload) {
-        alert('Veriler dışa aktarılamadı. Lütfen tekrar deneyin.');
-        return;
-      }
+  const handleFileUpload = (event) => {
+    const file = event.target.files[0];
+    if (!file) return;
 
-      const fileName = `strength-data-export-${payload.exportedAt.replace(/[:.]/g, '-')}.json`;
-      const blob = new Blob([JSON.stringify(payload, null, 2)], { type: 'application/json' });
-      const url = URL.createObjectURL(blob);
-      const link = document.createElement('a');
-      link.href = url;
-      link.download = fileName;
-      document.body.appendChild(link);
-      link.click();
-      document.body.removeChild(link);
-      URL.revokeObjectURL(url);
-    } catch (err) {
-      console.error('Export işlemi sırasında hata:', err);
-      alert('Veriler dışa aktarılamadı. Lütfen tekrar deneyin.');
-    }
+    const reader = new FileReader();
+    reader.onload = (e) => {
+      setJsonText(e.target.result);
+      setError('');
+    };
+    reader.onerror = () => {
+      setError('Dosya okunurken bir hata oluştu.');
+    };
+    reader.readAsText(file);
+    
+    // Reset input value to allow selecting the same file again
+    event.target.value = '';
   };
 
   const handleImport = async () => {
@@ -203,92 +199,108 @@ export default function ImportWorkoutModal({ isOpen, onClose, selectedDate, onSu
   "tarih": "2 Kasım 2025",
   "antrenman_adi": "Push 2",
   "antrenman_odagi": ["Göğüs", "Omuz", "Arka Kol"],
-  "antrenman_yakiti": ["2 Yumurta", "1 Muz", "Kafein (200mg)"],
   "egzersizler": [
     {
       "isim": "Bench Press",
       "setler": [
-        {"set": 1, "tekrar": 6, "agirlik_kg": 60},
-        {"set": 2, "tekrar": 8, "agirlik_kg": 65}
+        {"set": 1, "tekrar": 6, "agirlik_kg": 60}
       ]
     }
-  ],
-  "genel_yorum": "İyi bir antrenman günüydü."
+  ]
 }`;
 
   return (
     <div 
-      className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 backdrop-blur-sm p-4 animate-slide-in overflow-y-auto" 
+      className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 backdrop-blur-sm p-4 animate-in fade-in duration-200" 
       onClick={onClose}
     >
       <div
-        className="bg-background-dark border border-gray-700 rounded-2xl p-4 md:p-6 max-w-2xl w-full shadow-2xl my-8"
+        className="w-full max-w-2xl rounded-2xl bg-[#1C1C1E] border border-white/10 shadow-2xl overflow-hidden flex flex-col max-h-[90vh]"
         onClick={(e) => e.stopPropagation()}
       >
-        <div className="flex items-center justify-between mb-4">
-          <div>
-            <h2 className="text-lg md:text-xl font-bold text-white">JSON ile Antrenman Ekle</h2>
-            <p className="text-xs md:text-sm text-gray-400 mt-1">
-              Seçili tarih: {selectedDate}
+        {/* Header */}
+        <div className="flex items-center justify-between p-4 border-b border-white/5 shrink-0">
+          <div className="flex items-center gap-3">
+            <div className="flex h-10 w-10 items-center justify-center rounded-full bg-purple-500/10 text-purple-400">
+              <Upload className="h-5 w-5" />
+            </div>
+            <div>
+              <h2 className="text-lg font-bold text-white">Veri İçe Aktar</h2>
+              <p className="text-xs text-gray-400">
+                JSON dosyasını yükleyin veya metni yapıştırın
+              </p>
+            </div>
+          </div>
+          <button 
+            onClick={onClose} 
+            className="p-2 text-gray-400 hover:text-white hover:bg-white/5 rounded-lg transition"
+          >
+            <X className="h-5 w-5" />
+          </button>
+        </div>
+
+        {/* Body */}
+        <div className="p-4 overflow-y-auto custom-scrollbar">
+          
+          {/* File Upload Area */}
+          <div 
+            onClick={() => fileInputRef.current?.click()}
+            className="mb-6 flex flex-col items-center justify-center rounded-xl border-2 border-dashed border-white/10 bg-white/5 p-8 transition hover:bg-white/10 hover:border-purple-500/50 cursor-pointer group"
+          >
+            <input 
+              type="file" 
+              ref={fileInputRef}
+              onChange={handleFileUpload}
+              accept=".json"
+              className="hidden"
+            />
+            <div className="mb-3 rounded-full bg-purple-500/10 p-4 text-purple-400 transition group-hover:scale-110 group-hover:bg-purple-500/20 shadow-lg shadow-purple-500/5">
+              <FileText className="h-8 w-8" />
+            </div>
+            <p className="text-sm font-bold text-gray-200">
+              JSON Dosyası Seçin
+            </p>
+            <p className="text-xs text-gray-500 mt-1">
+              Bilgisayarınızdan bir yedek dosyası yükleyin
             </p>
           </div>
-          <div className="flex items-center gap-2">
-            <button
-              onClick={handleExportAll}
-              className="inline-flex items-center gap-1 px-3 py-2 rounded-lg bg-transparent text-primary border border-primary/40 text-xs md:text-sm font-semibold hover:bg-primary/10 transition"
-            >
-              <span className="material-symbols-outlined text-sm align-middle">download</span>
-              Dışa Aktar
-            </button>
-            <button onClick={onClose} className="p-2 hover:bg-gray-800 active:bg-gray-700 rounded-lg transition">
-              <span className="material-symbols-outlined text-gray-400">close</span>
-            </button>
+
+          <div className="relative">
+            <div className="absolute -top-3 left-1/2 -translate-x-1/2 bg-[#1C1C1E] px-3 text-[10px] font-bold text-gray-500 uppercase tracking-wider">
+              VEYA METİN YAPIŞTIRIN
+            </div>
+            <textarea
+              value={jsonText}
+              onChange={(e) => setJsonText(e.target.value)}
+              className="w-full h-48 p-4 bg-black/20 border border-white/10 rounded-xl text-sm font-mono text-gray-300 placeholder-gray-600 focus:border-purple-500/50 focus:ring-1 focus:ring-purple-500/50 focus:outline-none resize-none transition mt-2"
+              placeholder={exampleJSON}
+              spellCheck="false"
+            />
           </div>
+
+          {error && (
+            <div className="mt-4 flex items-start gap-3 rounded-xl bg-red-500/10 p-4 text-red-400 border border-red-500/20 animate-in slide-in-from-top-2">
+              <AlertTriangle className="h-5 w-5 shrink-0" />
+              <p className="text-sm">{error}</p>
+            </div>
+          )}
         </div>
 
-        <div className="mb-4">
-          <label className="block text-sm font-medium text-gray-300 mb-2">
-            JSON Verisi
-          </label>
-          <textarea
-            value={jsonText}
-            onChange={(e) => setJsonText(e.target.value)}
-            className="w-full h-64 md:h-80 p-3 bg-gray-900/80 border border-gray-700 rounded-lg text-white text-xs md:text-sm font-mono focus:ring-2 focus:ring-primary focus:border-transparent resize-none"
-            placeholder={exampleJSON}
-          />
-        </div>
-
-        {error && (
-          <div className="mb-4 p-3 bg-red-500/10 border border-red-500/30 rounded-lg">
-            <p className="text-xs md:text-sm text-red-400 whitespace-pre-wrap">{error}</p>
-          </div>
-        )}
-
-        <div className="mb-4 p-3 bg-primary/10 border border-primary/20 rounded-lg">
-          <p className="text-xs md:text-sm text-primary font-semibold mb-2">💡 İpuçları:</p>
-          <ul className="text-xs text-gray-300 space-y-1 list-disc list-inside">
-            <li>JSON formatına dikkat edin (tırnak işaretleri, virgüller)</li>
-            <li>Export dosyalarını buraya yapıştırdığınızda ilgili günler güncellenir</li>
-            <li>tarih: "2 Kasım 2025" formatında olmalı (manuel giriş için)</li>
-            <li>agirlik_kg: sayı veya "Vücut Ağırlığı" olabilir</li>
-            <li>tekrar: sayı veya "5 + 7" gibi metin olabilir</li>
-            <li>antrenman_yakiti: dizi formatında olmalı</li>
-          </ul>
-        </div>
-
-        <div className="flex gap-3">
+        {/* Footer */}
+        <div className="flex gap-3 p-4 border-t border-white/5 bg-white/[0.02] shrink-0">
+          <button
+            onClick={onClose}
+            className="flex-1 rounded-xl bg-white/5 py-3 font-medium text-white hover:bg-white/10 transition"
+          >
+            İptal
+          </button>
           <button
             onClick={handleImport}
             disabled={!jsonText.trim()}
-            className="flex-1 py-2.5 md:py-3 bg-primary text-background-dark rounded-lg font-semibold transition hover:bg-primary/90 active:bg-primary/80 disabled:opacity-50 disabled:cursor-not-allowed text-sm md:text-base"
+            className="flex-1 flex items-center justify-center gap-2 rounded-xl bg-purple-500 py-3 font-bold text-white hover:bg-purple-600 transition disabled:opacity-50 disabled:cursor-not-allowed shadow-lg shadow-purple-500/20"
           >
-            İçeri Aktar
-          </button>
-          <button
-            onClick={onClose}
-            className="px-4 md:px-6 py-2.5 md:py-3 bg-gray-800 hover:bg-gray-700 active:bg-gray-600 text-white rounded-lg font-semibold transition text-sm md:text-base"
-          >
-            İptal
+            <Upload className="h-4 w-4" />
+            İçe Aktar
           </button>
         </div>
       </div>
