@@ -1,6 +1,6 @@
 import { createContext, useContext, useEffect, useState } from 'react';
 import { auth, googleProvider } from '../firebase';
-import { isUserAdmin } from '../utils/admin';
+import { checkIsAdmin } from '../utils/admin';
 import { upsertUserMeta } from '../utils/userMeta';
 import { 
   signInWithPopup, 
@@ -71,16 +71,21 @@ export function AuthProvider({ children }) {
   }
 
   useEffect(() => {
-    const unsubscribe = onAuthStateChanged(auth, (user) => {
+    const unsubscribe = onAuthStateChanged(auth, async (user) => {
       setCurrentUser(user);
-      setIsAdmin(isUserAdmin(user));
-      setLoading(false);
 
       if (user) {
+        const adminStatus = await checkIsAdmin(user.uid);
+        setIsAdmin(adminStatus);
         upsertUserMeta(user).catch((err) => {
           console.warn('Kullanıcı meta verisi güncellenemedi:', err);
         });
+      } else {
+        setIsAdmin(false);
+        clearCache();
       }
+
+      setLoading(false);
     });
 
     return unsubscribe;

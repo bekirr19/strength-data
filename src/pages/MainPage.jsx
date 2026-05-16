@@ -13,6 +13,13 @@ import { getExerciseInfo } from '../utils/exerciseMetadata';
 
 const LAST_SELECTED_DATE_KEY = 'main_last_selected_date';
 
+const getStoredDate = () => {
+  try { return sessionStorage.getItem(LAST_SELECTED_DATE_KEY) || null; } catch { return null; }
+};
+const storeDate = (date) => {
+  try { sessionStorage.setItem(LAST_SELECTED_DATE_KEY, date); } catch { /* ignore */ }
+};
+
 const canonicalFromParts = (canonical, name) => normalizeExerciseName(canonical || name || '');
 const CATEGORY_PRIORITY = {
   leg: 0,
@@ -53,28 +60,18 @@ const detectCategoryKey = (item, library = []) => {
   return 'other';
 };
 
-// SPA içinde gezinirken tarihi hatırlamak için modül seviyesinde değişken.
-// Sayfa yenilendiğinde (refresh) bu değişken sıfırlanır.
-let sessionLastSelectedDate = null;
-
 export default function MainPage() {
   const navigate = useNavigate();
   const location = useLocation();
   const { logout, currentUser, isAdmin } = useAuth();
-  
+
   const [selectedDate, setSelectedDate] = useState(() => {
-    // 1. Eğer navigasyon ile gelen bir tarih varsa onu kullan (Örn: Egzersiz detayından gelindi)
-    if (location.state?.date) {
-      return location.state.date;
-    }
-    // 2. Eğer oturum içinde bir tarih seçildiyse onu kullan
-    // 3. Hiçbiri yoksa bugünü seç
-    return sessionLastSelectedDate || toISODate(new Date());
+    if (location.state?.date) return location.state.date;
+    return getStoredDate() || toISODate(new Date());
   });
 
-  // Seçilen tarihi oturum değişkenine kaydet
   useEffect(() => {
-    sessionLastSelectedDate = selectedDate;
+    storeDate(selectedDate);
   }, [selectedDate]);
 
   const [isCalendarOpen, setIsCalendarOpen] = useState(false);

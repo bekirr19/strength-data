@@ -52,31 +52,29 @@ export default function ImportWorkoutModal({ isOpen, onClose, selectedDate, onSu
 
   const handleImport = async () => {
     setError('');
-    
+
+    // Step 1: Parse JSON
+    let data;
     try {
-      console.log('Import başlıyor...');
-      const data = JSON.parse(jsonText);
-      console.log('JSON parse başarılı, data:', data);
+      data = JSON.parse(jsonText);
+    } catch (err) {
+      setError('JSON formatı hatalı. Lütfen geçerli bir JSON yapısı girin.\n\nHata: ' + err.message);
+      return;
+    }
 
+    // Step 2: Import
+    try {
       if (data && typeof data === 'object' && data.version && data.workouts) {
-        console.log('Bulk import modu (Tam Geri Yükleme)');
-        
         const confirmed = confirm('DİKKAT: Bu işlem mevcut TÜM verileri (antrenmanlar, egzersizler, vücut ağırlığı, geliştirmeler) silebilecek ve yedek dosyasındaki verilerle değiştirecektir. Devam edilsin mi?');
-        if (!confirmed) {
-          return;
-        }
+        if (!confirmed) return;
 
-        console.log('Import onaylandı, işlem başlıyor...');
         await importAllData(data);
-        
+
         alert('✅ Tüm veriler başarıyla içe aktarıldı ve senkronize edildi.');
-        
-        // Cache'i temizle
-        console.log('Import tamamlandı, cache temizleniyor...');
+
         clearCache();
-        
+
         if (typeof window !== 'undefined') {
-          // LocalStorage cache'i de temizle
           try {
             window.localStorage.removeItem('firebase_cache_workouts');
             window.localStorage.removeItem('firebase_cache_exercises');
@@ -85,26 +83,17 @@ export default function ImportWorkoutModal({ isOpen, onClose, selectedDate, onSu
             console.warn('LocalStorage cache temizlenemedi:', e);
           }
         }
-        
-        if (onSuccess) {
-          onSuccess();
-        }
-        
-        // Biraz bekle ki Firebase yazma işlemi kesinlikle tamamlansın
-        console.log('500ms sonra sayfa yenilenecek...');
+
+        if (onSuccess) onSuccess();
+
         setTimeout(() => {
-          if (typeof window !== 'undefined') {
-            console.log('Sayfa yenileniyor...');
-            window.location.reload();
-          }
+          if (typeof window !== 'undefined') window.location.reload();
         }, 500);
         return;
       }
-      
-      // Tarih parse
+
       const targetDate = data.tarih ? parseDate(data.tarih) : selectedDate;
-      
-      // Egzersizleri dönüştür
+
       const itemsPromises = (data.egzersizler || []).map(async (ex) => {
         const sets = (ex.setler || []).map((s) => {
           let reps = 0;
@@ -121,79 +110,52 @@ export default function ImportWorkoutModal({ isOpen, onClose, selectedDate, onSu
             : (s.agirlik || s.weight || '');
           const { value, display } = resolveWeightValue(rawWeight, ex.isim, targetDate);
 
-          // Tekrar kontrolü
-          if (!Number.isFinite(reps) || reps <= 0) {
-            console.warn(`Set atlandı (geçersiz tekrar): ${ex.isim}`, s);
-            return null;
-          }
+          if (!Number.isFinite(reps) || reps <= 0) return null;
 
-          // Ağırlık kontrolü - Body Weight (display var ama value = 0) veya geçerli sayı olmalı
           const isBodyWeight = display && (display === 'Body Weight' || display.startsWith('BW'));
           const hasValidWeight = Number.isFinite(value) && value > 0;
-          
-          if (!isBodyWeight && !hasValidWeight) {
-            console.warn(`Set atlandı (geçersiz ağırlık): ${ex.isim}`, s, { value, display });
-            return null;
-          }
+          if (!isBodyWeight && !hasValidWeight) return null;
 
-          return {
-            w: value,
-            wDisplay: display,
-            r: reps,
-            note: s.not || '',
-          };
+          return { w: value, wDisplay: display, r: reps, note: s.not || '' };
         }).filter(Boolean);
-        
+
         if (sets.length > 0) {
           await ensureExercise(ex.isim);
-          return {
-            name: ex.isim,
-            sets: sets
-          };
+          return { name: ex.isim, sets };
         }
-        
         return null;
       });
-      
+
       const items = (await Promise.all(itemsPromises)).filter(Boolean);
-      
+
       if (items.length === 0) {
         setError('Geçerli egzersiz bulunamadı. Lütfen JSON formatını kontrol edin.');
         return;
       }
-      
-      // Antrenman yakıtı
+
       let fuelText = '';
       if (data.antrenman_yakiti && Array.isArray(data.antrenman_yakiti)) {
         fuelText = data.antrenman_yakiti.join(', ');
       }
-      
-      // Notlar
-      const notesText = typeof data.genel_yorum === 'string' ? data.genel_yorum.trim() : '';
-      
-      // Workout objesini oluştur
+
       const workout = {
         dateISO: targetDate,
         workoutName: data.antrenman_adi || '',
         workoutFocus: data.antrenman_odagi || [],
         workoutFuel: fuelText,
-        items: items,
-        notes: notesText
+        items,
+        notes: typeof data.genel_yorum === 'string' ? data.genel_yorum.trim() : '',
       };
-      
-      // Kaydet
+
       await saveWorkout(workout);
-      
+
       alert(`✅ Antrenman başarıyla ${targetDate} tarihine eklendi!\n\n${items.length} egzersiz, ${items.reduce((acc, it) => acc + it.sets.length, 0)} set kaydedildi.`);
-      
-      if (onSuccess) {
-        onSuccess();
-      }
-      
+
+      if (onSuccess) onSuccess();
+
     } catch (err) {
-      console.error('JSON parse error:', err);
-      console.error('Error stack:', err.stack);
-      setError('JSON formatı hatalı. Lütfen geçerli bir JSON yapısı girin.\n\nHata: ' + err.message);
+      console.error('Import hatası:', err);
+      setError('İçe aktarma sırasında bir hata oluştu. Lütfen tekrar deneyin.\n\nHata: ' + err.message);
     }
   };
 
