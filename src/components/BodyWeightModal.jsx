@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useMemo } from 'react';
-import { Area, AreaChart, CartesianGrid, Tooltip, ResponsiveContainer, XAxis, YAxis } from 'recharts';
-import { getBodyWeightCollection, formatDateTRFull, fromISO } from '../utils/storage';
+import { Area, AreaChart, CartesianGrid, Tooltip, ResponsiveContainer, XAxis, YAxis, ReferenceLine } from 'recharts';
+import { getBodyWeightCollection, formatDateTRFull, fromISO } from '../utils/storage-client';
 
 export default function BodyWeightModal({ isOpen, onClose, initialWeight, onSave, selectedDate }) {
   const [weight, setWeight] = useState(initialWeight || '');
@@ -28,7 +28,7 @@ export default function BodyWeightModal({ isOpen, onClose, initialWeight, onSave
   };
 
   const chartData = useMemo(() => {
-    const entries = Object.entries(history)
+    const rawEntries = Object.entries(history)
       .map(([iso, val]) => ({
         date: iso,
         value: Number(val),
@@ -37,7 +37,7 @@ export default function BodyWeightModal({ isOpen, onClose, initialWeight, onSave
       .filter(item => !isNaN(item.value) && item.value > 0)
       .sort((a, b) => a.timestamp - b.timestamp);
 
-    if (entries.length === 0) return [];
+    if (rawEntries.length === 0) return [];
 
     const now = new Date();
     let cutoffDate = new Date(0); // Default 'all'
@@ -53,8 +53,18 @@ export default function BodyWeightModal({ isOpen, onClose, initialWeight, onSave
       cutoffDate.setFullYear(now.getFullYear() - 1);
     }
 
-    return entries.filter(item => item.timestamp >= cutoffDate.getTime());
+    return rawEntries.filter(item => item.timestamp >= cutoffDate.getTime());
   }, [history, timeRange]);
+
+  const { minValue, maxValue } = useMemo(() => {
+    if (!chartData || chartData.length === 0) return { minValue: 0, maxValue: 0 };
+    const values = chartData.map((d) => d.value).filter((v) => Number.isFinite(v));
+    if (values.length === 0) return { minValue: 0, maxValue: 0 };
+    return {
+      minValue: Math.min(...values),
+      maxValue: Math.max(...values),
+    };
+  }, [chartData]);
 
   const handleSave = () => {
     onSave(weight);
@@ -137,26 +147,17 @@ export default function BodyWeightModal({ isOpen, onClose, initialWeight, onSave
                   <AreaChart data={chartData}>
                     <defs>
                       <linearGradient id="colorWeight" x1="0" y1="0" x2="0" y2="1">
-                        <stop offset="5%" stopColor="#0DF293" stopOpacity={0.3}/>
-                        <stop offset="95%" stopColor="#0DF293" stopOpacity={0}/>
+                        <stop offset="5%" stopColor="#3b82f6" stopOpacity={0.3}/>
+                        <stop offset="95%" stopColor="#3b82f6" stopOpacity={0}/>
                       </linearGradient>
                     </defs>
                     <CartesianGrid strokeDasharray="3 3" stroke="#ffffff10" vertical={false} />
-                    <XAxis 
-                      dataKey="date" 
-                      stroke="#ffffff20"
-                      tick={{ fill: '#ffffff60', fontSize: 10 }}
-                      tickFormatter={(val) => {
-                        const d = new Date(val);
-                        return `${d.getDate()}.${d.getMonth() + 1}`;
-                      }}
-                      tickMargin={10}
-                    />
+                    <XAxis dataKey="date" hide />
                     <YAxis 
-                      domain={['dataMin - 1', 'dataMax + 1']} 
+                      domain={[minValue, maxValue + 0.5]} 
                       stroke="#ffffff20"
                       tick={{ fill: '#ffffff60', fontSize: 10 }}
-                      width={30}
+                      width={46}
                     />
                     <Tooltip
                       content={({ active, payload }) => {
@@ -173,10 +174,26 @@ export default function BodyWeightModal({ isOpen, onClose, initialWeight, onSave
                         return null;
                       }}
                     />
+                    {maxValue > 0 && (
+                      <ReferenceLine 
+                        y={maxValue} 
+                        stroke="#3b82f6" 
+                        strokeDasharray="4 4" 
+                        strokeOpacity={0.6}
+                        label={{ value: `${maxValue} kg`, position: 'left', fill: '#3b82f6', fontSize: 10, textAnchor: 'end' }}
+                      />
+                    )}
+                    {minValue > 0 && (
+                      <ReferenceLine
+                        y={minValue}
+                        stroke="transparent"
+                        label={{ value: `${minValue} kg`, position: 'left', fill: '#ffffff90', fontSize: 10, textAnchor: 'end' }}
+                      />
+                    )}
                     <Area
                       type="monotone"
                       dataKey="value"
-                      stroke="#0DF293"
+                      stroke="#3b82f6"
                       strokeWidth={3}
                       fillOpacity={1}
                       fill="url(#colorWeight)"

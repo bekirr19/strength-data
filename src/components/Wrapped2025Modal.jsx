@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { X, ChevronRight, ChevronLeft, Trophy, Calendar, Dumbbell, Activity, TrendingUp, BarChart2, PieChart as PieChartIcon, List } from 'lucide-react';
-import { getWorkouts } from '../utils/storage';
+import { getWorkouts } from '../utils/storage-client';
 import { getExerciseInfo } from '../utils/exerciseMetadata';
 import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, AreaChart, Area, PieChart, Pie, Cell } from 'recharts';
 
@@ -153,8 +153,8 @@ export default function Wrapped2025Modal({ isOpen, onClose }) {
           title: 'Toplam Set',
           value: totalSets,
           subtitle: `${totalReps.toLocaleString()} tekrar attın!`,
-          icon: <Dumbbell size={48} className="text-green-400" />,
-          gradient: 'from-emerald-600 to-green-500'
+          icon: <Dumbbell size={48} className="text-blue-400" />,
+          gradient: 'from-blue-600 to-blue-500'
         },
         {
           type: 'highlight',
@@ -340,7 +340,7 @@ export default function Wrapped2025Modal({ isOpen, onClose }) {
               {/* Volume Progress Chart */}
               <div className="bg-white/5 p-4 rounded-2xl border border-white/5">
                 <h3 className="text-lg font-bold mb-4 flex items-center gap-2">
-                  <TrendingUp size={20} className="text-green-400" />
+                  <TrendingUp size={20} className="text-blue-400" />
                   Hacim İlerlemesi (Ton)
                 </h3>
                 <div className="h-48 w-full">
@@ -348,8 +348,8 @@ export default function Wrapped2025Modal({ isOpen, onClose }) {
                     <AreaChart data={reportData?.monthlyStats}>
                       <defs>
                         <linearGradient id="colorVolume" x1="0" y1="0" x2="0" y2="1">
-                          <stop offset="5%" stopColor="#10b981" stopOpacity={0.3}/>
-                          <stop offset="95%" stopColor="#10b981" stopOpacity={0}/>
+                          <stop offset="5%" stopColor="#3b82f6" stopOpacity={0.3}/>
+                          <stop offset="95%" stopColor="#3b82f6" stopOpacity={0}/>
                         </linearGradient>
                       </defs>
                       <XAxis dataKey="name" stroke="#666" fontSize={12} tickLine={false} axisLine={false} />
@@ -357,7 +357,7 @@ export default function Wrapped2025Modal({ isOpen, onClose }) {
                         contentStyle={{ backgroundColor: '#1f2937', border: 'none', borderRadius: '8px' }}
                         itemStyle={{ color: '#fff' }}
                       />
-                      <Area type="monotone" dataKey="volume" stroke="#10b981" fillOpacity={1} fill="url(#colorVolume)" />
+                      <Area type="monotone" dataKey="volume" stroke="#3b82f6" fillOpacity={1} fill="url(#colorVolume)" />
                     </AreaChart>
                   </ResponsiveContainer>
                 </div>

@@ -70,11 +70,11 @@ export default function LoginPage() {
   }
 
   return (
-    <div className="flex min-h-screen flex-col items-center justify-center bg-background-dark p-4 text-white bg-[radial-gradient(ellipse_80%_80%_at_50%_-20%,rgba(13,242,147,0.15),rgba(16,34,27,0))]">
+    <div className="flex min-h-screen flex-col items-center justify-center bg-background-dark p-4 text-white bg-[radial-gradient(ellipse_80%_80%_at_50%_-20%,rgba(59,130,246,0.15),rgba(11,17,33,0))]">
       <div className="w-full max-w-md space-y-8 rounded-3xl border border-white/10 bg-[#1C1C1E]/80 p-8 shadow-2xl backdrop-blur-xl">
         <div className="text-center">
           <img
-            src="/logo-mark.svg"
+            src="/logo-blue.svg"
             alt="Strength Data"
             className="mx-auto h-16 w-16 rounded-2xl shadow-lg mb-4"
           />

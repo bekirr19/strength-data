@@ -1,5 +1,5 @@
 import { useState, useRef, useEffect, useCallback } from 'react';
-import { toISODate, turkishWeekdaysShort, turkishMonths, getWorkouts, fromISO, formatDateTRFull } from '../utils/storage';
+import { toISODate, turkishWeekdaysShort, turkishMonths, getWorkouts, fromISO, formatDateTRFull } from '../utils/storage-client';
 import { WORKOUT_TYPE_META, detectWorkoutType } from '../utils/workoutTypes';
 
 const DAYS_VISIBLE = 21;
@@ -162,7 +162,7 @@ export default function WeekStrip({ selectedDate, onDateSelect, refreshKey }) {
               if (typeMeta) {
                 paletteClasses = `${typeMeta.buttonClass} hover:brightness-110 active:brightness-125 transition`;
               } else if (hasWorkout) {
-                paletteClasses = 'bg-primary/10 text-primary font-semibold border border-primary/20 hover:bg-primary/20 active:bg-primary/30';
+                paletteClasses = 'bg-blue-500/10 text-blue-500 font-semibold border border-blue-500/20 hover:bg-blue-500/20 active:bg-blue-500/30';
               }
 
               if (isSelected) {
@@ -171,13 +171,13 @@ export default function WeekStrip({ selectedDate, onDateSelect, refreshKey }) {
                   paletteClasses = `${typeMeta.buttonClass} ring-2 ring-white/50 shadow-lg shadow-black/50 scale-105 z-10`;
                 } else if (hasWorkout) {
                   // Antrenman var ama tipi yok (Generic): Primary tonunu koru
-                  paletteClasses = 'bg-primary/20 text-primary font-bold border border-primary/50 ring-2 ring-white/50 shadow-lg shadow-primary/20 scale-105 z-10';
+                  paletteClasses = 'bg-blue-500/20 text-blue-500 font-bold border border-blue-500/50 ring-2 ring-white/50 shadow-lg shadow-blue-500/20 scale-105 z-10';
                 } else {
                   // Boş gün seçili: Yeşil yapma, nötr gri/beyaz tonlarında seçili olduğunu göster
                   paletteClasses = 'bg-white/10 text-white border border-white/20 ring-2 ring-white/50 shadow-lg shadow-black/50 scale-105 z-10';
                 }
               } else if (isToday) {
-                paletteClasses += ' ring-1 ring-primary/50';
+                paletteClasses += ' ring-1 ring-blue-500/50';
               }
 
               return (
@@ -225,7 +225,7 @@ export default function WeekStrip({ selectedDate, onDateSelect, refreshKey }) {
         </div>
 
         <div className="mt-2 text-center text-[11px] md:text-xs text-gray-400 font-medium">
-          <span className="text-primary/80">{weekLabel}</span>
+          <span className="text-blue-500/80">{weekLabel}</span>
           <span className="mx-1 text-gray-600">•</span>
           <span>{selectedDateDisplay}</span>
         </div>

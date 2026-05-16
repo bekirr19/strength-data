@@ -2,7 +2,7 @@ import { useState, useEffect, useRef, useMemo } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { User, LogOut } from 'lucide-react';
 import { useAuth } from '../contexts/AuthContext';
-import { toISODate, formatDateTRFull, fromISO, turkishWeekdays, turkishWeekdaysShort, getWorkouts, getBodyWeightInfo, saveBodyWeight, clearBodyWeight, saveWorkout, resolveWeightValue, getExercises, normalizeExerciseName } from '../utils/storage';
+import { toISODate, formatDateTRFull, fromISO, turkishWeekdays, turkishWeekdaysShort, getWorkouts, getBodyWeightInfo, saveBodyWeight, clearBodyWeight, saveWorkout, resolveWeightValue, getExercises, normalizeExerciseName } from '../utils/storage-client';
 import WeekStrip from '../components/WeekStrip';
 import CalendarModal from '../components/CalendarModal';
 import ImportWorkoutModal from '../components/ImportWorkoutModal';
@@ -10,6 +10,8 @@ import BodyWeightModal from '../components/BodyWeightModal';
 import LoadingSpinner from '../components/LoadingSpinner';
 import { detectWorkoutType, WORKOUT_TYPE_META } from '../utils/workoutTypes';
 import { getExerciseInfo } from '../utils/exerciseMetadata';
+
+const LAST_SELECTED_DATE_KEY = 'main_last_selected_date';
 
 const canonicalFromParts = (canonical, name) => normalizeExerciseName(canonical || name || '');
 const CATEGORY_PRIORITY = {
@@ -58,7 +60,7 @@ let sessionLastSelectedDate = null;
 export default function MainPage() {
   const navigate = useNavigate();
   const location = useLocation();
-  const { logout, currentUser } = useAuth();
+  const { logout, currentUser, isAdmin } = useAuth();
   
   const [selectedDate, setSelectedDate] = useState(() => {
     // 1. Eğer navigasyon ile gelen bir tarih varsa onu kullan (Örn: Egzersiz detayından gelindi)
@@ -383,27 +385,121 @@ export default function MainPage() {
 
   const handleQuickEditDeleteExercise = () => {
     if (!editingExercise || !currentWorkout) return;
+
     const updatedItems = currentWorkout.items.filter((_, i) => i !== editingExercise.index);
-    const updatedWorkout = { ...currentWorkout, items: updatedItems };
+    const { cleanedWorkout, issues } = buildCleanWorkout(currentWorkout.dateISO, updatedItems);
 
-    // Optimistic UI update & close immediately
-    setWorkoutsByDate(prev => ({
-      ...prev,
-      [selectedDate]: updatedWorkout,
-    }));
+    if (issues.length > 0) {
+      alert(issues.join('\n'));
+      return;
+    }
+
     closeQuickEdit();
+    navigate('/', { state: { updatedWorkout: cleanedWorkout } });
 
-    // Persist in background
     (async () => {
       try {
-        await saveWorkout(updatedWorkout);
-        setRefreshKey(prev => prev + 1);
+        await saveWorkout(cleanedWorkout);
       } catch (error) {
         console.error('Egzersiz silinirken hata:', error);
         alert('Egzersiz silinirken bir hata oluştu.');
-        setRefreshKey(prev => prev + 1);
       }
     })();
+  };
+
+  const buildCleanWorkout = (targetDateISO, itemsOverride = null) => {
+    const baseWorkout = workoutsByDate[targetDateISO] || {
+      dateISO: targetDateISO,
+      items: [],
+      notes: '',
+      workoutFuel: '',
+      workoutName: '',
+      workoutFocus: [],
+    };
+
+    const issues = [];
+    const sourceItems = itemsOverride || baseWorkout.items || [];
+
+    const cleanedItems = sourceItems
+      .map((it, exerciseIdx) => {
+        const trimmedName = (it.displayName || it.name || '').trim();
+        const exerciseLabel = trimmedName || `Egzersiz ${exerciseIdx + 1}`;
+
+        if (!trimmedName) {
+          issues.push(`${exerciseLabel} için bir isim girin.`);
+          return null;
+        }
+
+        const canonical = canonicalFromParts(it.canonicalName, trimmedName);
+        if (!canonical) {
+          issues.push(`${exerciseLabel} adı geçerli değil.`);
+          return null;
+        }
+
+        const sets = Array.isArray(it.sets) ? it.sets : [];
+        const cleanedSets = [];
+
+        sets.forEach((set, setIdx) => {
+          const repsInput = String(set?.r ?? '').trim();
+          const weightInput = String(set?.w ?? '').trim();
+
+          const hasReps = repsInput.length > 0;
+          const hasWeight = weightInput.length > 0;
+
+          if (!hasReps && !hasWeight) {
+            return;
+          }
+
+          if (!hasReps || !hasWeight) {
+            issues.push(`${exerciseLabel} set ${setIdx + 1} için ağırlık ve tekrar değerlerini birlikte girin ya da tamamen boş bırakın.`);
+            return;
+          }
+
+          const reps = Number(repsInput);
+          if (!Number.isFinite(reps) || reps <= 0) {
+            issues.push(`${exerciseLabel} set ${setIdx + 1} için geçerli tekrar sayısı girin.`);
+            return;
+          }
+
+          const { value, display } = resolveWeightValue(weightInput, trimmedName, targetDateISO);
+
+          const isBodyWeight = display && (display === 'Body Weight' || display.startsWith('BW'));
+          const hasValidWeight = Number.isFinite(value) && value > 0;
+
+          if (!isBodyWeight && !hasValidWeight) {
+            issues.push(`${exerciseLabel} set ${setIdx + 1} için geçerli ağırlık girin (sayı veya BW yazın).`);
+            return;
+          }
+
+          cleanedSets.push({
+            w: value,
+            wDisplay: display || String(value),
+            r: reps,
+          });
+        });
+
+        return {
+          ...it,
+          name: trimmedName,
+          displayName: trimmedName,
+          canonicalName: canonical,
+          sets: cleanedSets,
+        };
+      })
+      .filter(Boolean);
+
+    if (cleanedItems.length === 0) {
+      issues.push('Kaydetmek için en az bir egzersiz adı girin.');
+    }
+
+    const cleanedWorkout = {
+      ...baseWorkout,
+      dateISO: targetDateISO,
+      workoutFocus: Array.isArray(baseWorkout.workoutFocus) ? baseWorkout.workoutFocus : [],
+      items: cleanedItems,
+    };
+
+    return { cleanedWorkout, issues };
   };
 
   const handleQuickEditSave = async () => {
@@ -435,28 +531,23 @@ export default function MainPage() {
     const updatedItems = [...currentWorkout.items];
     updatedItems[index] = updatedItem;
 
-    const updatedWorkout = {
-      ...currentWorkout,
-      items: updatedItems
-    };
+    const { cleanedWorkout, issues } = buildCleanWorkout(currentWorkout.dateISO, updatedItems);
 
-    // Optimistic update & close immediately
-    setWorkoutsByDate(prev => ({
-      ...prev,
-      [selectedDate]: updatedWorkout,
-    }));
+    if (issues.length > 0) {
+      alert(issues.join('\n'));
+      return;
+    }
+
+    // Detay sayfasıyla aynı akış: önce kapat ve ana sayfaya state ile dön, kaydı arka planda yap
     closeQuickEdit();
+    navigate('/', { state: { updatedWorkout: cleanedWorkout } });
 
-    // Persist in background (no full refresh on success)
-    (async () => {
-      try {
-        await saveWorkout(updatedWorkout);
-      } catch (error) {
-        console.error('Hızlı düzenleme kaydedilirken hata:', error);
-        alert('Kaydedilirken bir hata oluştu.');
-        setRefreshKey(prev => prev + 1); // only refresh if failed
-      }
-    })();
+    try {
+      await saveWorkout(cleanedWorkout);
+    } catch (error) {
+      console.error('Hızlı düzenleme kaydedilirken hata:', error);
+      alert('Kaydedilirken bir hata oluştu.');
+    }
   };
 
   const handleSelectDate = (iso) => {
@@ -781,7 +872,7 @@ export default function MainPage() {
         className="inline-flex items-center justify-center gap-1.5 rounded-lg border border-white/10 bg-white/5 px-3 py-1.5 text-xs font-bold text-white/90 transition hover:bg-white/10 min-w-[80px]"
         title={bodyWeightMeta.isFallback && bodyWeightMeta.sourceDate ? `${formatDateTRFull(bodyWeightMeta.sourceDate)} değerinden geliyor` : 'Vücut ağırlığını düzenle'}
       >
-        <span className="material-symbols-outlined text-base text-primary">monitor_weight</span>
+        <span className="material-symbols-outlined text-base text-blue-500">monitor_weight</span>
         {displayValue}
         {bodyWeightMeta.isFallback && bodyWeightMeta.value !== null && (
           <span className="text-[10px] text-gray-500 ml-0.5">*</span>
@@ -792,7 +883,7 @@ export default function MainPage() {
 
   return (
     <div
-      className="relative flex h-auto min-h-screen w-full flex-col bg-background-dark bg-[radial-gradient(ellipse_80%_80%_at_50%_-20%,rgba(13,242,147,0.15),rgba(16,34,27,0))]"
+      className="relative flex h-auto min-h-screen w-full flex-col bg-background-dark bg-[radial-gradient(ellipse_80%_80%_at_50%_-20%,rgba(59,130,246,0.15),rgba(11,17,33,0))]"
       key={refreshKey}
       onTouchStart={handleTouchStart}
       onTouchMove={handleTouchMove}
@@ -809,7 +900,7 @@ export default function MainPage() {
             title="Bugüne git"
           >
             <img
-              src="/logo-mark.svg"
+              src="/logo-blue.svg"
               alt="Strength Data"
               className="h-10 w-10 md:h-12 md:w-12 rounded-2xl"
             />
@@ -865,9 +956,22 @@ export default function MainPage() {
                 }}
                 className="flex w-full items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium text-gray-200 hover:bg-white/10 hover:text-white transition-colors"
               >
-                <span className="material-symbols-outlined text-xl" style={{ fontVariationSettings: "'FILL' 0, 'wght' 300" }}>lightbulb</span>
-                Geliştirmeler
+                <span className="material-symbols-outlined text-xl" style={{ fontVariationSettings: "'FILL' 0, 'wght' 300" }}>chat</span>
+                Geri Bildirim
               </button>
+
+              {isAdmin && (
+                <button
+                  onClick={() => {
+                    navigate('/admin');
+                    setIsProfileMenuOpen(false);
+                  }}
+                  className="flex w-full items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium text-gray-200 hover:bg-white/10 hover:text-white transition-colors"
+                >
+                  <span className="material-symbols-outlined text-xl" style={{ fontVariationSettings: "'FILL' 0, 'wght' 300" }}>shield_person</span>
+                  Admin Paneli
+                </button>
+              )}
               
               <div className="my-1 h-px bg-white/10" />
 
@@ -889,8 +993,8 @@ export default function MainPage() {
       {/* Welcome Toast */}
       {showWelcomeToast && (
         <div className="fixed top-24 left-1/2 -translate-x-1/2 z-50 animate-in fade-in slide-in-from-top-4 duration-500">
-          <div className="flex items-center gap-3 rounded-2xl border border-green-500/20 bg-[#1C1C1E]/90 px-6 py-4 shadow-2xl backdrop-blur-xl">
-            <div className="flex h-10 w-10 items-center justify-center rounded-full bg-green-500/20 text-green-400">
+          <div className="flex items-center gap-3 rounded-2xl border border-blue-500/20 bg-[#1C1C1E]/90 px-6 py-4 shadow-2xl backdrop-blur-xl">
+            <div className="flex h-10 w-10 items-center justify-center rounded-full bg-blue-500/20 text-blue-400">
               <span className="material-symbols-outlined">check_circle</span>
             </div>
             <div>
@@ -1042,7 +1146,7 @@ export default function MainPage() {
               <div className="mt-6 flex flex-col sm:flex-row justify-center gap-3">
                 <button
                   onClick={() => navigate(`/workout/${selectedDate}`)}
-                  className="flex items-center justify-center gap-2 rounded-2xl bg-primary px-5 md:px-6 py-2.5 md:py-3 font-semibold text-background-dark shadow-lg shadow-primary/30 hover:bg-primary/90 transition text-sm md:text-base"
+                  className="flex items-center justify-center gap-2 rounded-2xl bg-blue-500 px-5 md:px-6 py-2.5 md:py-3 font-semibold text-white shadow-lg shadow-blue-500/30 hover:bg-blue-600 transition text-sm md:text-base"
                 >
                   <span className="material-symbols-outlined text-lg md:text-xl">add</span>
                   Manuel Ekle
@@ -1084,10 +1188,10 @@ export default function MainPage() {
 
         <button
           onClick={openExercisePicker}
-          className="inline-flex flex-1 items-center justify-center gap-2 rounded-full bg-primary text-background-dark px-6 py-3 font-bold shadow-xl shadow-primary/25 hover:shadow-primary/40 hover:bg-primary/90 transition text-base"
+          className="inline-flex flex-1 items-center justify-center gap-2 rounded-full bg-blue-500 text-white px-6 py-3 font-bold shadow-xl shadow-blue-500/25 hover:shadow-blue-500/40 hover:bg-blue-600 transition text-base"
         >
           <span className="material-symbols-outlined text-2xl">add</span>
-          <span>Antrenman Ekle</span>
+          <span>Egzersiz Ekle</span>
         </button>
       </nav>
 
@@ -1356,7 +1460,7 @@ export default function MainPage() {
               <button
                 type="button"
                 onClick={handleQuickEditSave}
-                className="w-full rounded-xl bg-primary py-3 text-sm font-bold text-background-dark hover:bg-primary/90 transition shadow-lg shadow-primary/20"
+                className="w-full rounded-xl bg-blue-500 py-3 text-sm font-bold text-white hover:bg-blue-600 transition shadow-lg shadow-blue-500/20"
               >
                 Kaydet ve Kapat
               </button>

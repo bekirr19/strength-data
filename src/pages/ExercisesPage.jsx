@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { getExercises, saveExercises, getWorkouts, normalizeExerciseName, renameExerciseEverywhere } from '../utils/storage';
+import { getExercises, saveExercises, getWorkouts, normalizeExerciseName, renameExerciseEverywhere } from '../utils/storage-client';
 import {
   EXERCISE_CATEGORY_META,
   getExerciseInfo,
@@ -311,7 +311,7 @@ export default function ExercisesPage() {
   }
 
   return (
-    <div className="relative flex h-auto min-h-screen w-full flex-col bg-background-dark bg-[radial-gradient(ellipse_80%_80%_at_50%_-20%,rgba(13,242,147,0.15),rgba(16,34,27,0))]">
+    <div className="relative flex h-auto min-h-screen w-full flex-col bg-background-dark bg-[radial-gradient(ellipse_80%_80%_at_50%_-20%,rgba(59,130,246,0.15),rgba(11,17,33,0))]">
       <header className="sticky top-0 z-20 flex items-center justify-between bg-background-dark/50 backdrop-blur-md px-4 py-3 border-b border-white/5">
         <button type="button" onClick={() => navigate(-1)} className="flex size-10 md:size-12 shrink-0 items-center justify-start rounded-lg hover:bg-white/5">
           <span className="material-symbols-outlined text-white text-xl md:text-2xl">arrow_back</span>

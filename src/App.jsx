@@ -7,9 +7,11 @@ import WorkoutDetailPage from './pages/WorkoutDetailPage';
 import GelistirmelerPage from './pages/GelistirmelerPage';
 import LoginPage from './pages/LoginPage';
 import ProfilePage from './pages/ProfilePage';
+import AdminPanelPage from './pages/AdminPanelPage';
 
 function PrivateRoute({ children }) {
-  const { currentUser } = useAuth();
+  const { currentUser, loading } = useAuth();
+  if (loading) return null;
   return currentUser ? children : <Navigate to="/login" />;
 }
 
@@ -39,6 +41,14 @@ function App() {
           element={
             <PrivateRoute>
               <GelistirmelerPage />
+            </PrivateRoute>
+          }
+        />
+        <Route
+          path="/admin"
+          element={
+            <PrivateRoute>
+              <AdminPanelPage />
             </PrivateRoute>
           }
         />

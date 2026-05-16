@@ -1,9 +1,48 @@
 import { useState, useEffect, useMemo, useRef } from 'react';
 import { useNavigate, useParams, useLocation } from 'react-router-dom';
-import { getWorkoutByDate, getWorkouts, saveWorkout, deleteWorkout, moveWorkout, formatDateTRFull, resolveWeightValue, getExercises, saveExercises, renameExerciseEverywhere, normalizeExerciseName } from '../utils/storage';
+import { getWorkoutByDate, getWorkouts, saveWorkout, deleteWorkout, formatDateTRFull, resolveWeightValue, getExercises, saveExercises, renameExerciseEverywhere, normalizeExerciseName } from '../utils/storage-client';
 import { getExerciseInfo, EXERCISE_CATEGORY_META, MUSCLE_OPTIONS } from '../utils/exerciseMetadata';
 
 const CATEGORY_ORDER = ['push', 'pull', 'leg', 'other'];
+
+const MAIN_PAGE_CATEGORY_PRIORITY = {
+  leg: 0,
+  chest: 1,
+  back: 2,
+  shoulder: 3,
+  arm: 4,
+  core: 5,
+  other: 6,
+};
+
+const detectCategoryKey = (item, library = []) => {
+  const name = item?.displayName || item?.name || '';
+  const canonical = item?.canonicalName || normalizeExerciseName(name);
+  const key = canonical.toLowerCase();
+
+  // Custom library lookup
+  const customExercise = library.find((ex) => {
+    const exKey = (ex.canonicalName || normalizeExerciseName(ex.name)).toLowerCase();
+    return exKey === key;
+  });
+
+  const overrides = { ...item, ...customExercise };
+  const info = getExerciseInfo(name, overrides);
+  const cat = (info?.category || '').toLowerCase();
+  const muscles = Array.isArray(info?.muscleLabels)
+    ? info.muscleLabels.map((m) => m.toLowerCase())
+    : [];
+
+  const matches = (keyword) => cat.includes(keyword) || muscles.some((m) => m.includes(keyword));
+
+  if (matches('chest') || matches('gogus') || matches('göğüs')) return 'chest';
+  if (matches('back') || matches('sirt') || matches('sırt')) return 'back';
+  if (matches('shoulder') || matches('omuz') || matches('deltoid')) return 'shoulder';
+  if (matches('arm') || matches('kol') || matches('bicep') || matches('tricep')) return 'arm';
+  if (matches('leg') || matches('bacak') || matches('quad') || matches('hamstring') || matches('glute')) return 'leg';
+  if (matches('core') || matches('abs') || matches('karin') || matches('karın')) return 'core';
+  return 'other';
+};
 
 const normalizeFocus = (focusArray = []) =>
   Array.from(
@@ -52,6 +91,47 @@ export default function WorkoutDetailPage() {
   const [isSavingExerciseEdit, setIsSavingExerciseEdit] = useState(false);
   const [focusTarget, setFocusTarget] = useState(null); // { exerciseIdx, setIdx, field: 'w' | 'r' }
   const dateInputRef = useRef(null);
+
+  const exerciseUsageMap = useMemo(() => {
+    const map = {};
+    exerciseLibrary.forEach((exercise) => {
+      const key = canonicalFromParts(exercise.canonicalName, exercise.name).toLowerCase();
+      map[key] = exercise.used || 0;
+    });
+    return map;
+  }, [exerciseLibrary]);
+
+  const workoutUsageMap = useMemo(() => {
+    const map = {};
+    Object.values(workoutsByDate || {}).forEach((wo) => {
+      (wo.items || []).forEach((it) => {
+        const key = canonicalFromParts(it.canonicalName, it.displayName || it.name).toLowerCase();
+        map[key] = (map[key] || 0) + 1;
+      });
+    });
+    return map;
+  }, [workoutsByDate]);
+
+  const sortedItems = useMemo(() => {
+    return (workout.items || [])
+      .map((item, idx) => ({
+        item,
+        idx,
+        category: detectCategoryKey(item, exerciseLibrary),
+        usage: workoutUsageMap[canonicalFromParts(item.canonicalName, item.displayName || item.name).toLowerCase()] || exerciseUsageMap[canonicalFromParts(item.canonicalName, item.displayName || item.name).toLowerCase()] || 0,
+      }))
+      .sort((a, b) => {
+        const pa = MAIN_PAGE_CATEGORY_PRIORITY[a.category] ?? MAIN_PAGE_CATEGORY_PRIORITY.other;
+        const pb = MAIN_PAGE_CATEGORY_PRIORITY[b.category] ?? MAIN_PAGE_CATEGORY_PRIORITY.other;
+        if (pa !== pb) return pa - pb;
+
+        if (a.usage !== b.usage) return b.usage - a.usage;
+
+        const nameA = a.item.displayName || a.item.name || '';
+        const nameB = b.item.displayName || b.item.name || '';
+        return nameA.localeCompare(nameB, 'tr');
+      });
+  }, [workout.items, exerciseLibrary, workoutUsageMap, exerciseUsageMap]);
 
   const normalizeWorkoutLabel = (name) => {
     const lower = (name || '').toLowerCase();
@@ -270,7 +350,7 @@ export default function WorkoutDetailPage() {
         .filter((dateKey) => dateKey !== workout.dateISO)
         .sort((a, b) => (a > b ? -1 : 1));
 
-      const latestMatch = sortedDates.find((dateKey) => {
+      const focusMatches = sortedDates.filter((dateKey) => {
         const candidate = all[dateKey];
         if (!candidate) return false;
 
@@ -286,8 +366,11 @@ export default function WorkoutDetailPage() {
         return hasExercises && normalizedFocus.length > 0 && allNamesMatch;
       });
 
-      if (latestMatch) {
-        const template = all[latestMatch];
+      // İstenen davranış: aynı odaklı son kaydın bir öncesini getir (2. önceki).
+      const targetDate = focusMatches[1] || focusMatches[0];
+
+      if (targetDate) {
+        const template = all[targetDate];
         setWorkout((prev) => ({
           ...prev,
           workoutName: targetLabel,
@@ -632,49 +715,10 @@ export default function WorkoutDetailPage() {
     return clamped % 1 === 0 ? String(clamped) : clamped.toFixed(1);
   };
 
-  const handleDelete = async () => {
-    if (confirm('Bu antrenmanı silmek istediğinizden emin misiniz?')) {
-      await deleteWorkout(date);
-      alert('Antrenman silindi!');
-      navigate('/');
-    }
-  };
-
-  const handleDateChange = async (e) => {
-    const newDate = e.target.value;
-    if (!newDate || newDate === date) return;
-
-    try {
-      const targetWorkout = await getWorkoutByDate(newDate);
-      if (targetWorkout && Array.isArray(targetWorkout.items) && targetWorkout.items.length > 0) {
-        alert(`Seçilen tarihte (${newDate}) zaten bir antrenman kaydı mevcut. Lütfen başka bir tarih seçin.`);
-        if (dateInputRef.current) {
-          dateInputRef.current.value = date;
-        }
-        return;
-      }
-
-      if (confirm(`Antrenmanı ${newDate} tarihine taşımak istediğinize emin misiniz?`)) {
-        await moveWorkout(date, newDate);
-        navigate(`/workout/${newDate}`, { replace: true });
-      } else {
-        if (dateInputRef.current) {
-          dateInputRef.current.value = date;
-        }
-      }
-    } catch (error) {
-      console.error('Tarih değiştirilirken hata:', error);
-      alert('Tarih değiştirilemedi.');
-      if (dateInputRef.current) {
-        dateInputRef.current.value = date;
-      }
-    }
-  };
-
-  const handleSave = async () => {
+  const buildCleanWorkout = (targetDateISO) => {
     const issues = [];
 
-    const cleanedItems = workout.items
+    const cleanedItems = (workout.items || [])
       .map((it, exerciseIdx) => {
         const trimmedName = (it.displayName || it.name || '').trim();
         const exerciseLabel = trimmedName || `Egzersiz ${exerciseIdx + 1}`;
@@ -684,14 +728,13 @@ export default function WorkoutDetailPage() {
           return null;
         }
 
-  const canonical = canonicalFromParts(it.canonicalName, trimmedName);
+        const canonical = canonicalFromParts(it.canonicalName, trimmedName);
         if (!canonical) {
           issues.push(`${exerciseLabel} adı geçerli değil.`);
           return null;
         }
 
         const sets = Array.isArray(it.sets) ? it.sets : [];
-
         const cleanedSets = [];
 
         sets.forEach((set, setIdx) => {
@@ -702,7 +745,6 @@ export default function WorkoutDetailPage() {
           const hasWeight = weightInput.length > 0;
 
           if (!hasReps && !hasWeight) {
-            // tamamen boş bırakılmış, şablon satırı olarak kabul et ve kaydetme kapsamına alma
             return;
           }
 
@@ -717,7 +759,7 @@ export default function WorkoutDetailPage() {
             return;
           }
 
-          const { value, display } = resolveWeightValue(weightInput, trimmedName, workout.dateISO);
+          const { value, display } = resolveWeightValue(weightInput, trimmedName, targetDateISO);
 
           const isBodyWeight = display && (display === 'Body Weight' || display.startsWith('BW'));
           const hasValidWeight = Number.isFinite(value) && value > 0;
@@ -744,21 +786,76 @@ export default function WorkoutDetailPage() {
       })
       .filter(Boolean);
 
-    if (issues.length > 0) {
-      alert(issues.join('\n'));
-      return;
-    }
-
     if (cleanedItems.length === 0) {
-      alert('Kaydetmek için en az bir egzersiz adı girin.');
-      return;
+      issues.push('Kaydetmek için en az bir egzersiz adı girin.');
     }
 
     const cleaned = {
       ...workout,
+      dateISO: targetDateISO,
       workoutFocus: Array.isArray(workout.workoutFocus) ? workout.workoutFocus : [],
       items: cleanedItems,
     };
+
+    return { cleaned, issues };
+  };
+
+  const handleDelete = async () => {
+    if (confirm('Bu antrenmanı silmek istediğinizden emin misiniz?')) {
+      await deleteWorkout(date);
+      alert('Antrenman silindi!');
+      navigate('/');
+    }
+  };
+
+  const handleDateChange = async (e) => {
+    const newDate = e.target.value;
+    if (!newDate || newDate === date) return;
+
+    try {
+      const targetWorkout = await getWorkoutByDate(newDate);
+      if (targetWorkout && Array.isArray(targetWorkout.items) && targetWorkout.items.length > 0) {
+        alert(`Seçilen tarihte (${newDate}) zaten bir antrenman kaydı mevcut. Lütfen başka bir tarih seçin.`);
+        if (dateInputRef.current) {
+          dateInputRef.current.value = date;
+        }
+        return;
+      }
+
+      const { cleaned, issues } = buildCleanWorkout(newDate);
+      if (issues.length > 0) {
+        alert(issues.join('\n'));
+        if (dateInputRef.current) {
+          dateInputRef.current.value = date;
+        }
+        return;
+      }
+
+      if (confirm(`Antrenmanı ${newDate} tarihine taşımak istediğinize emin misiniz?`)) {
+        await saveWorkout(cleaned);
+        await deleteWorkout(date);
+        navigate(`/workout/${newDate}`, { replace: true });
+      } else {
+        if (dateInputRef.current) {
+          dateInputRef.current.value = date;
+        }
+      }
+    } catch (error) {
+      console.error('Tarih değiştirilirken hata:', error);
+      alert('Tarih değiştirilemedi.');
+      if (dateInputRef.current) {
+        dateInputRef.current.value = date;
+      }
+    }
+  };
+
+  const handleSave = async () => {
+    const { cleaned, issues } = buildCleanWorkout(workout.dateISO);
+
+    if (issues.length > 0) {
+      alert(issues.join('\n'));
+      return;
+    }
 
     // Hızlı çıkış: önce navigasyon, kaydı arka planda yap
     navigate('/', { state: { updatedWorkout: cleaned } });
@@ -826,7 +923,7 @@ export default function WorkoutDetailPage() {
               onClick={() => handleToggleFocus('Pull')}
               className={`p-3 rounded-xl text-sm font-bold transition border tracking-wide ${
                 (workout.workoutFocus || []).includes('Pull')
-                  ? 'bg-primary text-background-dark border-primary shadow-[0_0_15px_rgba(13,242,147,0.3)]'
+                  ? 'bg-primary text-background-dark border-primary shadow-[0_0_15px_rgba(59,130,246,0.3)]'
                   : 'bg-[#1C1C1E] border-white/5 text-gray-400 hover:bg-white/5 hover:text-white'
               }`}
             >
@@ -837,7 +934,7 @@ export default function WorkoutDetailPage() {
               onClick={() => handleToggleFocus('Push')}
               className={`p-3 rounded-xl text-sm font-bold transition border tracking-wide ${
                 (workout.workoutFocus || []).includes('Push')
-                  ? 'bg-primary text-background-dark border-primary shadow-[0_0_15px_rgba(13,242,147,0.3)]'
+                  ? 'bg-primary text-background-dark border-primary shadow-[0_0_15px_rgba(59,130,246,0.3)]'
                   : 'bg-[#1C1C1E] border-white/5 text-gray-400 hover:bg-white/5 hover:text-white'
               }`}
             >
@@ -848,7 +945,7 @@ export default function WorkoutDetailPage() {
               onClick={() => handleToggleFocus('Leg')}
               className={`p-3 rounded-xl text-sm font-bold transition border tracking-wide ${
                 (workout.workoutFocus || []).includes('Leg')
-                  ? 'bg-primary text-background-dark border-primary shadow-[0_0_15px_rgba(13,242,147,0.3)]'
+                  ? 'bg-primary text-background-dark border-primary shadow-[0_0_15px_rgba(59,130,246,0.3)]'
                   : 'bg-[#1C1C1E] border-white/5 text-gray-400 hover:bg-white/5 hover:text-white'
               }`}
             >
@@ -857,7 +954,9 @@ export default function WorkoutDetailPage() {
           </div>
           <div className="mt-3 flex items-center justify-between gap-2">
             <div className="text-xs text-gray-500 truncate">
-              {(workout.workoutFocus || []).length > 0 ? labelFromFocus(workout.workoutFocus) : 'Tür seçilmedi'}
+              {(workout.workoutFocus || []).length > 0
+                ? `2 önceki ${labelFromFocus(workout.workoutFocus)} egzersizlerini listeler`
+                : 'Tür seçilmedi'}
             </div>
             <button
               type="button"
@@ -869,13 +968,13 @@ export default function WorkoutDetailPage() {
           </div>
         </div>
         <div className="flex flex-col gap-4 md:gap-6">
-          {workout.items.map((item, exerciseIdx) => (
+          {sortedItems.map(({ item, idx: exerciseIdx }, loopIdx) => (
             <div key={exerciseIdx} className="rounded-3xl bg-[#1C1C1E] p-5 shadow-lg border border-white/5">
               {/* Header */}
               <div className="flex items-start justify-between mb-6">
                 <div>
                   <p className="text-[11px] font-bold text-primary uppercase tracking-widest mb-1">
-                    EGZERSİZ {exerciseIdx + 1}
+                    EGZERSİZ {loopIdx + 1}
                   </p>
                   <div className="flex items-center gap-2">
                     <h3 

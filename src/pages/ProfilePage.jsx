@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
-import { getAllUserData } from '../utils/storage-firebase';
+import { exportAllData, getLastSyncAt } from '../utils/storage-client';
 import { LogOut, ArrowLeft, User, Lock, Check, Trash2, AlertTriangle, Download, ChevronRight, Upload, Database, Sparkles } from 'lucide-react';
 import ImportWorkoutModal from '../components/ImportWorkoutModal';
 import Wrapped2025Modal from '../components/Wrapped2025Modal';
@@ -20,10 +20,11 @@ export default function ProfilePage() {
   const [reauthRequired, setReauthRequired] = useState(false);
   const [isImportOpen, setIsImportOpen] = useState(false);
   const [isWrappedOpen, setIsWrappedOpen] = useState(false);
+  const [lastSyncAt, setLastSyncAt] = useState(getLastSyncAt());
 
   const handleExportData = async () => {
     try {
-      const data = await getAllUserData();
+      const data = await exportAllData();
       if (!data) {
         setMessage({ type: 'error', text: 'İndirilecek veri bulunamadı.' });
         return;
@@ -105,7 +106,7 @@ export default function ProfilePage() {
   );
 
   return (
-    <div className="min-h-screen bg-background-dark p-6 text-white font-sans bg-[radial-gradient(ellipse_80%_80%_at_50%_-20%,rgba(13,242,147,0.15),rgba(16,34,27,0))]">
+    <div className="min-h-screen bg-background-dark p-6 text-white font-sans bg-[radial-gradient(ellipse_80%_80%_at_50%_-20%,rgba(59,130,246,0.15),rgba(11,17,33,0))]">
       {/* Header / Nav */}
       <div className="flex items-center mb-8">
         <button
@@ -116,32 +117,31 @@ export default function ProfilePage() {
         </button>
       </div>
 
-      {/* Profile Section */}
-      <div className="flex flex-col items-center mb-10">
-        <div className="relative mb-4">
-          {currentUser.photoURL ? (
-            <img
-              src={currentUser.photoURL}
-              alt={currentUser.displayName}
-              className="h-24 w-24 rounded-full object-cover border-4 border-background-dark shadow-xl"
-            />
-          ) : (
-            <div className="flex h-24 w-24 items-center justify-center rounded-full bg-surface-dark border-4 border-background-dark shadow-xl">
-              <User className="h-10 w-10 text-primary" />
-            </div>
-          )}
-          {/* Status Badge */}
-          <div className="absolute bottom-0 right-0 flex h-6 w-6 items-center justify-center rounded-full border-4 border-background-dark bg-primary">
-            <Check className="h-3 w-3 stroke-[3] text-background-dark" />
+      {/* Profile & Sync Section */}
+      <div className="mb-8 rounded-2xl bg-surface-dark/50 border border-white/5 p-4 md:p-5 flex flex-col md:flex-row gap-4">
+        <div className="flex items-center gap-3 md:w-1/3">
+          <div className="relative">
+            {currentUser.photoURL ? (
+              <img
+                src={currentUser.photoURL}
+                alt={currentUser.displayName}
+                className="h-24 w-24 rounded-full object-cover border-4 border-background-dark shadow-xl"
+              />
+            ) : (
+              <div className="flex h-24 w-24 items-center justify-center rounded-full bg-surface-dark border-4 border-background-dark shadow-xl">
+                <User className="h-10 w-10 text-primary" />
+              </div>
+            )}
+          </div>
+          <div className="flex flex-col">
+            <h1 className="text-xl font-bold text-white leading-tight">{currentUser.displayName}</h1>
+            <p className="text-sm text-gray-400">{currentUser.email}</p>
           </div>
         </div>
 
-        <h1 className="mb-1 text-2xl font-bold text-white">
-          {currentUser.displayName}
-        </h1>
-        <p className="text-sm text-gray-400">
-          {currentUser.email}
-        </p>
+        <div className="flex-1 flex items-center">
+          <p className="text-[11px] text-gray-500">Verileriniz bulutta yedekleniyor</p>
+        </div>
       </div>
 
       {/* Settings List */}

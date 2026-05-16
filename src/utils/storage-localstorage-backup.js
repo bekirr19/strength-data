@@ -65,6 +65,18 @@ export function normalizeExerciseName(name) {
 }
 
 const BODY_WEIGHT_KEYWORDS = ['body weight', 'bodyweight', 'bw', 'vücut ağırlığı', 'vucut ağırlığı'];
+const BODY_WEIGHT_EXERCISES = new Set([
+  'pull up',
+  'pull-up',
+  'chin up',
+  'chin-up',
+  'muscle up',
+  'muscle-up',
+  'dip',
+  'dips',
+  'push up',
+  'push-up',
+]);
 
 function getBodyWeightMap() {
   const raw = localStorage.getItem(STORAGE.BODY_WEIGHT);
@@ -242,9 +254,16 @@ function normalizeWorkoutItems(items) {
         r: Number(set?.r || 0),
         note: set?.note || '',
       };
-    }).filter((set) => Number.isFinite(set.w) && set.w > 0 && Number.isFinite(set.r) && set.r > 0);
+    }).filter((set) => {
+      // Tekrar geçerli mi?
+      if (!Number.isFinite(set.r) || set.r <= 0) return false;
 
-    if (normalizedSets.length === 0) return;
+      const isBodyWeight = set.wDisplay && (set.wDisplay === 'Body Weight' || set.wDisplay === 'BW' || set.wDisplay.startsWith('BW+'));
+      const hasValidWeight = Number.isFinite(set.w) && set.w >= 0;
+
+      if (!isBodyWeight && !hasValidWeight) return false;
+      return true;
+    });
 
     const { dateISO: _ignoreDateISO, dateIso: _ignoreDateIso, date: _ignoreDate, ...restItem } = item;
     const cleanedItem = {
@@ -469,14 +488,20 @@ export function resolveWeightValue(weightInput, exerciseName, dateISO) {
   }
 
   const raw = typeof weightInput === 'string' ? weightInput.trim() : '';
-  if (!raw) {
-    return { value, display };
-  }
 
   const normalizedName = normalizeExerciseName(exerciseName || '');
+  const normalizedLower = normalizedName.toLowerCase();
   const lower = raw.toLowerCase();
   const isBodyWeightKeyword = BODY_WEIGHT_KEYWORDS.some((keyword) => lower.startsWith(keyword));
-  const isBodyWeightExercise = normalizedName.toLowerCase() === 'pull up';
+  const isBodyWeightExercise = BODY_WEIGHT_EXERCISES.has(normalizedLower);
+
+  if (!raw) {
+    // Bodyweight egzersizlerinde boş ağırlığı BW kabul et ki set silinmesin
+    if (isBodyWeightExercise) {
+      return { value: 0, display: 'BW' };
+    }
+    return { value, display };
+  }
 
   if (isBodyWeightKeyword || isBodyWeightExercise || lower.startsWith('+')) {
     const bodyWeight = getBodyWeight(dateISO);
@@ -509,7 +534,7 @@ export function resolveWeightValue(weightInput, exerciseName, dateISO) {
       if (additional > 0) {
         display = `BW+${formatNumber(additional)}`;
       } else {
-        display = 'Body Weight';
+        display = 'BW';
       }
     }
     return { value, display };

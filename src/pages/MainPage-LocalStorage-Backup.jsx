@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { toISODate, formatDateTRFull, getWorkoutByDate, getBodyWeightInfo, saveBodyWeight, clearBodyWeight, exportAllData } from '../utils/storage';
+import { toISODate, formatDateTRFull, getWorkoutByDate, getBodyWeightInfo, saveBodyWeight, clearBodyWeight, exportAllData } from '../utils/storage-client';
 import WeekStrip from '../components/WeekStrip';
 import CalendarModal from '../components/CalendarModal';
 import ImportWorkoutModal from '../components/ImportWorkoutModal';

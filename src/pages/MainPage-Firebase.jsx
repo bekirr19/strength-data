@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { toISODate, formatDateTRFull, getWorkoutByDate, getBodyWeightInfo, saveBodyWeight, clearBodyWeight, exportAllData } from '../utils/storage';
+import { toISODate, formatDateTRFull, getWorkoutByDate, getBodyWeightInfo, saveBodyWeight, clearBodyWeight, exportAllData } from '../utils/storage-client';
 import WeekStrip from '../components/WeekStrip';
 import CalendarModal from '../components/CalendarModal';
 import ImportWorkoutModal from '../components/ImportWorkoutModal';
@@ -171,17 +171,17 @@ export default function MainPage() {
   };
 
   const renderBodyWeightCard = () => (
-    <div className="rounded-xl bg-white/5 border border-primary/20 p-3 md:p-4 flex flex-col gap-3 w-full md:w-48 lg:w-56">
+    <div className="rounded-2xl bg-white/5 border border-primary/20 p-3 md:p-4 flex flex-col gap-3 w-full md:w-48 lg:w-56">
       <div className="flex items-start justify-between gap-2">
         <div>
-          <p className="text-sm md:text-base font-semibold text-white">Vücut Ağırlığı</p>
+          <p className="text-sm md:text-base font-bold text-white">Vücut Ağırlığı</p>
           {bodyWeightMeta.isFallback && bodyWeightMeta.value !== null && bodyWeightMeta.sourceDate && (
-            <p className="text-[11px] md:text-xs text-primary/70 mt-1 leading-snug">
+            <p className="text-[11px] md:text-xs text-primary/70 mt-1 leading-snug font-medium">
               {formatDateTRFull(bodyWeightMeta.sourceDate)} değerini kullanıyor
             </p>
           )}
           {!bodyWeightMeta.isFallback && bodyWeightMeta.value === null && (
-            <p className="text-[11px] md:text-xs text-gray-400 mt-1 leading-snug">
+            <p className="text-[11px] md:text-xs text-gray-400 mt-1 leading-snug font-medium">
               Henüz kayıt yok. Boş bırakırsanız önceki günün değeri kullanılır.
             </p>
           )}
@@ -202,10 +202,10 @@ export default function MainPage() {
             onBlur={() => commitBodyWeight()}
             onKeyDown={handleBodyWeightKeyDown}
             inputMode="decimal"
-            className="w-full rounded-lg bg-background-dark/70 border border-primary/40 px-2.5 py-1.5 text-base md:text-lg font-semibold text-white focus:outline-none focus:ring-2 focus:ring-primary text-center"
+            className="w-full rounded-xl bg-background-dark/70 border border-primary/40 px-2.5 py-1.5 text-base md:text-lg font-bold text-white focus:outline-none focus:ring-2 focus:ring-primary text-center"
             placeholder="kg"
           />
-          <span className="text-sm md:text-base text-gray-300 whitespace-nowrap">kg</span>
+          <span className="text-sm md:text-base text-gray-300 whitespace-nowrap font-medium">kg</span>
         </div>
       </div>
     </div>
@@ -262,20 +262,20 @@ export default function MainPage() {
       <main className="flex-grow p-4 pb-24 md:pb-8 max-w-4xl mx-auto w-full">
         {workout ? (
           <div className="grid md:grid-cols-[minmax(0,1fr)_auto] gap-4 lg:gap-6 items-start animate-slide-in">
-            <div className="rounded-xl bg-surface-dark p-4 md:p-6 shadow-lg">
+            <div className="rounded-2xl bg-surface-dark p-4 md:p-6 shadow-lg">
               <div className="flex items-center justify-between mb-4">
                 <div className="flex-1">
-                  <h3 className="font-semibold text-white text-base md:text-lg">
+                  <h3 className="font-bold text-white text-base md:text-lg">
                     {workout.workoutName || (selectedDate === toISODate(new Date()) ? 'Bugünkü Antrenman' : 'Antrenman')}
                   </h3>
                   {workout.workoutFocus && workout.workoutFocus.length > 0 && (
-                    <p className="text-xs md:text-sm text-primary/70 mt-1">
+                    <p className="text-xs md:text-sm text-primary/70 mt-1 font-medium">
                       {workout.workoutFocus.join(', ')}
                     </p>
                   )}
                 </div>
                 <div className="flex items-center gap-2 md:gap-3">
-                  <span className="text-xs md:text-sm text-gray-400">
+                  <span className="text-xs md:text-sm text-gray-400 font-medium">
                     {workout.items.reduce((acc, it) => acc + it.sets.length, 0)} set
                   </span>
                   <button
@@ -293,9 +293,9 @@ export default function MainPage() {
                   <div
                     key={idx}
                     onClick={() => handleExerciseClick(item.displayName || item.name)}
-                    className="flex items-center gap-3 md:gap-4 p-3 md:p-4 rounded-lg hover:bg-background-dark/50 active:bg-background-dark/70 cursor-pointer transition"
+                    className="flex items-center gap-3 md:gap-4 p-3 md:p-4 rounded-xl hover:bg-background-dark/50 active:bg-background-dark/70 cursor-pointer transition border border-transparent hover:border-gray-700/50"
                   >
-                    <div className="flex h-10 w-10 md:h-12 md:w-12 items-center justify-center rounded-lg bg-background-dark flex-shrink-0">
+                    <div className="flex h-10 w-10 md:h-12 md:w-12 items-center justify-center rounded-xl bg-background-dark flex-shrink-0">
                       <span className="material-symbols-outlined text-primary text-xl md:text-2xl">fitness_center</span>
                     </div>
                     <div className="flex-1 min-w-0">

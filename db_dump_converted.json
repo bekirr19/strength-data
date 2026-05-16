@@ -1,0 +1,8009 @@
+{
+  "version": 2,
+  "exportedAt": "2026-01-13T21:49:52.845Z",
+  "exercises": [
+    {
+      "canonicalName": "Bench Press",
+      "createdAt": 1762087044032,
+      "customCategory": "push",
+      "customMuscles": [
+        "chest",
+        "triceps",
+        "shoulders"
+      ],
+      "displayName": "Bench Press",
+      "name": "Bench Press",
+      "pr": 100,
+      "prReps": 20,
+      "used": 117
+    },
+    {
+      "canonicalName": "Squat",
+      "createdAt": 1762087044032,
+      "displayName": "Squat",
+      "name": "Squat",
+      "pr": 120,
+      "prReps": 12,
+      "used": 11
+    },
+    {
+      "canonicalName": "Deadlift",
+      "createdAt": 1762087044032,
+      "displayName": "Deadlift",
+      "name": "Deadlift",
+      "pr": 150,
+      "prReps": 0,
+      "used": 0
+    },
+    {
+      "canonicalName": "Overhead Press",
+      "createdAt": 1762087044032,
+      "displayName": "Overhead Press",
+      "name": "Overhead Press",
+      "pr": 60,
+      "prReps": 24,
+      "used": 98
+    },
+    {
+      "canonicalName": "Pull Up",
+      "createdAt": 1762087044032,
+      "displayName": "Pull Up",
+      "name": "Pull Up",
+      "pr": 79,
+      "prReps": 12,
+      "used": 38
+    },
+    {
+      "canonicalName": "Incline Dumbbell Press",
+      "createdAt": 1762087939271,
+      "displayName": "Incline Dumbbell Press",
+      "name": "Incline Dumbbell Press",
+      "pr": 27.5,
+      "prReps": 15,
+      "used": 86
+    },
+    {
+      "canonicalName": "Lateral Raise",
+      "createdAt": 1762087939271,
+      "displayName": "Lateral Raise",
+      "name": "Lateral Raise",
+      "pr": 12.5,
+      "prReps": 15,
+      "used": 83
+    },
+    {
+      "canonicalName": "Face Pull",
+      "createdAt": 1762087939271,
+      "displayName": "Face Pull",
+      "name": "Face Pull",
+      "pr": 48,
+      "prReps": 15,
+      "used": 11
+    },
+    {
+      "canonicalName": "Triceps Pushdown",
+      "createdAt": 1762087939271,
+      "displayName": "Triceps Pushdown",
+      "name": "Triceps Pushdown",
+      "pr": 66,
+      "prReps": 15,
+      "used": 43
+    },
+    {
+      "canonicalName": "Chest Fly",
+      "createdAt": 1762088312558,
+      "displayName": "Chest Fly",
+      "name": "Chest Fly",
+      "pr": 66,
+      "prReps": 15,
+      "used": 90
+    },
+    {
+      "canonicalName": "Cable Skull Crusher",
+      "createdAt": 1762088312558,
+      "displayName": "Cable Skull Crusher",
+      "name": "Cable Skull Crusher",
+      "pr": 18,
+      "prReps": 10,
+      "used": 2
+    },
+    {
+      "canonicalName": "Cable Row",
+      "createdAt": 1762088406337,
+      "displayName": "Cable Row",
+      "name": "Cable Row",
+      "pr": 66,
+      "prReps": 15,
+      "used": 77
+    },
+    {
+      "canonicalName": "Lat Pulldown",
+      "createdAt": 1762088406337,
+      "displayName": "Lat Pulldown",
+      "name": "Lat Pulldown",
+      "pr": 72,
+      "prReps": 15,
+      "used": 91
+    },
+    {
+      "canonicalName": "Barbell Curl",
+      "createdAt": 1762088406337,
+      "displayName": "Barbell Curl",
+      "name": "Barbell Curl",
+      "pr": 28,
+      "prReps": 12,
+      "used": 46
+    },
+    {
+      "canonicalName": "Dumbbell Curl",
+      "createdAt": 1762088406337,
+      "displayName": "Dumbbell Curl",
+      "name": "Dumbbell Curl",
+      "pr": 20,
+      "prReps": 12,
+      "used": 30
+    },
+    {
+      "canonicalName": "Rear Delt Fly",
+      "createdAt": 1762088461319,
+      "displayName": "Rear Delt Fly",
+      "name": "Rear Delt Fly",
+      "pr": 54,
+      "prReps": 15,
+      "used": 17
+    },
+    {
+      "canonicalName": "Incline Dumbbell Curl",
+      "createdAt": 1762088502717,
+      "displayName": "Incline Dumbbell Curl",
+      "name": "Incline Dumbbell Curl",
+      "pr": 15,
+      "prReps": 10,
+      "used": 23
+    },
+    {
+      "canonicalName": "T-Bar Row",
+      "createdAt": 1762088549765,
+      "displayName": "T-Bar Row",
+      "name": "T-Bar Row",
+      "pr": 15,
+      "prReps": 15,
+      "used": 7
+    },
+    {
+      "canonicalName": "Barbell Row",
+      "createdAt": 1762097537096,
+      "displayName": "Barbell Row",
+      "name": "Barbell Row",
+      "pr": 38,
+      "prReps": 18,
+      "used": 36
+    },
+    {
+      "canonicalName": "Cable Chest Fly",
+      "createdAt": 1762102285075,
+      "displayName": "Cable Chest Fly",
+      "name": "Cable Chest Fly",
+      "pr": 24,
+      "prReps": 15,
+      "used": 3
+    },
+    {
+      "canonicalName": "Dip",
+      "createdAt": 1762102285075,
+      "customCategory": "push",
+      "customMuscles": [
+        "chest",
+        "triceps",
+        "shoulders"
+      ],
+      "displayName": "Dip",
+      "name": "Dip",
+      "pr": 79,
+      "prReps": 10,
+      "used": 50
+    },
+    {
+      "canonicalName": "Push Up",
+      "createdAt": 1762102285075,
+      "displayName": "Push Up",
+      "name": "Push Up",
+      "pr": 78,
+      "prReps": 20,
+      "used": 14
+    },
+    {
+      "canonicalName": "Skull Crusher",
+      "createdAt": 1762102285075,
+      "displayName": "Skull Crusher",
+      "name": "Skull Crusher",
+      "pr": 24,
+      "prReps": 12,
+      "used": 14
+    },
+    {
+      "canonicalName": "One Arm Overhead Triceps Extension",
+      "createdAt": 1762102285075,
+      "displayName": "One Arm Overhead Triceps Extension",
+      "name": "One Arm Overhead Triceps Extension",
+      "pr": 12,
+      "prReps": 12,
+      "used": 6
+    },
+    {
+      "canonicalName": "Chin Up",
+      "createdAt": 1762102285075,
+      "displayName": "Chin Up",
+      "name": "Chin Up",
+      "pr": 79,
+      "prReps": 7,
+      "used": 8
+    },
+    {
+      "canonicalName": "Rope Pullover",
+      "createdAt": 1762102285075,
+      "displayName": "Rope Pullover",
+      "name": "Rope Pullover",
+      "pr": 42,
+      "prReps": 15,
+      "used": 11
+    },
+    {
+      "canonicalName": "Romanian Deadlift",
+      "createdAt": 1762102285075,
+      "displayName": "Romanian Deadlift",
+      "name": "Romanian Deadlift",
+      "pr": 38,
+      "prReps": 12,
+      "used": 10
+    },
+    {
+      "canonicalName": "Hammer Curl",
+      "createdAt": 1762102285075,
+      "displayName": "Hammer Curl",
+      "name": "Hammer Curl",
+      "pr": 15,
+      "prReps": 10,
+      "used": 9
+    },
+    {
+      "canonicalName": "Leg Press",
+      "createdAt": 1762102285075,
+      "displayName": "Leg Press",
+      "name": "Leg Press",
+      "pr": 90,
+      "prReps": 10,
+      "used": 8
+    },
+    {
+      "canonicalName": "Leg Curl",
+      "createdAt": 1762102285075,
+      "displayName": "Leg Curl",
+      "name": "Leg Curl",
+      "pr": 35,
+      "prReps": 15,
+      "used": 6
+    },
+    {
+      "canonicalName": "Calf Raise",
+      "createdAt": 1762102285075,
+      "displayName": "Calf Raise",
+      "name": "Calf Raise",
+      "pr": 15,
+      "prReps": 21,
+      "used": 2
+    },
+    {
+      "canonicalName": "Dumbbell Squat",
+      "createdAt": 1762102285075,
+      "displayName": "Dumbbell Squat",
+      "name": "Dumbbell Squat",
+      "pr": 0,
+      "prReps": 0,
+      "used": 0
+    },
+    {
+      "canonicalName": "Leg Extension",
+      "createdAt": 1762102285075,
+      "displayName": "Leg Extension",
+      "name": "Leg Extension",
+      "pr": 90,
+      "prReps": 10,
+      "used": 3
+    },
+    {
+      "canonicalName": "Bulgarian Split Squat",
+      "createdAt": 1762102285075,
+      "displayName": "Bulgarian Split Squat",
+      "name": "Bulgarian Split Squat",
+      "pr": 78,
+      "prReps": 14,
+      "used": 2
+    },
+    {
+      "canonicalName": "Single-Leg Hip Thrust",
+      "createdAt": 1762102285075,
+      "displayName": "Single-Leg Hip Thrust",
+      "name": "Single-Leg Hip Thrust",
+      "pr": 0,
+      "prReps": 0,
+      "used": 0
+    },
+    {
+      "canonicalName": "Hip Thrust",
+      "createdAt": 1762102285075,
+      "displayName": "Hip Thrust",
+      "name": "Hip Thrust",
+      "pr": 77.5,
+      "prReps": 15,
+      "used": 9
+    },
+    {
+      "canonicalName": "Ab Wheel",
+      "createdAt": 1762102285075,
+      "displayName": "Ab Wheel",
+      "name": "Ab Wheel",
+      "pr": 0,
+      "prReps": 0,
+      "used": 0
+    },
+    {
+      "canonicalName": "Plank",
+      "createdAt": 1762102285075,
+      "displayName": "Plank",
+      "name": "Plank",
+      "pr": 0,
+      "prReps": 0,
+      "used": 0
+    },
+    {
+      "canonicalName": "Hanging Leg Raise",
+      "createdAt": 1762102285075,
+      "displayName": "Hanging Leg Raise",
+      "name": "Hanging Leg Raise",
+      "pr": 0,
+      "prReps": 0,
+      "used": 0
+    },
+    {
+      "canonicalName": "Barbell Curl (D├╝z Bar)",
+      "createdAt": 1762109199006,
+      "displayName": "Barbell Curl (D├╝z Bar)",
+      "name": "Barbell Curl (D├╝z Bar)",
+      "pr": 18,
+      "prReps": 11,
+      "used": 1
+    },
+    {
+      "canonicalName": "Incline Press",
+      "createdAt": 1762109213483,
+      "displayName": "Incline Press",
+      "name": "Incline Press",
+      "pr": 20,
+      "prReps": 8,
+      "used": 2
+    },
+    {
+      "canonicalName": "Shoulder Raise",
+      "createdAt": 1762109213483,
+      "displayName": "Shoulder Raise",
+      "name": "Shoulder Raise",
+      "pr": 10,
+      "prReps": 10,
+      "used": 2
+    },
+    {
+      "canonicalName": "Incline Curl",
+      "createdAt": 1762109245551,
+      "displayName": "Incline Curl",
+      "name": "Incline Curl",
+      "pr": 15,
+      "prReps": 9,
+      "used": 3
+    },
+    {
+      "canonicalName": "bilinmiyor (Trapez)",
+      "createdAt": 1762114271462,
+      "displayName": "bilinmiyor (Trapez)",
+      "name": "bilinmiyor (Trapez)",
+      "pr": 20,
+      "prReps": 15,
+      "used": 1
+    },
+    {
+      "canonicalName": "bilinmiyor (Forearm)",
+      "createdAt": 1762114271462,
+      "displayName": "bilinmiyor (Forearm)",
+      "name": "bilinmiyor (Forearm)",
+      "pr": 10,
+      "prReps": 15,
+      "used": 1
+    },
+    {
+      "canonicalName": "Dumbbell Trapez",
+      "createdAt": 1762117767689,
+      "displayName": "Dumbbell Trapez",
+      "name": "Dumbbell Trapez",
+      "pr": 20,
+      "prReps": 15,
+      "used": 2
+    },
+    {
+      "canonicalName": "Dumbbell Forearm",
+      "createdAt": 1762117767690,
+      "displayName": "Dumbbell Forearm",
+      "name": "Dumbbell Forearm",
+      "pr": 10,
+      "prReps": 15,
+      "used": 2
+    },
+    {
+      "canonicalName": "close grip lat pulldown",
+      "createdAt": 1762118248079,
+      "customCategory": "pull",
+      "customMuscles": [
+        "biceps",
+        "back",
+        "lats"
+      ],
+      "displayName": "close grip lat pulldown",
+      "name": "close grip lat pulldown",
+      "pr": 72,
+      "prReps": 12,
+      "used": 2
+    },
+    {
+      "canonicalName": "barbell overhead press",
+      "createdAt": 1762120773457,
+      "customCategory": "push",
+      "customMuscles": [
+        "shoulders",
+        "triceps"
+      ],
+      "displayName": "barbell overhead press",
+      "name": "barbell overhead press",
+      "pr": 30,
+      "prReps": 24,
+      "used": 12
+    },
+    {
+      "canonicalName": "Front Shoulder",
+      "createdAt": 1763125707577,
+      "displayName": "Front Shoulder",
+      "name": "Front Shoulder",
+      "pr": 10,
+      "prReps": 10,
+      "used": 1
+    },
+    {
+      "canonicalName": "Rope Pushdown",
+      "createdAt": 1763125707577,
+      "displayName": "Rope Pushdown",
+      "name": "Rope Pushdown",
+      "pr": 36,
+      "prReps": 15,
+      "used": 2
+    },
+    {
+      "canonicalName": "Cable Curl",
+      "createdAt": 1763137067746,
+      "customCategory": "pull",
+      "customMuscles": [
+        "biceps"
+      ],
+      "displayName": "Cable Curl",
+      "name": "Cable Curl",
+      "pr": 24,
+      "prReps": 10,
+      "used": 1
+    },
+    {
+      "canonicalName": "Goblet Squad",
+      "createdAt": 1763139547005,
+      "customCategory": "leg",
+      "customMuscles": [
+        "core",
+        "quads",
+        "hipFlexors"
+      ],
+      "displayName": "Goblet Squad",
+      "name": "Goblet Squad",
+      "pr": 78,
+      "prReps": 20,
+      "used": 3
+    },
+    {
+      "canonicalName": "Bench Pres",
+      "createdAt": 1763159751456,
+      "displayName": "Bench Pres",
+      "name": "Bench Pres",
+      "pr": 70,
+      "prReps": 7,
+      "used": 1
+    }
+  ],
+  "workouts": {
+    "2025-03-02": {
+      "dateISO": "2025-03-02",
+      "items": [
+        {
+          "canonicalName": "Bench Press",
+          "displayName": "Bench Press",
+          "name": "Bench Press",
+          "sets": [
+            {
+              "r": 5,
+              "w": 60,
+              "wDisplay": "60",
+              "note": ""
+            },
+            {
+              "r": 8,
+              "w": 55,
+              "wDisplay": "55",
+              "note": ""
+            },
+            {
+              "r": 8,
+              "w": 55,
+              "wDisplay": "55",
+              "note": ""
+            }
+          ]
+        },
+        {
+          "canonicalName": "Overhead Press",
+          "displayName": "Shoulder Press",
+          "name": "Shoulder Press",
+          "sets": [
+            {
+              "r": 8,
+              "w": 20,
+              "wDisplay": "20",
+              "note": ""
+            },
+            {
+              "r": 8,
+              "w": 17.5,
+              "wDisplay": "17.5",
+              "note": ""
+            },
+            {
+              "r": 8,
+              "w": 17.5,
+              "wDisplay": "17.5",
+              "note": ""
+            }
+          ]
+        },
+        {
+          "canonicalName": "Incline Dumbbell Press",
+          "displayName": "Incline Dumbbell Press",
+          "name": "Incline Dumbbell Press",
+          "sets": [
+            {
+              "r": 6,
+              "w": 20,
+              "wDisplay": "20",
+              "note": ""
+            },
+            {
+              "r": 8,
+              "w": 17.5,
+              "wDisplay": "17.5",
+              "note": ""
+            },
+            {
+              "r": 8,
+              "w": 17.5,
+              "wDisplay": "17.5",
+              "note": ""
+            }
+          ]
+        },
+        {
+          "canonicalName": "Chest Fly",
+          "displayName": "Chest Fly",
+          "name": "Chest Fly",
+          "sets": [
+            {
+              "r": 12,
+              "w": 54,
+              "wDisplay": "54",
+              "note": ""
+            },
+            {
+              "r": 12,
+              "w": 54,
+              "wDisplay": "54",
+              "note": ""
+            },
+            {
+              "r": 12,
+              "w": 54,
+              "wDisplay": "54",
+              "note": ""
+            }
+          ]
+        },
+        {
+          "canonicalName": "Lateral Raise",
+          "displayName": "lateral raise",
+          "name": "lateral raise",
+          "sets": [
+            {
+              "r": 10,
+              "w": 10,
+              "wDisplay": "10",
+              "note": ""
+            },
+            {
+              "r": 10,
+              "w": 10,
+              "wDisplay": "10",
+              "note": ""
+            },
+            {
+              "r": 10,
+              "w": 7.5,
+              "wDisplay": "7.5",
+              "note": ""
+            }
+          ]
+        }
+      ],
+      "notes": "Ba┼şlang─▒├ğ notu: '13 ┼Şubat siuuuuu, bench'",
+      "workoutFocus": [
+        "G├Â─ş├╝s",
+        "Omuz"
+      ],
+      "workoutFuel": "",
+      "workoutName": "Push"
+    },
+    "2025-03-03": {
+      "dateISO": "2025-03-03",
+      "items": [
+        {
+          "canonicalName": "Lat Pulldown",
+          "displayName": "Lat Pulldown",
+          "name": "Lat Pulldown",
+          "sets": [
+            {
+              "r": 8,
+              "w": 60,
+              "wDisplay": "60",
+              "note": ""
+            },
+            {
+              "r": 12,
+              "w": 54,
+              "wDisplay": "54",
+              "note": ""
+            },
+            {
+              "r": 12,
+              "w": 54,
+              "wDisplay": "54",
+              "note": ""
+            },
+            {
+              "r": 12,
+              "w": 54,
+              "wDisplay": "54",
+              "note": ""
+            }
+          ]
+        },
+        {
+          "canonicalName": "Barbell Row",
+          "displayName": "Barbell Row",
+          "name": "Barbell Row",
+          "sets": [
+            {
+              "r": 10,
+              "w": 38,
+              "wDisplay": "38",
+              "note": ""
+            },
+            {
+              "r": 10,
+              "w": 38,
+              "wDisplay": "38",
+              "note": ""
+            },
+            {
+              "r": 10,
+              "w": 38,
+              "wDisplay": "38",
+              "note": ""
+            }
+          ]
+        },
+        {
+          "canonicalName": "Incline Dumbbell Curl",
+          "displayName": "Incline Dumbbell Curl",
+          "name": "Incline Dumbbell Curl",
+          "sets": [
+            {
+              "r": 7,
+              "w": 15,
+              "wDisplay": "15",
+              "note": ""
+            },
+            {
+              "r": 10,
+              "w": 12.5,
+              "wDisplay": "12.5",
+              "note": ""
+            },
+            {
+              "r": 10,
+              "w": 12.5,
+              "wDisplay": "12.5",
+              "note": ""
+            }
+          ]
+        },
+        {
+          "canonicalName": "Barbell Curl",
+          "displayName": "Barbell Curl",
+          "name": "Barbell Curl",
+          "sets": [
+            {
+              "r": 9,
+              "w": 18,
+              "wDisplay": "18",
+              "note": ""
+            },
+            {
+              "r": 11,
+              "w": 13,
+              "wDisplay": "13",
+              "note": ""
+            },
+            {
+              "r": 11,
+              "w": 13,
+              "wDisplay": "13",
+              "note": ""
+            }
+          ]
+        }
+      ],
+      "notes": "",
+      "workoutFocus": [
+        "S─▒rt",
+        "Biceps"
+      ],
+      "workoutFuel": "",
+      "workoutName": "Pull"
+    },
+    "2025-03-07": {
+      "dateISO": "2025-03-07",
+      "items": [
+        {
+          "canonicalName": "Overhead Press",
+          "displayName": "Shoulder Press",
+          "name": "Shoulder Press",
+          "sets": [
+            {
+              "r": 15,
+              "w": 20,
+              "wDisplay": "20",
+              "note": ""
+            },
+            {
+              "r": 8,
+              "w": 17.5,
+              "wDisplay": "17.5",
+              "note": ""
+            },
+            {
+              "r": 8,
+              "w": 17.5,
+              "wDisplay": "17.5",
+              "note": ""
+            }
+          ]
+        },
+        {
+          "canonicalName": "Incline Dumbbell Press",
+          "displayName": "Incline Dumbbell Press",
+          "name": "Incline Dumbbell Press",
+          "sets": [
+            {
+              "r": 15,
+              "w": 20,
+              "wDisplay": "20",
+              "note": ""
+            },
+            {
+              "r": 8,
+              "w": 17.5,
+              "wDisplay": "17.5",
+              "note": ""
+            },
+            {
+              "r": 8,
+              "w": 17.5,
+              "wDisplay": "17.5",
+              "note": ""
+            }
+          ]
+        },
+        {
+          "canonicalName": "Chest Fly",
+          "displayName": "Chest Fly",
+          "name": "Chest Fly",
+          "sets": [
+            {
+              "r": 12,
+              "w": 54,
+              "wDisplay": "54",
+              "note": ""
+            },
+            {
+              "r": 12,
+              "w": 60,
+              "wDisplay": "60",
+              "note": ""
+            },
+            {
+              "r": 12,
+              "w": 60,
+              "wDisplay": "60",
+              "note": ""
+            }
+          ]
+        },
+        {
+          "canonicalName": "Triceps Pushdown",
+          "displayName": "Triceps Pushdown",
+          "name": "Triceps Pushdown",
+          "sets": [
+            {
+              "r": 12,
+              "w": 48,
+              "wDisplay": "48",
+              "note": ""
+            },
+            {
+              "r": 12,
+              "w": 48,
+              "wDisplay": "48",
+              "note": ""
+            },
+            {
+              "r": 12,
+              "w": 48,
+              "wDisplay": "48",
+              "note": ""
+            },
+            {
+              "r": 12,
+              "w": 48,
+              "wDisplay": "48",
+              "note": ""
+            }
+          ]
+        }
+      ],
+      "notes": "",
+      "workoutFocus": [
+        "G├Â─ş├╝s",
+        "Omuz",
+        "Arka Kol"
+      ],
+      "workoutFuel": "",
+      "workoutName": "Push"
+    },
+    "2025-03-08": {
+      "dateISO": "2025-03-08",
+      "items": [
+        {
+          "canonicalName": "Lat Pulldown",
+          "displayName": "Lat Pulldown",
+          "name": "Lat Pulldown",
+          "sets": [
+            {
+              "r": 10,
+              "w": 60,
+              "wDisplay": "60",
+              "note": ""
+            },
+            {
+              "r": 10,
+              "w": 60,
+              "wDisplay": "60",
+              "note": ""
+            },
+            {
+              "r": 10,
+              "w": 60,
+              "wDisplay": "60",
+              "note": ""
+            },
+            {
+              "r": 10,
+              "w": 60,
+              "wDisplay": "60",
+              "note": ""
+            }
+          ]
+        },
+        {
+          "canonicalName": "Cable Row",
+          "displayName": "Cable Row",
+          "name": "Cable Row",
+          "sets": [
+            {
+              "r": 12,
+              "w": 48,
+              "wDisplay": "48",
+              "note": ""
+            },
+            {
+              "r": 12,
+              "w": 60,
+              "wDisplay": "60",
+              "note": ""
+            },
+            {
+              "r": 15,
+              "w": 54,
+              "wDisplay": "54",
+              "note": ""
+            },
+            {
+              "r": 12,
+              "w": 48,
+              "wDisplay": "48",
+              "note": ""
+            }
+          ]
+        },
+        {
+          "canonicalName": "Romanian Deadlift",
+          "displayName": "Romanian Deadlift",
+          "name": "Romanian Deadlift",
+          "sets": [
+            {
+              "r": 10,
+              "w": 33,
+              "wDisplay": "33",
+              "note": ""
+            },
+            {
+              "r": 10,
+              "w": 33,
+              "wDisplay": "33",
+              "note": ""
+            },
+            {
+              "r": 10,
+              "w": 33,
+              "wDisplay": "33",
+              "note": ""
+            },
+            {
+              "r": 10,
+              "w": 33,
+              "wDisplay": "33",
+              "note": ""
+            }
+          ]
+        }
+      ],
+      "notes": "",
+      "workoutFocus": [
+        "S─▒rt",
+        "Arka Bacak"
+      ],
+      "workoutFuel": "",
+      "workoutName": "Pull"
+    },
+    "2025-03-09": {
+      "dateISO": "2025-03-09",
+      "items": [
+        {
+          "canonicalName": "Leg Extension",
+          "displayName": "Leg Extension",
+          "name": "Leg Extension",
+          "sets": [
+            {
+              "r": 10,
+              "w": 84,
+              "wDisplay": "84",
+              "note": ""
+            },
+            {
+              "r": 10,
+              "w": 90,
+              "wDisplay": "90",
+              "note": ""
+            },
+            {
+              "r": 10,
+              "w": 84,
+              "wDisplay": "84",
+              "note": ""
+            },
+            {
+              "r": 10,
+              "w": 84,
+              "wDisplay": "84",
+              "note": ""
+            }
+          ]
+        }
+      ],
+      "notes": "",
+      "workoutFocus": [
+        "├ûn Bacak"
+      ],
+      "workoutFuel": "",
+      "workoutName": "Bacak"
+    },
+    "2025-03-10": {
+      "dateISO": "2025-03-10",
+      "items": [
+        {
+          "canonicalName": "Incline Curl",
+          "displayName": "Incline Curl",
+          "name": "Incline Curl",
+          "sets": [
+            {
+              "r": 8,
+              "w": 15,
+              "wDisplay": "15",
+              "note": ""
+            },
+            {
+              "r": 8,
+              "w": 12.5,
+              "wDisplay": "12.5",
+              "note": ""
+            },
+            {
+              "r": 8,
+              "w": 12.5,
+              "wDisplay": "12.5",
+              "note": ""
+            },
+            {
+              "r": 9,
+              "w": 12.5,
+              "wDisplay": "12.5",
+              "note": ""
+            }
+          ]
+        },
+        {
+          "canonicalName": "Hammer Curl",
+          "displayName": "Hammer Curl",
+          "name": "Hammer Curl",
+          "sets": [
+            {
+              "r": 8,
+              "w": 12.5,
+              "wDisplay": "12.5",
+              "note": ""
+            },
+            {
+              "r": 8,
+              "w": 12.5,
+              "wDisplay": "12.5",
+              "note": ""
+            },
+            {
+              "r": 10,
+              "w": 12.5,
+              "wDisplay": "12.5",
+              "note": ""
+            }
+          ]
+        }
+      ],
+      "notes": "",
+      "workoutFocus": [
+        "Biceps"
+      ],
+      "workoutFuel": "",
+      "workoutName": "Pull"
+    },
+    "2025-03-15": {
+      "dateISO": "2025-03-15",
+      "items": [
+        {
+          "canonicalName": "Bench Press",
+          "displayName": "Bench Press",
+          "name": "Bench Press",
+          "sets": [
+            {
+              "r": 6,
+              "w": 60,
+              "wDisplay": "60",
+              "note": ""
+            },
+            {
+              "r": 6,
+              "w": 55,
+              "wDisplay": "55",
+              "note": ""
+            },
+            {
+              "r": 5,
+              "w": 55,
+              "wDisplay": "55",
+              "note": ""
+            },
+            {
+              "r": 5,
+              "w": 60,
+              "wDisplay": "60",
+              "note": ""
+            }
+          ]
+        },
+        {
+          "canonicalName": "Incline Dumbbell Press",
+          "displayName": "incline dumbbell press",
+          "name": "incline dumbbell press",
+          "sets": [
+            {
+              "r": 8,
+              "w": 20,
+              "wDisplay": "20",
+              "note": ""
+            },
+            {
+              "r": 8,
+              "w": 20,
+              "wDisplay": "20",
+              "note": ""
+            },
+            {
+              "r": 6,
+              "w": 20,
+              "wDisplay": "20",
+              "note": ""
+            }
+          ]
+        },
+        {
+          "canonicalName": "Chest Fly",
+          "displayName": "chest fly",
+          "name": "chest fly",
+          "sets": [
+            {
+              "r": 12,
+              "w": 60,
+              "wDisplay": "60",
+              "note": ""
+            },
+            {
+              "r": 12,
+              "w": 60,
+              "wDisplay": "60",
+              "note": ""
+            },
+            {
+              "r": 12,
+              "w": 60,
+              "wDisplay": "60",
+              "note": ""
+            }
+          ]
+        }
+      ],
+      "notes": "",
+      "workoutFocus": [
+        "G├Â─ş├╝s"
+      ],
+      "workoutFuel": "",
+      "workoutName": "Push"
+    },
+    "2025-03-16": {
+      "dateISO": "2025-03-16",
+      "items": [
+        {
+          "canonicalName": "Lat Pulldown",
+          "displayName": "lat pulldown",
+          "name": "lat pulldown",
+          "sets": [
+            {
+              "r": 10,
+              "w": 33,
+              "wDisplay": "33",
+              "note": ""
+            },
+            {
+              "r": 10,
+              "w": 38,
+              "wDisplay": "38",
+              "note": ""
+            },
+            {
+              "r": 10,
+              "w": 38,
+              "wDisplay": "38",
+              "note": ""
+            },
+            {
+              "r": 10,
+              "w": 38,
+              "wDisplay": "38",
+              "note": ""
+            }
+          ]
+        },
+        {
+          "canonicalName": "Cable Row",
+          "displayName": "cable row",
+          "name": "cable row",
+          "sets": [
+            {
+              "r": 12,
+              "w": 54,
+              "wDisplay": "54",
+              "note": ""
+            },
+            {
+              "r": 12,
+              "w": 60,
+              "wDisplay": "60",
+              "note": ""
+            },
+            {
+              "r": 12,
+              "w": 60,
+              "wDisplay": "60",
+              "note": ""
+            }
+          ]
+        },
+        {
+          "canonicalName": "Dumbbell Curl",
+          "displayName": "dumbbell curl",
+          "name": "dumbbell curl",
+          "sets": [
+            {
+              "r": 8,
+              "w": 15,
+              "wDisplay": "15",
+              "note": ""
+            },
+            {
+              "r": 8,
+              "w": 15,
+              "wDisplay": "15",
+              "note": ""
+            },
+            {
+              "r": 8,
+              "w": 15,
+              "wDisplay": "15",
+              "note": ""
+            }
+          ]
+        },
+        {
+          "canonicalName": "Barbell Curl",
+          "displayName": "barbell curl",
+          "name": "barbell curl",
+          "sets": [
+            {
+              "r": 8,
+              "w": 18,
+              "wDisplay": "18",
+              "note": ""
+            },
+            {
+              "r": 8,
+              "w": 18,
+              "wDisplay": "18",
+              "note": ""
+            },
+            {
+              "r": 8,
+              "w": 18,
+              "wDisplay": "18",
+              "note": ""
+            }
+          ]
+        }
+      ],
+      "notes": "Ba┼şl─▒kta 'S─▒rt 2' yaz─▒yor.",
+      "workoutFocus": [
+        "S─▒rt",
+        "Biceps"
+      ],
+      "workoutFuel": "",
+      "workoutName": "Pull"
+    },
+    "2025-03-17": {
+      "dateISO": "2025-03-17",
+      "items": [
+        {
+          "canonicalName": "Overhead Press",
+          "displayName": "overhead press",
+          "name": "overhead press",
+          "sets": [
+            {
+              "r": 8,
+              "w": 20,
+              "wDisplay": "20",
+              "note": ""
+            },
+            {
+              "r": 8,
+              "w": 17.5,
+              "wDisplay": "17.5",
+              "note": ""
+            },
+            {
+              "r": 6,
+              "w": 17.5,
+              "wDisplay": "17.5",
+              "note": ""
+            },
+            {
+              "r": 5,
+              "w": 20,
+              "wDisplay": "20",
+              "note": ""
+            }
+          ]
+        },
+        {
+          "canonicalName": "Lateral Raise",
+          "displayName": "lateral raise",
+          "name": "lateral raise",
+          "sets": [
+            {
+              "r": 10,
+              "w": 10,
+              "wDisplay": "10",
+              "note": ""
+            },
+            {
+              "r": 10,
+              "w": 10,
+              "wDisplay": "10",
+              "note": ""
+            },
+            {
+              "r": 10,
+              "w": 10,
+              "wDisplay": "10",
+              "note": ""
+            },
+            {
+              "r": 6,
+              "w": 7.5,
+              "wDisplay": "7.5",
+              "note": ""
+            },
+            {
+              "r": 8,
+              "w": 7.5,
+              "wDisplay": "7.5",
+              "note": ""
+            }
+          ]
+        }
+      ],
+      "notes": "",
+      "workoutFocus": [
+        "Omuz"
+      ],
+      "workoutFuel": "",
+      "workoutName": "Push"
+    },
+    "2025-03-23": {
+      "dateISO": "2025-03-23",
+      "items": [
+        {
+          "canonicalName": "Bench Press",
+          "displayName": "Bench Press",
+          "name": "Bench Press",
+          "sets": [
+            {
+              "r": 6,
+              "w": 55,
+              "wDisplay": "55",
+              "note": ""
+            },
+            {
+              "r": 11,
+              "w": 40,
+              "wDisplay": "40",
+              "note": ""
+            },
+            {
+              "r": 6,
+              "w": 55,
+              "wDisplay": "55",
+              "note": ""
+            },
+            {
+              "r": 6,
+              "w": 55,
+              "wDisplay": "55",
+              "note": ""
+            }
+          ]
+        },
+        {
+          "canonicalName": "Overhead Press",
+          "displayName": "overhead press",
+          "name": "overhead press",
+          "sets": [
+            {
+              "r": 6,
+              "w": 15,
+              "wDisplay": "15",
+              "note": ""
+            },
+            {
+              "r": 10,
+              "w": 15,
+              "wDisplay": "15",
+              "note": ""
+            },
+            {
+              "r": 8,
+              "w": 15,
+              "wDisplay": "15",
+              "note": ""
+            },
+            {
+              "r": 8,
+              "w": 15,
+              "wDisplay": "15",
+              "note": ""
+            }
+          ]
+        },
+        {
+          "canonicalName": "Incline Dumbbell Press",
+          "displayName": "incline dumbbell press",
+          "name": "incline dumbbell press",
+          "sets": [
+            {
+              "r": 8,
+              "w": 17.5,
+              "wDisplay": "17.5",
+              "note": ""
+            },
+            {
+              "r": 8,
+              "w": 17.5,
+              "wDisplay": "17.5",
+              "note": ""
+            },
+            {
+              "r": 8,
+              "w": 17.5,
+              "wDisplay": "17.5",
+              "note": ""
+            },
+            {
+              "r": 8,
+              "w": 17.5,
+              "wDisplay": "17.5",
+              "note": ""
+            }
+          ]
+        },
+        {
+          "canonicalName": "Lateral Raise",
+          "displayName": "lateral raise",
+          "name": "lateral raise",
+          "sets": [
+            {
+              "r": 10,
+              "w": 10,
+              "wDisplay": "10",
+              "note": ""
+            },
+            {
+              "r": 7,
+              "w": 7.5,
+              "wDisplay": "7.5",
+              "note": ""
+            },
+            {
+              "r": 9,
+              "w": 7.5,
+              "wDisplay": "7.5",
+              "note": ""
+            },
+            {
+              "r": 5,
+              "w": 10,
+              "wDisplay": "10",
+              "note": ""
+            },
+            {
+              "r": 3,
+              "w": 10,
+              "wDisplay": "10",
+              "note": ""
+            }
+          ]
+        },
+        {
+          "canonicalName": "Chest Fly",
+          "displayName": "chest fly",
+          "name": "chest fly",
+          "sets": [
+            {
+              "r": 12,
+              "w": 54,
+              "wDisplay": "54",
+              "note": ""
+            },
+            {
+              "r": 15,
+              "w": 48,
+              "wDisplay": "48",
+              "note": ""
+            },
+            {
+              "r": 9,
+              "w": 54,
+              "wDisplay": "54",
+              "note": ""
+            }
+          ]
+        }
+      ],
+      "notes": "Ba┼şl─▒kta 'Bench day' yaz─▒yor.",
+      "workoutFocus": [
+        "G├Â─ş├╝s",
+        "Omuz"
+      ],
+      "workoutFuel": "",
+      "workoutName": "Push"
+    },
+    "2025-03-24": {
+      "dateISO": "2025-03-24",
+      "items": [
+        {
+          "canonicalName": "Lat Pulldown",
+          "displayName": "lat pulldown",
+          "name": "lat pulldown",
+          "sets": [
+            {
+              "r": 10,
+              "w": 60,
+              "wDisplay": "60",
+              "note": ""
+            },
+            {
+              "r": 10,
+              "w": 60,
+              "wDisplay": "60",
+              "note": ""
+            },
+            {
+              "r": 10,
+              "w": 60,
+              "wDisplay": "60",
+              "note": ""
+            }
+          ]
+        },
+        {
+          "canonicalName": "Cable Row",
+          "displayName": "cable row",
+          "name": "cable row",
+          "sets": [
+            {
+              "r": 12,
+              "w": 48,
+              "wDisplay": "48",
+              "note": ""
+            },
+            {
+              "r": 15,
+              "w": 48,
+              "wDisplay": "48",
+              "note": ""
+            },
+            {
+              "r": 15,
+              "w": 48,
+              "wDisplay": "48",
+              "note": ""
+            }
+          ]
+        },
+        {
+          "canonicalName": "barbell row",
+          "displayName": "barbell row",
+          "name": "barbell row",
+          "sets": [
+            {
+              "r": 12,
+              "w": 28,
+              "wDisplay": "28",
+              "note": ""
+            },
+            {
+              "r": 12,
+              "w": 28,
+              "wDisplay": "28",
+              "note": ""
+            },
+            {
+              "r": 15,
+              "w": 28,
+              "wDisplay": "28",
+              "note": ""
+            }
+          ]
+        },
+        {
+          "canonicalName": "Dumbbell Curl",
+          "displayName": "dumbbell curl",
+          "name": "dumbbell curl",
+          "sets": [
+            {
+              "r": 8,
+              "w": 15,
+              "wDisplay": "15",
+              "note": ""
+            },
+            {
+              "r": 8,
+              "w": 12.5,
+              "wDisplay": "12.5",
+              "note": ""
+            },
+            {
+              "r": 8,
+              "w": 12.5,
+              "wDisplay": "12.5",
+              "note": ""
+            }
+          ]
+        },
+        {
+          "canonicalName": "Barbell Curl",
+          "displayName": "barbell curl",
+          "name": "barbell curl",
+          "sets": [
+            {
+              "r": 10,
+              "w": 18,
+              "wDisplay": "18",
+              "note": ""
+            },
+            {
+              "r": 10,
+              "w": 18,
+              "wDisplay": "18",
+              "note": ""
+            },
+            {
+              "r": 12,
+              "w": 18,
+              "wDisplay": "18",
+              "note": ""
+            }
+          ]
+        }
+      ],
+      "notes": "Ba┼şl─▒kta 'S─▒rt 1' yaz─▒yor.",
+      "workoutFocus": [
+        "S─▒rt",
+        "Biceps"
+      ],
+      "workoutFuel": "",
+      "workoutName": "Pull"
+    },
+    "2025-03-25": {
+      "dateISO": "2025-03-25",
+      "items": [
+        {
+          "canonicalName": "Overhead Press",
+          "displayName": "overhead press",
+          "name": "overhead press",
+          "sets": [
+            {
+              "r": 6,
+              "w": 20,
+              "wDisplay": "20",
+              "note": ""
+            },
+            {
+              "r": 6,
+              "w": 20,
+              "wDisplay": "20",
+              "note": ""
+            },
+            {
+              "r": 7,
+              "w": 17.5,
+              "wDisplay": "17.5",
+              "note": ""
+            },
+            {
+              "r": 6,
+              "w": 20,
+              "wDisplay": "20",
+              "note": ""
+            }
+          ]
+        },
+        {
+          "canonicalName": "Hammer Curl",
+          "displayName": "hammer curl",
+          "name": "hammer curl",
+          "sets": [
+            {
+              "r": 8,
+              "w": 15,
+              "wDisplay": "15",
+              "note": ""
+            },
+            {
+              "r": 8,
+              "w": 15,
+              "wDisplay": "15",
+              "note": ""
+            },
+            {
+              "r": 8,
+              "w": 15,
+              "wDisplay": "15",
+              "note": ""
+            }
+          ]
+        }
+      ],
+      "notes": "",
+      "workoutFocus": [
+        "Omuz",
+        "Biceps (Ba┼şl─▒ktan yorumland─▒)"
+      ],
+      "workoutFuel": "",
+      "workoutName": "Push"
+    },
+    "2025-03-26": {
+      "dateISO": "2025-03-26",
+      "items": [
+        {
+          "canonicalName": "Bench Press",
+          "displayName": "Bench Press",
+          "name": "Bench Press",
+          "sets": [
+            {
+              "r": 6,
+              "w": 55,
+              "wDisplay": "55",
+              "note": ""
+            },
+            {
+              "r": 6,
+              "w": 55,
+              "wDisplay": "55",
+              "note": ""
+            },
+            {
+              "r": 6,
+              "w": 55,
+              "wDisplay": "55",
+              "note": ""
+            }
+          ]
+        },
+        {
+          "canonicalName": "Incline Dumbbell Press",
+          "displayName": "incline dumbbell press",
+          "name": "incline dumbbell press",
+          "sets": [
+            {
+              "r": 10,
+              "w": 20,
+              "wDisplay": "20",
+              "note": ""
+            },
+            {
+              "r": 8,
+              "w": 20,
+              "wDisplay": "20",
+              "note": ""
+            },
+            {
+              "r": 8,
+              "w": 20,
+              "wDisplay": "20",
+              "note": ""
+            },
+            {
+              "r": 8,
+              "w": 20,
+              "wDisplay": "20",
+              "note": ""
+            }
+          ]
+        },
+        {
+          "canonicalName": "Chest Fly",
+          "displayName": "chest fly",
+          "name": "chest fly",
+          "sets": [
+            {
+              "r": 12,
+              "w": 54,
+              "wDisplay": "54",
+              "note": ""
+            },
+            {
+              "r": 12,
+              "w": 60,
+              "wDisplay": "60",
+              "note": ""
+            },
+            {
+              "r": 12,
+              "w": 54,
+              "wDisplay": "54",
+              "note": ""
+            },
+            {
+              "r": 12,
+              "w": 54,
+              "wDisplay": "54",
+              "note": ""
+            }
+          ]
+        }
+      ],
+      "notes": "BENCH DAY",
+      "workoutFocus": [
+        "G├Â─ş├╝s"
+      ],
+      "workoutFuel": "",
+      "workoutName": "Push"
+    },
+    "2025-04-06": {
+      "dateISO": "2025-04-06",
+      "items": [
+        {
+          "canonicalName": "Overhead Press",
+          "displayName": "overhead press",
+          "name": "overhead press",
+          "sets": [
+            {
+              "r": 6,
+              "w": 20,
+              "wDisplay": "20",
+              "note": ""
+            },
+            {
+              "r": 8,
+              "w": 17.5,
+              "wDisplay": "17.5",
+              "note": ""
+            },
+            {
+              "r": 6,
+              "w": 20,
+              "wDisplay": "20",
+              "note": ""
+            }
+          ]
+        },
+        {
+          "canonicalName": "Incline Dumbbell Press",
+          "displayName": "incline dumbbell press",
+          "name": "incline dumbbell press",
+          "sets": [
+            {
+              "r": 8,
+              "w": 20,
+              "wDisplay": "20",
+              "note": ""
+            },
+            {
+              "r": 8,
+              "w": 17.5,
+              "wDisplay": "17.5",
+              "note": ""
+            },
+            {
+              "r": 8,
+              "w": 17.5,
+              "wDisplay": "17.5",
+              "note": ""
+            }
+          ]
+        },
+        {
+          "canonicalName": "Chest Fly",
+          "displayName": "chest fly",
+          "name": "chest fly",
+          "sets": [
+            {
+              "r": 10,
+              "w": 54,
+              "wDisplay": "54",
+              "note": ""
+            },
+            {
+              "r": 15,
+              "w": 48,
+              "wDisplay": "48",
+              "note": ""
+            },
+            {
+              "r": 12,
+              "w": 48,
+              "wDisplay": "48",
+              "note": ""
+            }
+          ]
+        },
+        {
+          "canonicalName": "Lateral Raise",
+          "displayName": "lateral raise",
+          "name": "lateral raise",
+          "sets": [
+            {
+              "r": 7,
+              "w": 10,
+              "wDisplay": "10",
+              "note": ""
+            },
+            {
+              "r": 7,
+              "w": 7.5,
+              "wDisplay": "7.5",
+              "note": ""
+            },
+            {
+              "r": 7,
+              "w": 5,
+              "wDisplay": "5",
+              "note": ""
+            },
+            {
+              "r": 5,
+              "w": 10,
+              "wDisplay": "10",
+              "note": ""
+            },
+            {
+              "r": 5,
+              "w": 10,
+              "wDisplay": "10",
+              "note": ""
+            },
+            {
+              "r": 5,
+              "w": 7.5,
+              "wDisplay": "7.5",
+              "note": ""
+            },
+            {
+              "r": 5,
+              "w": 7.5,
+              "wDisplay": "7.5",
+              "note": ""
+            },
+            {
+              "r": 5,
+              "w": 5,
+              "wDisplay": "5",
+              "note": ""
+            },
+            {
+              "r": 5,
+              "w": 5,
+              "wDisplay": "5",
+              "note": ""
+            }
+          ]
+        },
+        {
+          "canonicalName": "One Arm Overhead Triceps Extension",
+          "displayName": "one arm overhead triceps extension",
+          "name": "one arm overhead triceps extension",
+          "sets": [
+            {
+              "r": 10,
+              "w": 12,
+              "wDisplay": "12",
+              "note": ""
+            },
+            {
+              "r": 12,
+              "w": 12,
+              "wDisplay": "12",
+              "note": ""
+            },
+            {
+              "r": 12,
+              "w": 12,
+              "wDisplay": "12",
+              "note": ""
+            }
+          ]
+        },
+        {
+          "canonicalName": "Triceps Pushdown",
+          "displayName": "triceps pushdown",
+          "name": "triceps pushdown",
+          "sets": [
+            {
+              "r": 12,
+              "w": 48,
+              "wDisplay": "48",
+              "note": ""
+            },
+            {
+              "r": 12,
+              "w": 48,
+              "wDisplay": "48",
+              "note": ""
+            },
+            {
+              "r": 12,
+              "w": 48,
+              "wDisplay": "48",
+              "note": ""
+            },
+            {
+              "r": 12,
+              "w": 48,
+              "wDisplay": "48",
+              "note": ""
+            }
+          ]
+        }
+      ],
+      "notes": "",
+      "workoutFocus": [
+        "Omuz",
+        "G├Â─ş├╝s",
+        "Triceps"
+      ],
+      "workoutFuel": "",
+      "workoutName": "Push"
+    },
+    "2025-04-07": {
+      "dateISO": "2025-04-07",
+      "items": [
+        {
+          "canonicalName": "Lat Pulldown",
+          "displayName": "lat pulldown",
+          "name": "lat pulldown",
+          "sets": [
+            {
+              "r": 8,
+              "w": 60,
+              "wDisplay": "60",
+              "note": ""
+            },
+            {
+              "r": 8,
+              "w": 60,
+              "wDisplay": "60",
+              "note": ""
+            },
+            {
+              "r": 12,
+              "w": 54,
+              "wDisplay": "54",
+              "note": ""
+            },
+            {
+              "r": 15,
+              "w": 48,
+              "wDisplay": "48",
+              "note": ""
+            }
+          ]
+        },
+        {
+          "canonicalName": "barbell row",
+          "displayName": "barbell row",
+          "name": "barbell row",
+          "sets": [
+            {
+              "r": 12,
+              "w": 23,
+              "wDisplay": "23",
+              "note": ""
+            },
+            {
+              "r": 18,
+              "w": 23,
+              "wDisplay": "23",
+              "note": ""
+            },
+            {
+              "r": 12,
+              "w": 33,
+              "wDisplay": "33",
+              "note": ""
+            },
+            {
+              "r": 12,
+              "w": 33,
+              "wDisplay": "33",
+              "note": ""
+            }
+          ]
+        },
+        {
+          "canonicalName": "Dumbbell Curl",
+          "displayName": "dumbbell curl",
+          "name": "dumbbell curl",
+          "sets": [
+            {
+              "r": 8,
+              "w": 15,
+              "wDisplay": "15",
+              "note": ""
+            },
+            {
+              "r": 8,
+              "w": 15,
+              "wDisplay": "15",
+              "note": ""
+            },
+            {
+              "r": 8,
+              "w": 15,
+              "wDisplay": "15",
+              "note": ""
+            }
+          ]
+        },
+        {
+          "canonicalName": "Barbell Curl",
+          "displayName": "barbell curl",
+          "name": "barbell curl",
+          "sets": [
+            {
+              "r": 10,
+              "w": 18,
+              "wDisplay": "18",
+              "note": ""
+            },
+            {
+              "r": 10,
+              "w": 18,
+              "wDisplay": "18",
+              "note": ""
+            },
+            {
+              "r": 10,
+              "w": 18,
+              "wDisplay": "18",
+              "note": ""
+            },
+            {
+              "r": 10,
+              "w": 18,
+              "wDisplay": "18",
+              "note": ""
+            }
+          ]
+        }
+      ],
+      "notes": "Ba┼şl─▒kta '07 april s─▒rt' ve 'sa─ş biceps' yaz─▒yor.",
+      "workoutFocus": [
+        "S─▒rt",
+        "Biceps"
+      ],
+      "workoutFuel": "",
+      "workoutName": "Pull"
+    },
+    "2025-04-15": {
+      "dateISO": "2025-04-15",
+      "items": [
+        {
+          "canonicalName": "Overhead Press",
+          "displayName": "overhead press",
+          "name": "overhead press",
+          "sets": [
+            {
+              "r": 6,
+              "w": 20,
+              "wDisplay": "20",
+              "note": ""
+            },
+            {
+              "r": 5,
+              "w": 20,
+              "wDisplay": "20",
+              "note": ""
+            },
+            {
+              "r": 7,
+              "w": 17.5,
+              "wDisplay": "17.5",
+              "note": ""
+            },
+            {
+              "r": 6,
+              "w": 17.5,
+              "wDisplay": "17.5",
+              "note": ""
+            }
+          ]
+        },
+        {
+          "canonicalName": "Triceps Pushdown",
+          "displayName": "triceps pushdown",
+          "name": "triceps pushdown",
+          "sets": [
+            {
+              "r": 10,
+              "w": 48,
+              "wDisplay": "48",
+              "note": ""
+            },
+            {
+              "r": 10,
+              "w": 48,
+              "wDisplay": "48",
+              "note": ""
+            },
+            {
+              "r": 10,
+              "w": 48,
+              "wDisplay": "48",
+              "note": ""
+            },
+            {
+              "r": 10,
+              "w": 48,
+              "wDisplay": "48",
+              "note": ""
+            }
+          ]
+        },
+        {
+          "canonicalName": "One Arm Overhead Triceps Extension",
+          "displayName": "one arm overhead triceps extension",
+          "name": "one arm overhead triceps extension",
+          "sets": [
+            {
+              "r": 10,
+              "w": 11,
+              "wDisplay": "11",
+              "note": ""
+            },
+            {
+              "r": 10,
+              "w": 11,
+              "wDisplay": "11",
+              "note": ""
+            },
+            {
+              "r": 8,
+              "w": 11,
+              "wDisplay": "11",
+              "note": ""
+            }
+          ]
+        }
+      ],
+      "notes": "",
+      "workoutFocus": [
+        "Omuz",
+        "Triceps"
+      ],
+      "workoutFuel": "",
+      "workoutName": "Push"
+    },
+    "2025-04-24": {
+      "dateISO": "2025-04-24",
+      "items": [
+        {
+          "canonicalName": "Overhead Press",
+          "displayName": "overhead press",
+          "name": "overhead press",
+          "sets": [
+            {
+              "r": 6,
+              "w": 20,
+              "wDisplay": "20",
+              "note": ""
+            },
+            {
+              "r": 6,
+              "w": 20,
+              "wDisplay": "20",
+              "note": ""
+            },
+            {
+              "r": 6,
+              "w": 20,
+              "wDisplay": "20",
+              "note": ""
+            },
+            {
+              "r": 7,
+              "w": 20,
+              "wDisplay": "20",
+              "note": ""
+            }
+          ]
+        },
+        {
+          "canonicalName": "Incline Dumbbell Press",
+          "displayName": "incline dumbbell press",
+          "name": "incline dumbbell press",
+          "sets": [
+            {
+              "r": 6,
+              "w": 20,
+              "wDisplay": "20",
+              "note": ""
+            },
+            {
+              "r": 8,
+              "w": 20,
+              "wDisplay": "20",
+              "note": ""
+            },
+            {
+              "r": 9,
+              "w": 20,
+              "wDisplay": "20",
+              "note": ""
+            },
+            {
+              "r": 6,
+              "w": 20,
+              "wDisplay": "20",
+              "note": ""
+            }
+          ]
+        },
+        {
+          "canonicalName": "Lateral Raise",
+          "displayName": "lateral raise",
+          "name": "lateral raise",
+          "sets": [
+            {
+              "r": 8,
+              "w": 10,
+              "wDisplay": "10",
+              "note": ""
+            },
+            {
+              "r": 8,
+              "w": 7.5,
+              "wDisplay": "7.5",
+              "note": ""
+            },
+            {
+              "r": 8,
+              "w": 7.5,
+              "wDisplay": "7.5",
+              "note": ""
+            },
+            {
+              "r": 8,
+              "w": 7.5,
+              "wDisplay": "7.5",
+              "note": ""
+            }
+          ]
+        },
+        {
+          "canonicalName": "Chest Fly",
+          "displayName": "chest fly",
+          "name": "chest fly",
+          "sets": [
+            {
+              "r": 12,
+              "w": 54,
+              "wDisplay": "54",
+              "note": ""
+            },
+            {
+              "r": 12,
+              "w": 54,
+              "wDisplay": "54",
+              "note": ""
+            },
+            {
+              "r": 12,
+              "w": 54,
+              "wDisplay": "54",
+              "note": ""
+            },
+            {
+              "r": 15,
+              "w": 54,
+              "wDisplay": "54",
+              "note": ""
+            }
+          ]
+        },
+        {
+          "canonicalName": "Triceps Pushdown",
+          "displayName": "triceps pushdown",
+          "name": "triceps pushdown",
+          "sets": [
+            {
+              "r": 12,
+              "w": 54,
+              "wDisplay": "54",
+              "note": ""
+            },
+            {
+              "r": 12,
+              "w": 54,
+              "wDisplay": "54",
+              "note": ""
+            },
+            {
+              "r": 12,
+              "w": 54,
+              "wDisplay": "54",
+              "note": ""
+            },
+            {
+              "r": 12,
+              "w": 60,
+              "wDisplay": "60",
+              "note": ""
+            }
+          ]
+        }
+      ],
+      "notes": "Ba┼şl─▒kta '24 N─░SAN omuz, TR─░CEPS' yaz─▒yor.",
+      "workoutFocus": [
+        "Omuz",
+        "Triceps",
+        "G├Â─ş├╝s"
+      ],
+      "workoutFuel": "",
+      "workoutName": "Push"
+    },
+    "2025-04-25": {
+      "dateISO": "2025-04-25",
+      "items": [
+        {
+          "canonicalName": "Lat Pulldown",
+          "displayName": "lat pulldown",
+          "name": "lat pulldown",
+          "sets": [
+            {
+              "r": 10,
+              "w": 50,
+              "wDisplay": "50",
+              "note": ""
+            },
+            {
+              "r": 10,
+              "w": 50,
+              "wDisplay": "50",
+              "note": ""
+            },
+            {
+              "r": 12,
+              "w": 45,
+              "wDisplay": "45",
+              "note": ""
+            },
+            {
+              "r": 12,
+              "w": 45,
+              "wDisplay": "45",
+              "note": ""
+            }
+          ]
+        },
+        {
+          "canonicalName": "Cable Row",
+          "displayName": "cable row",
+          "name": "cable row",
+          "sets": [
+            {
+              "r": 10,
+              "w": 45,
+              "wDisplay": "45",
+              "note": ""
+            },
+            {
+              "r": 12,
+              "w": 45,
+              "wDisplay": "45",
+              "note": ""
+            },
+            {
+              "r": 15,
+              "w": 40,
+              "wDisplay": "40",
+              "note": ""
+            },
+            {
+              "r": 15,
+              "w": 40,
+              "wDisplay": "40",
+              "note": ""
+            }
+          ]
+        },
+        {
+          "canonicalName": "Romanian Deadlift",
+          "displayName": "Romanian Deadlift",
+          "name": "Romanian Deadlift",
+          "sets": [
+            {
+              "r": 10,
+              "w": 28,
+              "wDisplay": "28",
+              "note": ""
+            },
+            {
+              "r": 12,
+              "w": 38,
+              "wDisplay": "38",
+              "note": ""
+            },
+            {
+              "r": 12,
+              "w": 38,
+              "wDisplay": "38",
+              "note": ""
+            },
+            {
+              "r": 12,
+              "w": 38,
+              "wDisplay": "38",
+              "note": ""
+            }
+          ]
+        },
+        {
+          "canonicalName": "Dumbbell Curl",
+          "displayName": "dumbbell curl",
+          "name": "dumbbell curl",
+          "sets": [
+            {
+              "r": 12,
+              "w": 12.5,
+              "wDisplay": "12.5",
+              "note": ""
+            },
+            {
+              "r": 12,
+              "w": 12.5,
+              "wDisplay": "12.5",
+              "note": ""
+            },
+            {
+              "r": 12,
+              "w": 12.5,
+              "wDisplay": "12.5",
+              "note": ""
+            }
+          ]
+        }
+      ],
+      "notes": "Ba┼şl─▒kta '25 N─░SAN S─▒rt' yaz─▒yor.",
+      "workoutFocus": [
+        "S─▒rt",
+        "Biceps",
+        "Leg"
+      ],
+      "workoutFuel": "",
+      "workoutName": "Pull"
+    },
+    "2025-04-27": {
+      "dateISO": "2025-04-27",
+      "items": [
+        {
+          "canonicalName": "Dip",
+          "displayName": "dips",
+          "name": "dips",
+          "sets": [
+            {
+              "r": 6,
+              "w": 79,
+              "wDisplay": "79",
+              "note": ""
+            },
+            {
+              "r": 6,
+              "w": 79,
+              "wDisplay": "79",
+              "note": ""
+            },
+            {
+              "r": 5,
+              "w": 79,
+              "wDisplay": "79",
+              "note": ""
+            }
+          ]
+        },
+        {
+          "canonicalName": "Incline Dumbbell Curl",
+          "displayName": "incline dumbbell curl",
+          "name": "incline dumbbell curl",
+          "sets": [
+            {
+              "r": 8,
+              "w": 15,
+              "wDisplay": "15",
+              "note": ""
+            },
+            {
+              "r": 8,
+              "w": 15,
+              "wDisplay": "15",
+              "note": ""
+            },
+            {
+              "r": 6,
+              "w": 15,
+              "wDisplay": "15",
+              "note": ""
+            }
+          ]
+        },
+        {
+          "canonicalName": "Barbell Curl",
+          "displayName": "barbell curl",
+          "name": "barbell curl",
+          "sets": [
+            {
+              "r": 10,
+              "w": 18,
+              "wDisplay": "18",
+              "note": ""
+            },
+            {
+              "r": 10,
+              "w": 18,
+              "wDisplay": "18",
+              "note": ""
+            },
+            {
+              "r": 10,
+              "w": 18,
+              "wDisplay": "18",
+              "note": ""
+            },
+            {
+              "r": 12,
+              "w": 18,
+              "wDisplay": "18",
+              "note": ""
+            }
+          ]
+        },
+        {
+          "canonicalName": "Hammer Curl",
+          "displayName": "hammer curl",
+          "name": "hammer curl",
+          "sets": [
+            {
+              "r": 7,
+              "w": 15,
+              "wDisplay": "15",
+              "note": ""
+            },
+            {
+              "r": 9,
+              "w": 12.5,
+              "wDisplay": "12.5",
+              "note": ""
+            },
+            {
+              "r": 8,
+              "w": 12.5,
+              "wDisplay": "12.5",
+              "note": ""
+            }
+          ]
+        },
+        {
+          "canonicalName": "Dumbbell Trapez",
+          "displayName": "Dumbbell Trapez",
+          "name": "Dumbbell Trapez",
+          "sets": [
+            {
+              "r": 15,
+              "w": 17.5,
+              "wDisplay": "17.5",
+              "note": ""
+            },
+            {
+              "r": 15,
+              "w": 20,
+              "wDisplay": "20",
+              "note": ""
+            },
+            {
+              "r": 12,
+              "w": 20,
+              "wDisplay": "20",
+              "note": ""
+            },
+            {
+              "r": 15,
+              "w": 20,
+              "wDisplay": "20",
+              "note": ""
+            }
+          ]
+        },
+        {
+          "canonicalName": "Dumbbell Forearm",
+          "displayName": "Dumbbell Forearm",
+          "name": "Dumbbell Forearm",
+          "sets": [
+            {
+              "r": 15,
+              "w": 7.5,
+              "wDisplay": "7.5",
+              "note": ""
+            },
+            {
+              "r": 12,
+              "w": 10,
+              "wDisplay": "10",
+              "note": ""
+            },
+            {
+              "r": 12,
+              "w": 10,
+              "wDisplay": "10",
+              "note": ""
+            }
+          ]
+        }
+      ],
+      "notes": "Ba┼şl─▒kta '27 N─░SAN , pull DAY' yaz─▒yor.",
+      "workoutFocus": [
+        "S─▒rt",
+        "Biceps",
+        "Triceps (Dips)",
+        "Omuz (Trapez)"
+      ],
+      "workoutFuel": "",
+      "workoutName": "Pull"
+    },
+    "2025-04-28": {
+      "dateISO": "2025-04-28",
+      "items": [
+        {
+          "canonicalName": "Bench Press",
+          "displayName": "Bench Press",
+          "name": "Bench Press",
+          "sets": [
+            {
+              "r": 1,
+              "w": 70,
+              "wDisplay": "70",
+              "note": ""
+            },
+            {
+              "r": 5,
+              "w": 60,
+              "wDisplay": "60",
+              "note": ""
+            },
+            {
+              "r": 8,
+              "w": 55,
+              "wDisplay": "55",
+              "note": ""
+            },
+            {
+              "r": 10,
+              "w": 50,
+              "wDisplay": "50",
+              "note": ""
+            }
+          ]
+        },
+        {
+          "canonicalName": "Incline Dumbbell Press",
+          "displayName": "incline dumbbell press",
+          "name": "incline dumbbell press",
+          "sets": [
+            {
+              "r": 8,
+              "w": 20,
+              "wDisplay": "20",
+              "note": ""
+            },
+            {
+              "r": 8,
+              "w": 20,
+              "wDisplay": "20",
+              "note": ""
+            },
+            {
+              "r": 8,
+              "w": 20,
+              "wDisplay": "20",
+              "note": ""
+            },
+            {
+              "r": 10,
+              "w": 20,
+              "wDisplay": "20",
+              "note": ""
+            }
+          ]
+        },
+        {
+          "canonicalName": "Triceps Pushdown",
+          "displayName": "triceps pushdown",
+          "name": "triceps pushdown",
+          "sets": [
+            {
+              "r": 8,
+              "w": 48,
+              "wDisplay": "48",
+              "note": ""
+            },
+            {
+              "r": 8,
+              "w": 60,
+              "wDisplay": "60",
+              "note": ""
+            },
+            {
+              "r": 9,
+              "w": 60,
+              "wDisplay": "60",
+              "note": ""
+            }
+          ]
+        },
+        {
+          "canonicalName": "Chest Fly",
+          "displayName": "Chest Fly",
+          "name": "Chest Fly",
+          "sets": [
+            {
+              "r": 15,
+              "w": 54,
+              "wDisplay": "54",
+              "note": ""
+            },
+            {
+              "r": 15,
+              "w": 54,
+              "wDisplay": "54",
+              "note": ""
+            },
+            {
+              "r": 15,
+              "w": 54,
+              "wDisplay": "54",
+              "note": ""
+            },
+            {
+              "r": 15,
+              "w": 54,
+              "wDisplay": "54",
+              "note": ""
+            }
+          ]
+        }
+      ],
+      "notes": "Ba┼şl─▒kta '28 APR─░L, push' yaz─▒yor.",
+      "workoutFocus": [
+        "G├Â─ş├╝s",
+        "Triceps"
+      ],
+      "workoutFuel": "",
+      "workoutName": "Push"
+    },
+    "2025-04-30": {
+      "dateISO": "2025-04-30",
+      "items": [
+        {
+          "canonicalName": "Lat Pulldown",
+          "displayName": "lat pulldown",
+          "name": "lat pulldown",
+          "sets": [
+            {
+              "r": 10,
+              "w": 50,
+              "wDisplay": "50",
+              "note": ""
+            },
+            {
+              "r": 8,
+              "w": 55,
+              "wDisplay": "55",
+              "note": ""
+            },
+            {
+              "r": 8,
+              "w": 55,
+              "wDisplay": "55",
+              "note": ""
+            },
+            {
+              "r": 6,
+              "w": 55,
+              "wDisplay": "55",
+              "note": ""
+            }
+          ]
+        },
+        {
+          "canonicalName": "Cable Row",
+          "displayName": "cable row",
+          "name": "cable row",
+          "sets": [
+            {
+              "r": 12,
+              "w": 45,
+              "wDisplay": "45",
+              "note": ""
+            },
+            {
+              "r": 12,
+              "w": 45,
+              "wDisplay": "45",
+              "note": ""
+            },
+            {
+              "r": 12,
+              "w": 40,
+              "wDisplay": "40",
+              "note": ""
+            }
+          ]
+        },
+        {
+          "canonicalName": "Leg Press",
+          "displayName": "leg press",
+          "name": "leg press",
+          "sets": [
+            {
+              "r": 10,
+              "w": 80,
+              "wDisplay": "80",
+              "note": ""
+            },
+            {
+              "r": 10,
+              "w": 80,
+              "wDisplay": "80",
+              "note": ""
+            },
+            {
+              "r": 10,
+              "w": 80,
+              "wDisplay": "80",
+              "note": ""
+            }
+          ]
+        },
+        {
+          "canonicalName": "Leg Curl",
+          "displayName": "leg curl",
+          "name": "leg curl",
+          "sets": [
+            {
+              "r": 10,
+              "w": 35,
+              "wDisplay": "35",
+              "note": ""
+            },
+            {
+              "r": 12,
+              "w": 25,
+              "wDisplay": "25",
+              "note": ""
+            }
+          ]
+        }
+      ],
+      "notes": "Ba┼şl─▒kta '30 N─░SAN, pull' yaz─▒yor.",
+      "workoutFocus": [
+        "S─▒rt",
+        "Leg"
+      ],
+      "workoutFuel": "",
+      "workoutName": "Pull"
+    },
+    "2025-05-01": {
+      "dateISO": "2025-05-01",
+      "items": [
+        {
+          "canonicalName": "Lateral Raise",
+          "displayName": "lateral raise",
+          "name": "lateral raise",
+          "sets": [
+            {
+              "r": 7,
+              "w": 10,
+              "wDisplay": "10",
+              "note": ""
+            },
+            {
+              "r": 7,
+              "w": 10,
+              "wDisplay": "10",
+              "note": ""
+            },
+            {
+              "r": 7,
+              "w": 10,
+              "wDisplay": "10",
+              "note": ""
+            },
+            {
+              "r": 8,
+              "w": 10,
+              "wDisplay": "10",
+              "note": ""
+            },
+            {
+              "r": 7,
+              "w": 7.5,
+              "wDisplay": "7.5",
+              "note": ""
+            },
+            {
+              "r": 7,
+              "w": 7.5,
+              "wDisplay": "7.5",
+              "note": ""
+            }
+          ]
+        },
+        {
+          "canonicalName": "Overhead Press",
+          "displayName": "overhead press",
+          "name": "overhead press",
+          "sets": [
+            {
+              "r": 6,
+              "w": 17.5,
+              "wDisplay": "17.5",
+              "note": ""
+            },
+            {
+              "r": 5,
+              "w": 20,
+              "wDisplay": "20",
+              "note": ""
+            },
+            {
+              "r": 6,
+              "w": 20,
+              "wDisplay": "20",
+              "note": ""
+            }
+          ]
+        },
+        {
+          "canonicalName": "Dip",
+          "displayName": "dips",
+          "name": "dips",
+          "sets": [
+            {
+              "r": 5,
+              "w": 79,
+              "wDisplay": "79",
+              "note": ""
+            },
+            {
+              "r": 4,
+              "w": 79,
+              "wDisplay": "79",
+              "note": ""
+            },
+            {
+              "r": 5,
+              "w": 79,
+              "wDisplay": "79",
+              "note": ""
+            }
+          ]
+        },
+        {
+          "canonicalName": "Triceps Pushdown",
+          "displayName": "triceps pushdown",
+          "name": "triceps pushdown",
+          "sets": [
+            {
+              "r": 8,
+              "w": 60,
+              "wDisplay": "60",
+              "note": ""
+            },
+            {
+              "r": 10,
+              "w": 60,
+              "wDisplay": "60",
+              "note": ""
+            }
+          ]
+        },
+        {
+          "canonicalName": "Chin Up",
+          "displayName": "Chin up",
+          "name": "Chin up",
+          "sets": [
+            {
+              "r": 6,
+              "w": 79,
+              "wDisplay": "79",
+              "note": ""
+            },
+            {
+              "r": 6,
+              "w": 79,
+              "wDisplay": "79",
+              "note": ""
+            },
+            {
+              "r": 6,
+              "w": 79,
+              "wDisplay": "79",
+              "note": ""
+            },
+            {
+              "r": 5,
+              "w": 79,
+              "wDisplay": "79",
+              "note": ""
+            }
+          ]
+        }
+      ],
+      "notes": "1 MAYIS, push",
+      "workoutFocus": [
+        "Omuz",
+        "Triceps",
+        "Biceps"
+      ],
+      "workoutFuel": "",
+      "workoutName": "Push"
+    },
+    "2025-05-02": {
+      "dateISO": "2025-05-02",
+      "items": [
+        {
+          "canonicalName": "Dip",
+          "displayName": "dips",
+          "name": "dips",
+          "sets": [
+            {
+              "r": 8,
+              "w": 79,
+              "wDisplay": "79",
+              "note": ""
+            },
+            {
+              "r": 6,
+              "w": 79,
+              "wDisplay": "79",
+              "note": ""
+            },
+            {
+              "r": 7,
+              "w": 79,
+              "wDisplay": "79",
+              "note": ""
+            }
+          ]
+        },
+        {
+          "canonicalName": "close grip lat pulldown",
+          "displayName": "close grip lat pulldown",
+          "name": "close grip lat pulldown",
+          "sets": [
+            {
+              "r": 12,
+              "w": 60,
+              "wDisplay": "60",
+              "note": ""
+            },
+            {
+              "r": 10,
+              "w": 72,
+              "wDisplay": "72",
+              "note": ""
+            },
+            {
+              "r": 10,
+              "w": 66,
+              "wDisplay": "66",
+              "note": ""
+            },
+            {
+              "r": 12,
+              "w": 60,
+              "wDisplay": "60",
+              "note": ""
+            }
+          ]
+        },
+        {
+          "canonicalName": "Incline Dumbbell Curl",
+          "displayName": "incline dumbbell curl",
+          "name": "incline dumbbell curl",
+          "sets": [
+            {
+              "r": 10,
+              "w": 15,
+              "wDisplay": "15",
+              "note": ""
+            },
+            {
+              "r": 7,
+              "w": 15,
+              "wDisplay": "15",
+              "note": ""
+            },
+            {
+              "r": 6,
+              "w": 15,
+              "wDisplay": "15",
+              "note": ""
+            },
+            {
+              "r": 4,
+              "w": 10,
+              "wDisplay": "10",
+              "note": ""
+            }
+          ]
+        }
+      ],
+      "notes": "Ba┼şl─▒kta '2 MAYIS, pull' yaz─▒yor.",
+      "workoutFocus": [
+        "S─▒rt",
+        "Biceps",
+        "Triceps (Dips)"
+      ],
+      "workoutFuel": "",
+      "workoutName": "Pull"
+    },
+    "2025-05-04": {
+      "dateISO": "2025-05-04",
+      "items": [
+        {
+          "canonicalName": "Bench Press",
+          "displayName": "Bench Press",
+          "name": "Bench Press",
+          "sets": [
+            {
+              "r": 6,
+              "w": 60,
+              "wDisplay": "60",
+              "note": ""
+            },
+            {
+              "r": 6,
+              "w": 60,
+              "wDisplay": "60",
+              "note": ""
+            },
+            {
+              "r": 5,
+              "w": 60,
+              "wDisplay": "60",
+              "note": ""
+            },
+            {
+              "r": 11,
+              "w": 50,
+              "wDisplay": "50",
+              "note": ""
+            }
+          ]
+        },
+        {
+          "canonicalName": "Chest Fly",
+          "displayName": "chest fly",
+          "name": "chest fly",
+          "sets": [
+            {
+              "r": 12,
+              "w": 54,
+              "wDisplay": "54",
+              "note": ""
+            },
+            {
+              "r": 12,
+              "w": 54,
+              "wDisplay": "54",
+              "note": ""
+            },
+            {
+              "r": 12,
+              "w": 54,
+              "wDisplay": "54",
+              "note": ""
+            }
+          ]
+        },
+        {
+          "canonicalName": "Incline Dumbbell Press",
+          "displayName": "incline dumbbell press",
+          "name": "incline dumbbell press",
+          "sets": [
+            {
+              "r": 8,
+              "w": 20,
+              "wDisplay": "20",
+              "note": ""
+            },
+            {
+              "r": 6,
+              "w": 20,
+              "wDisplay": "20",
+              "note": ""
+            },
+            {
+              "r": 8,
+              "w": 20,
+              "wDisplay": "20",
+              "note": ""
+            },
+            {
+              "r": 6,
+              "w": 20,
+              "wDisplay": "20",
+              "note": ""
+            }
+          ]
+        }
+      ],
+      "notes": "Ba┼şl─▒kta '4 MAYIS , push' yaz─▒yor.",
+      "workoutFocus": [
+        "G├Â─ş├╝s",
+        "Triceps"
+      ],
+      "workoutFuel": "",
+      "workoutName": "Push"
+    },
+    "2025-05-06": {
+      "dateISO": "2025-05-06",
+      "items": [
+        {
+          "canonicalName": "Lateral Raise",
+          "displayName": "lateral raise",
+          "name": "lateral raise",
+          "sets": [
+            {
+              "r": 7,
+              "w": 10,
+              "wDisplay": "10",
+              "note": ""
+            },
+            {
+              "r": 5,
+              "w": 7.5,
+              "wDisplay": "7.5",
+              "note": ""
+            },
+            {
+              "r": 12,
+              "w": 7.5,
+              "wDisplay": "7.5",
+              "note": ""
+            },
+            {
+              "r": 12,
+              "w": 7.5,
+              "wDisplay": "7.5",
+              "note": ""
+            }
+          ]
+        },
+        {
+          "canonicalName": "Overhead Press",
+          "displayName": "overhead press",
+          "name": "overhead press",
+          "sets": [
+            {
+              "r": 6,
+              "w": 20,
+              "wDisplay": "20",
+              "note": ""
+            },
+            {
+              "r": 6,
+              "w": 20,
+              "wDisplay": "20",
+              "note": ""
+            },
+            {
+              "r": 6,
+              "w": 20,
+              "wDisplay": "20",
+              "note": ""
+            },
+            {
+              "r": 12,
+              "w": 15,
+              "wDisplay": "15",
+              "note": ""
+            }
+          ]
+        },
+        {
+          "canonicalName": "Dip",
+          "displayName": "dips",
+          "name": "dips",
+          "sets": [
+            {
+              "r": 8,
+              "w": 79,
+              "wDisplay": "79",
+              "note": ""
+            },
+            {
+              "r": 6,
+              "w": 79,
+              "wDisplay": "79",
+              "note": ""
+            },
+            {
+              "r": 6,
+              "w": 79,
+              "wDisplay": "79",
+              "note": ""
+            }
+          ]
+        }
+      ],
+      "notes": "6 MAY , push, konu┼şma, ├Âzg├╝ven, pes140",
+      "workoutFocus": [
+        "Omuz",
+        "Triceps"
+      ],
+      "workoutFuel": "",
+      "workoutName": "Push"
+    },
+    "2025-05-07": {
+      "dateISO": "2025-05-07",
+      "items": [
+        {
+          "canonicalName": "Lat Pulldown",
+          "displayName": "lat pulldown",
+          "name": "lat pulldown",
+          "sets": [
+            {
+              "r": 8,
+              "w": 60,
+              "wDisplay": "60",
+              "note": ""
+            },
+            {
+              "r": 10,
+              "w": 60,
+              "wDisplay": "60",
+              "note": ""
+            },
+            {
+              "r": 12,
+              "w": 60,
+              "wDisplay": "60",
+              "note": ""
+            },
+            {
+              "r": 8,
+              "w": 66,
+              "wDisplay": "66",
+              "note": ""
+            }
+          ]
+        },
+        {
+          "canonicalName": "Cable Row",
+          "displayName": "cable row",
+          "name": "cable row",
+          "sets": [
+            {
+              "r": 12,
+              "w": 54,
+              "wDisplay": "54",
+              "note": ""
+            },
+            {
+              "r": 12,
+              "w": 54,
+              "wDisplay": "54",
+              "note": ""
+            },
+            {
+              "r": 15,
+              "w": 54,
+              "wDisplay": "54",
+              "note": ""
+            }
+          ]
+        },
+        {
+          "canonicalName": "barbell row",
+          "displayName": "barbell row",
+          "name": "barbell row",
+          "sets": [
+            {
+              "r": 10,
+              "w": 28,
+              "wDisplay": "28",
+              "note": ""
+            },
+            {
+              "r": 10,
+              "w": 38,
+              "wDisplay": "38",
+              "note": ""
+            },
+            {
+              "r": 10,
+              "w": 33,
+              "wDisplay": "33",
+              "note": ""
+            },
+            {
+              "r": 10,
+              "w": 33,
+              "wDisplay": "33",
+              "note": ""
+            }
+          ]
+        }
+      ],
+      "notes": "Ba┼şl─▒kta '7 MAY pull' yaz─▒yor.",
+      "workoutFocus": [
+        "S─▒rt",
+        "Biceps"
+      ],
+      "workoutFuel": "",
+      "workoutName": "Pull"
+    },
+    "2025-05-08": {
+      "dateISO": "2025-05-08",
+      "items": [
+        {
+          "canonicalName": "Bench Press",
+          "displayName": "Bench Press",
+          "name": "Bench Press",
+          "sets": [
+            {
+              "r": 8,
+              "w": 60,
+              "wDisplay": "60",
+              "note": ""
+            },
+            {
+              "r": 8,
+              "w": 60,
+              "wDisplay": "60",
+              "note": ""
+            },
+            {
+              "r": 4,
+              "w": 60,
+              "wDisplay": "60",
+              "note": ""
+            },
+            {
+              "r": 5,
+              "w": 60,
+              "wDisplay": "60",
+              "note": ""
+            }
+          ]
+        },
+        {
+          "canonicalName": "Incline Dumbbell Press",
+          "displayName": "incline dumbbell press",
+          "name": "incline dumbbell press",
+          "sets": [
+            {
+              "r": 8,
+              "w": 20,
+              "wDisplay": "20",
+              "note": ""
+            },
+            {
+              "r": 11,
+              "w": 20,
+              "wDisplay": "20",
+              "note": ""
+            },
+            {
+              "r": 10,
+              "w": 20,
+              "wDisplay": "20",
+              "note": ""
+            },
+            {
+              "r": 10,
+              "w": 20,
+              "wDisplay": "20",
+              "note": ""
+            }
+          ]
+        },
+        {
+          "canonicalName": "Chest Fly",
+          "displayName": "chest fly",
+          "name": "chest fly",
+          "sets": [
+            {
+              "r": 10,
+              "w": 60,
+              "wDisplay": "60",
+              "note": ""
+            },
+            {
+              "r": 10,
+              "w": 60,
+              "wDisplay": "60",
+              "note": ""
+            },
+            {
+              "r": 10,
+              "w": 60,
+              "wDisplay": "60",
+              "note": ""
+            }
+          ]
+        },
+        {
+          "canonicalName": "Triceps Pushdown",
+          "displayName": "triceps pushdown",
+          "name": "triceps pushdown",
+          "sets": [
+            {
+              "r": 10,
+              "w": 60,
+              "wDisplay": "60",
+              "note": ""
+            },
+            {
+              "r": 12,
+              "w": 48,
+              "wDisplay": "48",
+              "note": ""
+            },
+            {
+              "r": 12,
+              "w": 48,
+              "wDisplay": "48",
+              "note": ""
+            },
+            {
+              "r": 10,
+              "w": 48,
+              "wDisplay": "48",
+              "note": ""
+            }
+          ]
+        }
+      ],
+      "notes": "Ba┼şl─▒kta '8 MAY push' yaz─▒yor.",
+      "workoutFocus": [
+        "G├Â─ş├╝s",
+        "Triceps"
+      ],
+      "workoutFuel": "",
+      "workoutName": "Push"
+    },
+    "2025-05-10": {
+      "dateISO": "2025-05-10",
+      "items": [
+        {
+          "canonicalName": "Overhead Press",
+          "displayName": "overhead press",
+          "name": "overhead press",
+          "sets": [
+            {
+              "r": 8,
+              "w": 20,
+              "wDisplay": "20",
+              "note": ""
+            },
+            {
+              "r": 8,
+              "w": 20,
+              "wDisplay": "20",
+              "note": ""
+            },
+            {
+              "r": 6,
+              "w": 20,
+              "wDisplay": "20",
+              "note": ""
+            },
+            {
+              "r": 6,
+              "w": 20,
+              "wDisplay": "20",
+              "note": ""
+            }
+          ]
+        },
+        {
+          "canonicalName": "Lateral Raise",
+          "displayName": "lateral raise",
+          "name": "lateral raise",
+          "sets": [
+            {
+              "r": 10,
+              "w": 10,
+              "wDisplay": "10",
+              "note": ""
+            },
+            {
+              "r": 8,
+              "w": 10,
+              "wDisplay": "10",
+              "note": ""
+            },
+            {
+              "r": 12,
+              "w": 10,
+              "wDisplay": "10",
+              "note": ""
+            }
+          ]
+        },
+        {
+          "canonicalName": "Dip",
+          "displayName": "dips",
+          "name": "dips",
+          "sets": [
+            {
+              "r": 6,
+              "w": 79,
+              "wDisplay": "79",
+              "note": ""
+            },
+            {
+              "r": 6,
+              "w": 79,
+              "wDisplay": "79",
+              "note": ""
+            },
+            {
+              "r": 6,
+              "w": 79,
+              "wDisplay": "79",
+              "note": ""
+            }
+          ]
+        },
+        {
+          "canonicalName": "Incline Dumbbell Curl",
+          "displayName": "incline dumbbell curl",
+          "name": "incline dumbbell curl",
+          "sets": [
+            {
+              "r": 8,
+              "w": 15,
+              "wDisplay": "15",
+              "note": ""
+            },
+            {
+              "r": 6,
+              "w": 15,
+              "wDisplay": "15",
+              "note": ""
+            },
+            {
+              "r": 8,
+              "w": 12.5,
+              "wDisplay": "12.5",
+              "note": ""
+            }
+          ]
+        },
+        {
+          "canonicalName": "Barbell Curl",
+          "displayName": "barbell curl",
+          "name": "barbell curl",
+          "sets": [
+            {
+              "r": 10,
+              "w": 18,
+              "wDisplay": "18",
+              "note": ""
+            },
+            {
+              "r": 10,
+              "w": 18,
+              "wDisplay": "18",
+              "note": ""
+            },
+            {
+              "r": 8,
+              "w": 18,
+              "wDisplay": "18",
+              "note": ""
+            }
+          ]
+        }
+      ],
+      "notes": "Ba┼şl─▒kta '10 MAY, push' yaz─▒yor.",
+      "workoutFocus": [
+        "Omuz",
+        "Triceps (Dips)",
+        "Biceps"
+      ],
+      "workoutFuel": "",
+      "workoutName": "Push"
+    },
+    "2025-05-13": {
+      "dateISO": "2025-05-13",
+      "items": [
+        {
+          "canonicalName": "Lat Pulldown",
+          "displayName": "lat pulldown",
+          "name": "lat pulldown",
+          "sets": [
+            {
+              "r": 6,
+              "w": 60,
+              "wDisplay": "60",
+              "note": ""
+            },
+            {
+              "r": 8,
+              "w": 55,
+              "wDisplay": "55",
+              "note": ""
+            },
+            {
+              "r": 8,
+              "w": 50,
+              "wDisplay": "50",
+              "note": ""
+            },
+            {
+              "r": 9,
+              "w": 50,
+              "wDisplay": "50",
+              "note": ""
+            }
+          ]
+        },
+        {
+          "canonicalName": "Cable Row",
+          "displayName": "cable row",
+          "name": "cable row",
+          "sets": [
+            {
+              "r": 12,
+              "w": 45,
+              "wDisplay": "45",
+              "note": ""
+            },
+            {
+              "r": 13,
+              "w": 35,
+              "wDisplay": "35",
+              "note": ""
+            },
+            {
+              "r": 15,
+              "w": 35,
+              "wDisplay": "35",
+              "note": ""
+            }
+          ]
+        },
+        {
+          "canonicalName": "Leg Curl",
+          "displayName": "leg curl",
+          "name": "leg curl",
+          "sets": [
+            {
+              "r": 15,
+              "w": 30,
+              "wDisplay": "30",
+              "note": ""
+            },
+            {
+              "r": 12,
+              "w": 30,
+              "wDisplay": "30",
+              "note": ""
+            },
+            {
+              "r": 12,
+              "w": 35,
+              "wDisplay": "35",
+              "note": ""
+            }
+          ]
+        },
+        {
+          "canonicalName": "Leg Press",
+          "displayName": "leg press",
+          "name": "leg press",
+          "sets": [
+            {
+              "r": 8,
+              "w": 74,
+              "wDisplay": "74",
+              "note": ""
+            },
+            {
+              "r": 10,
+              "w": 90,
+              "wDisplay": "90",
+              "note": ""
+            },
+            {
+              "r": 10,
+              "w": 90,
+              "wDisplay": "90",
+              "note": ""
+            }
+          ]
+        }
+      ],
+      "notes": "Ba┼şl─▒kta '13 MAY pull' yaz─▒yor.",
+      "workoutFocus": [
+        "S─▒rt",
+        "Leg"
+      ],
+      "workoutFuel": "",
+      "workoutName": "Pull"
+    },
+    "2025-05-14": {
+      "dateISO": "2025-05-14",
+      "items": [
+        {
+          "canonicalName": "Bench Press",
+          "displayName": "Bench Press",
+          "name": "Bench Press",
+          "sets": [
+            {
+              "r": 6,
+              "w": 60,
+              "wDisplay": "60",
+              "note": ""
+            },
+            {
+              "r": 6,
+              "w": 60,
+              "wDisplay": "60",
+              "note": ""
+            },
+            {
+              "r": 6,
+              "w": 60,
+              "wDisplay": "60",
+              "note": ""
+            },
+            {
+              "r": 6,
+              "w": 60,
+              "wDisplay": "60",
+              "note": ""
+            }
+          ]
+        },
+        {
+          "canonicalName": "Cable Chest Fly",
+          "displayName": "cable chest fly",
+          "name": "cable chest fly",
+          "sets": [
+            {
+              "r": 15,
+              "w": 18,
+              "wDisplay": "18",
+              "note": ""
+            },
+            {
+              "r": 15,
+              "w": 18,
+              "wDisplay": "18",
+              "note": ""
+            },
+            {
+              "r": 15,
+              "w": 18,
+              "wDisplay": "18",
+              "note": ""
+            },
+            {
+              "r": 10,
+              "w": 24,
+              "wDisplay": "24",
+              "note": ""
+            }
+          ]
+        },
+        {
+          "canonicalName": "Dip",
+          "displayName": "dips",
+          "name": "dips",
+          "sets": [
+            {
+              "r": 7,
+              "w": 79,
+              "wDisplay": "79",
+              "note": ""
+            },
+            {
+              "r": 6,
+              "w": 79,
+              "wDisplay": "79",
+              "note": ""
+            },
+            {
+              "r": 6,
+              "w": 79,
+              "wDisplay": "79",
+              "note": ""
+            }
+          ]
+        },
+        {
+          "canonicalName": "Incline Dumbbell Press",
+          "displayName": "incline dumbbell press",
+          "name": "incline dumbbell press",
+          "sets": [
+            {
+              "r": 8,
+              "w": 20,
+              "wDisplay": "20",
+              "note": ""
+            },
+            {
+              "r": 8,
+              "w": 20,
+              "wDisplay": "20",
+              "note": ""
+            },
+            {
+              "r": 8,
+              "w": 20,
+              "wDisplay": "20",
+              "note": ""
+            },
+            {
+              "r": 9,
+              "w": 20,
+              "wDisplay": "20",
+              "note": ""
+            }
+          ]
+        }
+      ],
+      "notes": "Push 14 may─▒s",
+      "workoutFocus": [
+        "G├Â─ş├╝s",
+        "Triceps"
+      ],
+      "workoutFuel": "",
+      "workoutName": "Push"
+    },
+    "2025-05-15": {
+      "dateISO": "2025-05-15",
+      "items": [
+        {
+          "canonicalName": "Overhead Press",
+          "displayName": "overhead press",
+          "name": "overhead press",
+          "sets": [
+            {
+              "r": 8,
+              "w": 20,
+              "wDisplay": "20",
+              "note": ""
+            },
+            {
+              "r": 8,
+              "w": 20,
+              "wDisplay": "20",
+              "note": ""
+            },
+            {
+              "r": 8,
+              "w": 20,
+              "wDisplay": "20",
+              "note": ""
+            },
+            {
+              "r": 9,
+              "w": 20,
+              "wDisplay": "20",
+              "note": ""
+            }
+          ]
+        },
+        {
+          "canonicalName": "Lateral Raise",
+          "displayName": "lateral raise",
+          "name": "lateral raise",
+          "sets": [
+            {
+              "r": 7,
+              "w": 10,
+              "wDisplay": "10",
+              "note": ""
+            },
+            {
+              "r": 10,
+              "w": 10,
+              "wDisplay": "10",
+              "note": ""
+            },
+            {
+              "r": 12,
+              "w": 10,
+              "wDisplay": "10",
+              "note": ""
+            },
+            {
+              "r": 12,
+              "w": 10,
+              "wDisplay": "10",
+              "note": ""
+            }
+          ]
+        },
+        {
+          "canonicalName": "Triceps Pushdown",
+          "displayName": "Triceps Pushdown",
+          "name": "Triceps Pushdown",
+          "sets": [
+            {
+              "r": 10,
+              "w": 48,
+              "wDisplay": "48",
+              "note": ""
+            },
+            {
+              "r": 10,
+              "w": 48,
+              "wDisplay": "48",
+              "note": ""
+            },
+            {
+              "r": 10,
+              "w": 48,
+              "wDisplay": "48",
+              "note": ""
+            },
+            {
+              "r": 10,
+              "w": 48,
+              "wDisplay": "48",
+              "note": ""
+            }
+          ]
+        }
+      ],
+      "notes": "Ba┼şl─▒kta '15 MAY, push' ve 'triceps ortaya kar─▒┼ş─▒k' yaz─▒yor.",
+      "workoutFocus": [
+        "Omuz",
+        "Triceps"
+      ],
+      "workoutFuel": "",
+      "workoutName": "Push"
+    },
+    "2025-06-11": {
+      "dateISO": "2025-06-11",
+      "items": [
+        {
+          "canonicalName": "Incline Dumbbell Press",
+          "displayName": "incline dumbbell press",
+          "name": "incline dumbbell press",
+          "sets": [
+            {
+              "r": 10,
+              "w": 20,
+              "wDisplay": "20",
+              "note": ""
+            },
+            {
+              "r": 10,
+              "w": 20,
+              "wDisplay": "20",
+              "note": ""
+            },
+            {
+              "r": 8,
+              "w": 20,
+              "wDisplay": "20",
+              "note": ""
+            },
+            {
+              "r": 8,
+              "w": 20,
+              "wDisplay": "20",
+              "note": ""
+            }
+          ]
+        },
+        {
+          "canonicalName": "Chest Fly",
+          "displayName": "chest fly",
+          "name": "chest fly",
+          "sets": [
+            {
+              "r": 10,
+              "w": 60,
+              "wDisplay": "60",
+              "note": ""
+            },
+            {
+              "r": 10,
+              "w": 60,
+              "wDisplay": "60",
+              "note": ""
+            },
+            {
+              "r": 10,
+              "w": 54,
+              "wDisplay": "54",
+              "note": ""
+            },
+            {
+              "r": 12,
+              "w": 54,
+              "wDisplay": "54",
+              "note": ""
+            }
+          ]
+        },
+        {
+          "canonicalName": "Lateral Raise",
+          "displayName": "lateral raise",
+          "name": "lateral raise",
+          "sets": [
+            {
+              "r": 7,
+              "w": 10,
+              "wDisplay": "10",
+              "note": ""
+            },
+            {
+              "r": 10,
+              "w": 10,
+              "wDisplay": "10",
+              "note": ""
+            },
+            {
+              "r": 8,
+              "w": 10,
+              "wDisplay": "10",
+              "note": ""
+            }
+          ]
+        }
+      ],
+      "notes": "Ba┼şl─▒kta 'Chest 8 set, omuz 11 set, triceps 4' hacim bilgileri yer al─▒yor.",
+      "workoutFocus": [
+        "G├Â─ş├╝s",
+        "Omuz",
+        "Triceps"
+      ],
+      "workoutFuel": "",
+      "workoutName": "Push"
+    },
+    "2025-06-15": {
+      "dateISO": "2025-06-15",
+      "items": [
+        {
+          "canonicalName": "Bench Press",
+          "displayName": "Bench Press",
+          "name": "Bench Press",
+          "sets": [
+            {
+              "r": 4,
+              "w": 60,
+              "wDisplay": "60",
+              "note": ""
+            },
+            {
+              "r": 4,
+              "w": 60,
+              "wDisplay": "60",
+              "note": ""
+            },
+            {
+              "r": 4,
+              "w": 60,
+              "wDisplay": "60",
+              "note": ""
+            },
+            {
+              "r": 4,
+              "w": 60,
+              "wDisplay": "60",
+              "note": ""
+            }
+          ]
+        },
+        {
+          "canonicalName": "Incline Dumbbell Press",
+          "displayName": "incline dumbbell press",
+          "name": "incline dumbbell press",
+          "sets": [
+            {
+              "r": 10,
+              "w": 20,
+              "wDisplay": "20",
+              "note": ""
+            },
+            {
+              "r": 10,
+              "w": 20,
+              "wDisplay": "20",
+              "note": ""
+            },
+            {
+              "r": 7,
+              "w": 20,
+              "wDisplay": "20",
+              "note": ""
+            },
+            {
+              "r": 6,
+              "w": 20,
+              "wDisplay": "20",
+              "note": ""
+            }
+          ]
+        },
+        {
+          "canonicalName": "Dip",
+          "displayName": "dips",
+          "name": "dips",
+          "sets": [
+            {
+              "r": 3,
+              "w": 79,
+              "wDisplay": "79",
+              "note": ""
+            },
+            {
+              "r": 6,
+              "w": 79,
+              "wDisplay": "79",
+              "note": ""
+            }
+          ]
+        },
+        {
+          "canonicalName": "Lateral Raise",
+          "displayName": "lateral raise",
+          "name": "lateral raise",
+          "sets": [
+            {
+              "r": 12,
+              "w": 10,
+              "wDisplay": "10",
+              "note": ""
+            },
+            {
+              "r": 10,
+              "w": 10,
+              "wDisplay": "10",
+              "note": ""
+            },
+            {
+              "r": 10,
+              "w": 10,
+              "wDisplay": "10",
+              "note": ""
+            }
+          ]
+        },
+        {
+          "canonicalName": "Triceps Pushdown",
+          "displayName": "triceps pushdown",
+          "name": "triceps pushdown",
+          "sets": [
+            {
+              "r": 10,
+              "w": 60,
+              "wDisplay": "60",
+              "note": ""
+            },
+            {
+              "r": 10,
+              "w": 60,
+              "wDisplay": "60",
+              "note": ""
+            },
+            {
+              "r": 10,
+              "w": 54,
+              "wDisplay": "54",
+              "note": ""
+            },
+            {
+              "r": 10,
+              "w": 48,
+              "wDisplay": "48",
+              "note": ""
+            }
+          ]
+        }
+      ],
+      "notes": "Ba┼şl─▒kta 'JUNE 15 push' yaz─▒yor.",
+      "workoutFocus": [
+        "G├Â─ş├╝s",
+        "Omuz",
+        "Triceps"
+      ],
+      "workoutFuel": "",
+      "workoutName": "Push"
+    },
+    "2025-07-16": {
+      "dateISO": "2025-07-16",
+      "items": [
+        {
+          "canonicalName": "Lat Pulldown",
+          "displayName": "lat pulldown",
+          "name": "lat pulldown",
+          "sets": [
+            {
+              "r": 7,
+              "w": 70,
+              "wDisplay": "70",
+              "note": ""
+            },
+            {
+              "r": 7,
+              "w": 70,
+              "wDisplay": "70",
+              "note": ""
+            },
+            {
+              "r": 7,
+              "w": 70,
+              "wDisplay": "70",
+              "note": ""
+            },
+            {
+              "r": 7,
+              "w": 70,
+              "wDisplay": "70",
+              "note": ""
+            }
+          ]
+        },
+        {
+          "canonicalName": "Cable Row",
+          "displayName": "cable row",
+          "name": "cable row",
+          "sets": [
+            {
+              "r": 12,
+              "w": 50,
+              "wDisplay": "50",
+              "note": ""
+            },
+            {
+              "r": 12,
+              "w": 50,
+              "wDisplay": "50",
+              "note": ""
+            },
+            {
+              "r": 12,
+              "w": 50,
+              "wDisplay": "50",
+              "note": ""
+            }
+          ]
+        },
+        {
+          "canonicalName": "Romanian Deadlift",
+          "displayName": "Romanian Deadlift",
+          "name": "Romanian Deadlift",
+          "sets": [
+            {
+              "r": 10,
+              "w": 38,
+              "wDisplay": "38",
+              "note": ""
+            },
+            {
+              "r": 10,
+              "w": 38,
+              "wDisplay": "38",
+              "note": ""
+            },
+            {
+              "r": 10,
+              "w": 38,
+              "wDisplay": "38",
+              "note": ""
+            },
+            {
+              "r": 10,
+              "w": 38,
+              "wDisplay": "38",
+              "note": ""
+            }
+          ]
+        },
+        {
+          "canonicalName": "Incline Dumbbell Curl",
+          "displayName": "Incline Dumbbell Curl",
+          "name": "Incline Dumbbell Curl",
+          "sets": [
+            {
+              "r": 8,
+              "w": 12.5,
+              "wDisplay": "12.5",
+              "note": ""
+            },
+            {
+              "r": 8,
+              "w": 12.5,
+              "wDisplay": "12.5",
+              "note": ""
+            },
+            {
+              "r": 8,
+              "w": 12.5,
+              "wDisplay": "12.5",
+              "note": ""
+            },
+            {
+              "r": 8,
+              "w": 12.5,
+              "wDisplay": "12.5",
+              "note": ""
+            }
+          ]
+        },
+        {
+          "canonicalName": "Leg Press",
+          "displayName": "Leg Press",
+          "name": "Leg Press",
+          "sets": [
+            {
+              "r": 10,
+              "w": 90,
+              "wDisplay": "90",
+              "note": ""
+            },
+            {
+              "r": 10,
+              "w": 90,
+              "wDisplay": "90",
+              "note": ""
+            },
+            {
+              "r": 10,
+              "w": 90,
+              "wDisplay": "90",
+              "note": ""
+            },
+            {
+              "r": 10,
+              "w": 90,
+              "wDisplay": "90",
+              "note": ""
+            }
+          ]
+        },
+        {
+          "canonicalName": "Calf Raise",
+          "displayName": "Calf Raise",
+          "name": "Calf Raise",
+          "sets": [
+            {
+              "r": 21,
+              "w": 15,
+              "wDisplay": "15",
+              "note": ""
+            },
+            {
+              "r": 21,
+              "w": 15,
+              "wDisplay": "15",
+              "note": ""
+            },
+            {
+              "r": 21,
+              "w": 15,
+              "wDisplay": "15",
+              "note": ""
+            },
+            {
+              "r": 21,
+              "w": 15,
+              "wDisplay": "15",
+              "note": ""
+            }
+          ]
+        }
+      ],
+      "notes": "Ba┼şl─▒kta '16 07 2025 LEG AND BACK DAY' yaz─▒yor.",
+      "workoutFocus": [
+        "S─▒rt",
+        "Leg"
+      ],
+      "workoutFuel": "",
+      "workoutName": "Leg and Back Day"
+    },
+    "2025-07-17": {
+      "dateISO": "2025-07-17",
+      "items": [
+        {
+          "canonicalName": "Bench Press",
+          "displayName": "Bench Press",
+          "name": "Bench Press",
+          "sets": [
+            {
+              "r": 6,
+              "w": 55,
+              "wDisplay": "55",
+              "note": ""
+            },
+            {
+              "r": 6,
+              "w": 55,
+              "wDisplay": "55",
+              "note": ""
+            },
+            {
+              "r": 6,
+              "w": 55,
+              "wDisplay": "55",
+              "note": ""
+            },
+            {
+              "r": 6,
+              "w": 55,
+              "wDisplay": "55",
+              "note": ""
+            }
+          ]
+        },
+        {
+          "canonicalName": "Overhead Press",
+          "displayName": "overhead press",
+          "name": "overhead press",
+          "sets": [
+            {
+              "r": 6,
+              "w": 17.5,
+              "wDisplay": "17.5",
+              "note": ""
+            },
+            {
+              "r": 6,
+              "w": 17.5,
+              "wDisplay": "17.5",
+              "note": ""
+            },
+            {
+              "r": 6,
+              "w": 17.5,
+              "wDisplay": "17.5",
+              "note": ""
+            },
+            {
+              "r": 6,
+              "w": 17.5,
+              "wDisplay": "17.5",
+              "note": ""
+            }
+          ]
+        },
+        {
+          "canonicalName": "Dip",
+          "displayName": "dips",
+          "name": "dips",
+          "sets": [
+            {
+              "r": 6,
+              "w": 79,
+              "wDisplay": "79",
+              "note": ""
+            },
+            {
+              "r": 6,
+              "w": 79,
+              "wDisplay": "79",
+              "note": ""
+            },
+            {
+              "r": 6,
+              "w": 79,
+              "wDisplay": "79",
+              "note": ""
+            }
+          ]
+        },
+        {
+          "canonicalName": "Triceps Pushdown",
+          "displayName": "triceps pushdown",
+          "name": "triceps pushdown",
+          "sets": [
+            {
+              "r": 10,
+              "w": 50,
+              "wDisplay": "50",
+              "note": ""
+            },
+            {
+              "r": 10,
+              "w": 50,
+              "wDisplay": "50",
+              "note": ""
+            },
+            {
+              "r": 10,
+              "w": 50,
+              "wDisplay": "50",
+              "note": ""
+            }
+          ]
+        },
+        {
+          "canonicalName": "Lateral Raise",
+          "displayName": "Lateral Raise",
+          "name": "Lateral Raise",
+          "sets": [
+            {
+              "r": 10,
+              "w": 10,
+              "wDisplay": "10",
+              "note": ""
+            },
+            {
+              "r": 9,
+              "w": 10,
+              "wDisplay": "10",
+              "note": ""
+            },
+            {
+              "r": 8,
+              "w": 10,
+              "wDisplay": "10",
+              "note": ""
+            },
+            {
+              "r": 7,
+              "w": 10,
+              "wDisplay": "10",
+              "note": ""
+            }
+          ]
+        },
+        {
+          "canonicalName": "Face Pull",
+          "displayName": "Face Pull",
+          "name": "Face Pull",
+          "sets": [
+            {
+              "r": 15,
+              "w": 15,
+              "wDisplay": "15",
+              "note": ""
+            },
+            {
+              "r": 15,
+              "w": 15,
+              "wDisplay": "15",
+              "note": ""
+            },
+            {
+              "r": 15,
+              "w": 15,
+              "wDisplay": "15",
+              "note": ""
+            }
+          ]
+        }
+      ],
+      "notes": "Dips ve alt kar─▒n birlikte yap─▒lm─▒┼ş (6 tekrar dips, 15 tekrar kar─▒n).",
+      "workoutFocus": [
+        "G├Â─ş├╝s",
+        "Omuz",
+        "Triceps",
+        "Kar─▒n"
+      ],
+      "workoutFuel": "",
+      "workoutName": "Push"
+    },
+    "2025-07-26": {
+      "dateISO": "2025-07-26",
+      "items": [
+        {
+          "canonicalName": "Bench Press",
+          "displayName": "Bench Press",
+          "name": "Bench Press",
+          "sets": [
+            {
+              "r": 3,
+              "w": 65,
+              "wDisplay": "65",
+              "note": ""
+            },
+            {
+              "r": 6,
+              "w": 55,
+              "wDisplay": "55",
+              "note": ""
+            },
+            {
+              "r": 6,
+              "w": 55,
+              "wDisplay": "55",
+              "note": ""
+            },
+            {
+              "r": 6,
+              "w": 55,
+              "wDisplay": "55",
+              "note": ""
+            }
+          ]
+        },
+        {
+          "canonicalName": "barbell overhead press",
+          "displayName": "barbell overhead press",
+          "name": "barbell overhead press",
+          "sets": [
+            {
+              "r": 6,
+              "w": 8.5,
+              "wDisplay": "8.5",
+              "note": ""
+            },
+            {
+              "r": 16,
+              "w": 11,
+              "wDisplay": "11",
+              "note": ""
+            }
+          ]
+        }
+      ],
+      "notes": "26 temmuz push",
+      "workoutFocus": [
+        "G├Â─ş├╝s",
+        "Omuz"
+      ],
+      "workoutFuel": "",
+      "workoutName": "Push Day"
+    },
+    "2025-07-28": {
+      "dateISO": "2025-07-28",
+      "items": [
+        {
+          "canonicalName": "barbell overhead press",
+          "displayName": "barbell overhead press",
+          "name": "barbell overhead press",
+          "sets": [
+            {
+              "r": 12,
+              "w": 11,
+              "wDisplay": "11",
+              "note": ""
+            },
+            {
+              "r": 12,
+              "w": 11,
+              "wDisplay": "11",
+              "note": ""
+            },
+            {
+              "r": 12,
+              "w": 11,
+              "wDisplay": "11",
+              "note": ""
+            },
+            {
+              "r": 12,
+              "w": 11,
+              "wDisplay": "11",
+              "note": ""
+            }
+          ]
+        },
+        {
+          "canonicalName": "Bench Press",
+          "displayName": "Bench Press",
+          "name": "Bench Press",
+          "sets": [
+            {
+              "r": 5,
+              "w": 55,
+              "wDisplay": "55",
+              "note": ""
+            },
+            {
+              "r": 5,
+              "w": 55,
+              "wDisplay": "55",
+              "note": ""
+            },
+            {
+              "r": 5,
+              "w": 55,
+              "wDisplay": "55",
+              "note": ""
+            },
+            {
+              "r": 5,
+              "w": 55,
+              "wDisplay": "55",
+              "note": ""
+            }
+          ]
+        }
+      ],
+      "notes": "",
+      "workoutFocus": [
+        "Omuz",
+        "G├Â─ş├╝s"
+      ],
+      "workoutFuel": "",
+      "workoutName": "Push Day"
+    },
+    "2025-10-22": {
+      "dateISO": "2025-10-22",
+      "items": [
+        {
+          "canonicalName": "Bench Press",
+          "displayName": "Bench Press",
+          "name": "Bench Press",
+          "sets": [
+            {
+              "r": 4,
+              "w": 65,
+              "wDisplay": "65",
+              "note": ""
+            },
+            {
+              "r": 6,
+              "w": 65,
+              "wDisplay": "65",
+              "note": "Form d├╝zeltildi, iyi yap─▒ld─▒"
+            },
+            {
+              "r": 8,
+              "w": 60,
+              "wDisplay": "60",
+              "note": "Yard─▒mla"
+            }
+          ]
+        },
+        {
+          "canonicalName": "Incline Dumbbell Press",
+          "displayName": "Incline Dumbbell Press",
+          "name": "Incline Dumbbell Press",
+          "sets": [
+            {
+              "r": 10,
+              "w": 20,
+              "wDisplay": "20",
+              "note": ""
+            },
+            {
+              "r": 10,
+              "w": 20,
+              "wDisplay": "20",
+              "note": ""
+            },
+            {
+              "r": 8,
+              "w": 20,
+              "wDisplay": "20",
+              "note": ""
+            }
+          ]
+        },
+        {
+          "canonicalName": "Chest Fly",
+          "displayName": "Chest Fly",
+          "name": "Chest Fly",
+          "sets": [
+            {
+              "r": 12,
+              "w": 48,
+              "wDisplay": "48",
+              "note": ""
+            },
+            {
+              "r": 12,
+              "w": 48,
+              "wDisplay": "48",
+              "note": ""
+            },
+            {
+              "r": 12,
+              "w": 48,
+              "wDisplay": "48",
+              "note": ""
+            }
+          ]
+        },
+        {
+          "canonicalName": "Cable Skull Crusher",
+          "displayName": "Cable Skull Crusher",
+          "name": "Cable Skull Crusher",
+          "sets": [
+            {
+              "r": 10,
+              "w": 18,
+              "wDisplay": "18",
+              "note": ""
+            },
+            {
+              "r": 10,
+              "w": 18,
+              "wDisplay": "18",
+              "note": ""
+            },
+            {
+              "r": 10,
+              "w": 12,
+              "wDisplay": "12",
+              "note": ""
+            }
+          ]
+        }
+      ],
+      "notes": "­şöÑ Antrenman Yak─▒t─▒: Bilinmiyor\n\nBa┼şlang─▒├ğta sa─ş ├Ân kol ve ├Ân omuzda zorlanma, sonradan form d├╝zeltildi.",
+      "workoutFocus": [
+        "G├Â─ş├╝s",
+        "Arka Kol"
+      ],
+      "workoutFuel": "Bilinmiyor",
+      "workoutName": "Push 1"
+    },
+    "2025-10-23": {
+      "dateISO": "2025-10-23",
+      "items": [
+        {
+          "canonicalName": "Cable Row",
+          "displayName": "Cable Row",
+          "name": "Cable Row",
+          "sets": [
+            {
+              "r": 15,
+              "w": 42,
+              "wDisplay": "42",
+              "note": ""
+            },
+            {
+              "r": 15,
+              "w": 42,
+              "wDisplay": "42",
+              "note": ""
+            },
+            {
+              "r": 15,
+              "w": 54,
+              "wDisplay": "54",
+              "note": ""
+            }
+          ]
+        },
+        {
+          "canonicalName": "Lat Pulldown",
+          "displayName": "Lat Pulldown",
+          "name": "Lat Pulldown",
+          "sets": [
+            {
+              "r": 10,
+              "w": 66,
+              "wDisplay": "66",
+              "note": ""
+            },
+            {
+              "r": 9,
+              "w": 60,
+              "wDisplay": "60",
+              "note": ""
+            }
+          ]
+        },
+        {
+          "canonicalName": "Barbell Curl",
+          "displayName": "Barbell Curl",
+          "name": "Barbell Curl",
+          "sets": [
+            {
+              "r": 8,
+              "w": 23,
+              "wDisplay": "23",
+              "note": ""
+            },
+            {
+              "r": 8,
+              "w": 23,
+              "wDisplay": "23",
+              "note": ""
+            },
+            {
+              "r": 8,
+              "w": 23,
+              "wDisplay": "23",
+              "note": ""
+            }
+          ]
+        },
+        {
+          "canonicalName": "Dumbbell Curl",
+          "displayName": "Dumbbell Curl",
+          "name": "Dumbbell Curl",
+          "sets": [
+            {
+              "r": 10,
+              "w": 12.5,
+              "wDisplay": "12.5",
+              "note": ""
+            },
+            {
+              "r": 8,
+              "w": 15,
+              "wDisplay": "15",
+              "note": ""
+            },
+            {
+              "r": 10,
+              "w": 12.5,
+              "wDisplay": "12.5",
+              "note": ""
+            }
+          ]
+        },
+        {
+          "canonicalName": "Pull Up",
+          "displayName": "Pull-up",
+          "name": "Pull-up",
+          "sets": [
+            {
+              "r": 2,
+              "w": 74,
+              "wDisplay": "BW",
+              "note": ""
+            },
+            {
+              "r": 6,
+              "w": 74,
+              "wDisplay": "BW",
+              "note": ""
+            },
+            {
+              "r": 8,
+              "w": 74,
+              "wDisplay": "BW",
+              "note": ""
+            }
+          ]
+        }
+      ],
+      "notes": "­şöÑ Antrenman Yak─▒t─▒: 1 Muz, Kafein (200mg), Hydroprime, Kahvalt─▒\n\nYo─şun bir s─▒rt ve biceps antrenman─▒.",
+      "workoutFocus": [
+        "S─▒rt",
+        "├ûn Kol"
+      ],
+      "workoutFuel": "1 Muz, Kafein (200mg), Hydroprime, Kahvalt─▒",
+      "workoutName": "Pull Day"
+    },
+    "2025-10-26": {
+      "dateISO": "2025-10-26",
+      "items": [
+        {
+          "canonicalName": "Bench Press",
+          "displayName": "Bench Press",
+          "name": "Bench Press",
+          "sets": [
+            {
+              "r": 3,
+              "w": 65,
+              "wDisplay": "65",
+              "note": ""
+            },
+            {
+              "r": 3,
+              "w": 65,
+              "wDisplay": "65",
+              "note": ""
+            },
+            {
+              "r": 6,
+              "w": 60,
+              "wDisplay": "60",
+              "note": ""
+            },
+            {
+              "r": 6,
+              "w": 60,
+              "wDisplay": "60",
+              "note": ""
+            }
+          ]
+        },
+        {
+          "canonicalName": "Incline Dumbbell Press",
+          "displayName": "Incline Dumbbell Press",
+          "name": "Incline Dumbbell Press",
+          "sets": [
+            {
+              "r": 10,
+              "w": 20,
+              "wDisplay": "20",
+              "note": ""
+            },
+            {
+              "r": 10,
+              "w": 20,
+              "wDisplay": "20",
+              "note": ""
+            },
+            {
+              "r": 10,
+              "w": 20,
+              "wDisplay": "20",
+              "note": ""
+            }
+          ]
+        },
+        {
+          "canonicalName": "Chest Fly",
+          "displayName": "Chest Fly",
+          "name": "Chest Fly",
+          "sets": [
+            {
+              "r": 15,
+              "w": 54,
+              "wDisplay": "54",
+              "note": ""
+            },
+            {
+              "r": 15,
+              "w": 54,
+              "wDisplay": "54",
+              "note": ""
+            },
+            {
+              "r": 15,
+              "w": 54,
+              "wDisplay": "54",
+              "note": ""
+            }
+          ]
+        },
+        {
+          "canonicalName": "Overhead Press",
+          "displayName": "Overhead Press",
+          "name": "Overhead Press",
+          "sets": [
+            {
+              "r": 5,
+              "w": 20,
+              "wDisplay": "20",
+              "note": ""
+            },
+            {
+              "r": 10,
+              "w": 17.5,
+              "wDisplay": "17.5",
+              "note": ""
+            },
+            {
+              "r": 10,
+              "w": 17.5,
+              "wDisplay": "17.5",
+              "note": ""
+            }
+          ]
+        },
+        {
+          "canonicalName": "Lateral Raise",
+          "displayName": "Lateral Raise",
+          "name": "Lateral Raise",
+          "sets": [
+            {
+              "r": 10,
+              "w": 12.5,
+              "wDisplay": "12.5",
+              "note": ""
+            },
+            {
+              "r": 8,
+              "w": 12.5,
+              "wDisplay": "12.5",
+              "note": ""
+            }
+          ]
+        },
+        {
+          "canonicalName": "Rear Delt Fly",
+          "displayName": "Rear Delt Fly",
+          "name": "Rear Delt Fly",
+          "sets": [
+            {
+              "r": 15,
+              "w": 36,
+              "wDisplay": "36",
+              "note": ""
+            },
+            {
+              "r": 15,
+              "w": 36,
+              "wDisplay": "36",
+              "note": ""
+            },
+            {
+              "r": 15,
+              "w": 36,
+              "wDisplay": "36",
+              "note": ""
+            }
+          ]
+        },
+        {
+          "canonicalName": "Triceps Pushdown",
+          "displayName": "Triceps Pushdown",
+          "name": "Triceps Pushdown",
+          "sets": [
+            {
+              "r": 8,
+              "w": 66,
+              "wDisplay": "66",
+              "note": ""
+            },
+            {
+              "r": 8,
+              "w": 66,
+              "wDisplay": "66",
+              "note": ""
+            },
+            {
+              "r": 8,
+              "w": 66,
+              "wDisplay": "66",
+              "note": ""
+            }
+          ]
+        },
+        {
+          "canonicalName": "Dip",
+          "displayName": "Dips",
+          "name": "Dips",
+          "sets": [
+            {
+              "r": 10,
+              "w": 74,
+              "wDisplay": "74",
+              "note": ""
+            },
+            {
+              "r": 7,
+              "w": 74,
+              "wDisplay": "74",
+              "note": ""
+            },
+            {
+              "r": 5,
+              "w": 74,
+              "wDisplay": "74",
+              "note": ""
+            }
+          ]
+        }
+      ],
+      "notes": "­şöÑ Antrenman Yak─▒t─▒: 1 Muz, Kafein (200mg), Hydroprime, Kahvalt─▒\n\n├çok iyi bir antrenmand─▒. ├çok g├╝├ğl├╝ hissedildi. A─ş─▒rl─▒k art─▒rma inanc─▒ artt─▒.",
+      "workoutFocus": [
+        "G├Â─ş├╝s",
+        "Omuz",
+        "Arka Kol"
+      ],
+      "workoutFuel": "1 Muz, Kafein (200mg), Hydroprime, Kahvalt─▒",
+      "workoutName": "Push Day"
+    },
+    "2025-10-27": {
+      "dateISO": "2025-10-27",
+      "items": [
+        {
+          "canonicalName": "Lat Pulldown",
+          "displayName": "Lat Pulldown",
+          "name": "Lat Pulldown",
+          "sets": [
+            {
+              "r": 8,
+              "w": 66,
+              "wDisplay": "66",
+              "note": ""
+            },
+            {
+              "r": 8,
+              "w": 72,
+              "wDisplay": "72",
+              "note": ""
+            },
+            {
+              "r": 8,
+              "w": 72,
+              "wDisplay": "72",
+              "note": ""
+            }
+          ]
+        },
+        {
+          "canonicalName": "Cable Row",
+          "displayName": "Cable Row",
+          "name": "Cable Row",
+          "sets": [
+            {
+              "r": 12,
+              "w": 66,
+              "wDisplay": "66",
+              "note": ""
+            },
+            {
+              "r": 10,
+              "w": 60,
+              "wDisplay": "60",
+              "note": ""
+            },
+            {
+              "r": 11,
+              "w": 60,
+              "wDisplay": "60",
+              "note": ""
+            }
+          ]
+        },
+        {
+          "canonicalName": "Incline Dumbbell Curl",
+          "displayName": "Incline Dumbbell Curl",
+          "name": "Incline Dumbbell Curl",
+          "sets": [
+            {
+              "r": 10,
+              "w": 15,
+              "wDisplay": "15",
+              "note": ""
+            },
+            {
+              "r": 8,
+              "w": 15,
+              "wDisplay": "15",
+              "note": ""
+            },
+            {
+              "r": 10,
+              "w": 12.5,
+              "wDisplay": "12.5",
+              "note": ""
+            },
+            {
+              "r": 10,
+              "w": 12.5,
+              "wDisplay": "12.5",
+              "note": ""
+            }
+          ]
+        },
+        {
+          "canonicalName": "Pull Up",
+          "displayName": "Pull-Up",
+          "name": "Pull-Up",
+          "sets": [
+            {
+              "r": 8,
+              "w": 0,
+              "wDisplay": "BW",
+              "note": ""
+            },
+            {
+              "r": 7,
+              "w": 0,
+              "wDisplay": "BW",
+              "note": ""
+            }
+          ]
+        }
+      ],
+      "notes": "­şöÑ Antrenman Yak─▒t─▒: 1 Muz, Kafein (200mg), Kahvalt─▒\n\nD├╝n gibi ├ğok g├╝├ğl├╝ hissedildi. ─░yi bir Pull Day oldu. Antrenman sonras─▒ ├Ân kol, lat ve biceps esnetme/izometrik tutu┼ş yap─▒ld─▒.",
+      "workoutFocus": [
+        "S─▒rt",
+        "├ûn Kol"
+      ],
+      "workoutFuel": "1 Muz, Kafein (200mg), Kahvalt─▒",
+      "workoutName": "Pull Day"
+    },
+    "2025-10-29": {
+      "dateISO": "2025-10-29",
+      "items": [
+        {
+          "canonicalName": "Bench Press",
+          "displayName": "Bench Press",
+          "name": "Bench Press",
+          "sets": [
+            {
+              "r": 3,
+              "w": 65,
+              "wDisplay": "65",
+              "note": ""
+            },
+            {
+              "r": 6,
+              "w": 60,
+              "wDisplay": "60",
+              "note": ""
+            },
+            {
+              "r": 5,
+              "w": 60,
+              "wDisplay": "60",
+              "note": ""
+            }
+          ]
+        },
+        {
+          "canonicalName": "Incline Dumbbell Press",
+          "displayName": "Incline Dumbbell Press",
+          "name": "Incline Dumbbell Press",
+          "sets": [
+            {
+              "r": 10,
+              "w": 20,
+              "wDisplay": "20",
+              "note": ""
+            },
+            {
+              "r": 10,
+              "w": 20,
+              "wDisplay": "20",
+              "note": ""
+            },
+            {
+              "r": 10,
+              "w": 20,
+              "wDisplay": "20",
+              "note": ""
+            }
+          ]
+        },
+        {
+          "canonicalName": "Chest Fly",
+          "displayName": "Chest Fly",
+          "name": "Chest Fly",
+          "sets": [
+            {
+              "r": 15,
+              "w": 48,
+              "wDisplay": "48",
+              "note": ""
+            },
+            {
+              "r": 15,
+              "w": 48,
+              "wDisplay": "48",
+              "note": ""
+            },
+            {
+              "r": 15,
+              "w": 48,
+              "wDisplay": "48",
+              "note": ""
+            }
+          ]
+        },
+        {
+          "canonicalName": "Overhead Press",
+          "displayName": "Overhead Press",
+          "name": "Overhead Press",
+          "sets": [
+            {
+              "r": 4,
+              "w": 20,
+              "wDisplay": "20",
+              "note": ""
+            },
+            {
+              "r": 6,
+              "w": 20,
+              "wDisplay": "20",
+              "note": ""
+            },
+            {
+              "r": 6,
+              "w": 20,
+              "wDisplay": "20",
+              "note": ""
+            }
+          ]
+        },
+        {
+          "canonicalName": "Lateral Raise",
+          "displayName": "Lateral Raise",
+          "name": "Lateral Raise",
+          "sets": [
+            {
+              "r": 10,
+              "w": 12.5,
+              "wDisplay": "12.5",
+              "note": ""
+            },
+            {
+              "r": 8,
+              "w": 10,
+              "wDisplay": "10",
+              "note": ""
+            },
+            {
+              "r": 8,
+              "w": 10,
+              "wDisplay": "10",
+              "note": "Drop Set"
+            },
+            {
+              "r": 15,
+              "w": 7.5,
+              "wDisplay": "7.5",
+              "note": "Failure"
+            }
+          ]
+        },
+        {
+          "canonicalName": "Face Pull",
+          "displayName": "Face Pull",
+          "name": "Face Pull",
+          "sets": [
+            {
+              "r": 15,
+              "w": 42,
+              "wDisplay": "42",
+              "note": ""
+            },
+            {
+              "r": 15,
+              "w": 42,
+              "wDisplay": "42",
+              "note": ""
+            },
+            {
+              "r": 15,
+              "w": 42,
+              "wDisplay": "42",
+              "note": ""
+            }
+          ]
+        },
+        {
+          "canonicalName": "Triceps Pushdown",
+          "displayName": "Triceps Pushdown",
+          "name": "Triceps Pushdown",
+          "sets": [
+            {
+              "r": 10,
+              "w": 60,
+              "wDisplay": "60",
+              "note": ""
+            },
+            {
+              "r": 10,
+              "w": 60,
+              "wDisplay": "60",
+              "note": ""
+            },
+            {
+              "r": 7,
+              "w": 60,
+              "wDisplay": "60",
+              "note": ""
+            },
+            {
+              "r": 15,
+              "w": 48,
+              "wDisplay": "48",
+              "note": "Failure"
+            }
+          ]
+        }
+      ],
+      "notes": "­şöÑ Antrenman Yak─▒t─▒: Bilinmiyor\n\nZihinsel olarak yorgun hissedildi ancak kendini zorlayarak antrenman tamamland─▒.",
+      "workoutFocus": [
+        "G├Â─ş├╝s",
+        "Omuz",
+        "Arka Kol"
+      ],
+      "workoutFuel": "Bilinmiyor",
+      "workoutName": "Push 1"
+    },
+    "2025-10-30": {
+      "dateISO": "2025-10-30",
+      "items": [
+        {
+          "canonicalName": "Lat Pulldown",
+          "displayName": "Lat Pulldown",
+          "name": "Lat Pulldown",
+          "sets": [
+            {
+              "r": 8,
+              "w": 72,
+              "wDisplay": "72",
+              "note": ""
+            },
+            {
+              "r": 8,
+              "w": 66,
+              "wDisplay": "66",
+              "note": ""
+            }
+          ]
+        },
+        {
+          "canonicalName": "T-Bar Row",
+          "displayName": "T-Bar Row",
+          "name": "T-Bar Row",
+          "sets": [
+            {
+              "r": 15,
+              "w": 7.5,
+              "wDisplay": "7.5",
+              "note": ""
+            },
+            {
+              "r": 15,
+              "w": 15,
+              "wDisplay": "15",
+              "note": ""
+            },
+            {
+              "r": 15,
+              "w": 15,
+              "wDisplay": "15",
+              "note": ""
+            }
+          ]
+        },
+        {
+          "canonicalName": "Cable Row",
+          "displayName": "Cable Row",
+          "name": "Cable Row",
+          "sets": [
+            {
+              "r": 12,
+              "w": 66,
+              "wDisplay": "66",
+              "note": ""
+            },
+            {
+              "r": 15,
+              "w": 60,
+              "wDisplay": "60",
+              "note": ""
+            },
+            {
+              "r": 15,
+              "w": 60,
+              "wDisplay": "60",
+              "note": ""
+            }
+          ]
+        },
+        {
+          "canonicalName": "Barbell Curl",
+          "displayName": "Barbell Curl",
+          "name": "Barbell Curl",
+          "sets": [
+            {
+              "r": 8,
+              "w": 28,
+              "wDisplay": "28",
+              "note": ""
+            },
+            {
+              "r": 6,
+              "w": 28,
+              "wDisplay": "28",
+              "note": ""
+            },
+            {
+              "r": 8,
+              "w": 23,
+              "wDisplay": "23",
+              "note": ""
+            }
+          ]
+        },
+        {
+          "canonicalName": "Pull Up",
+          "displayName": "Pull-up",
+          "name": "Pull-up",
+          "sets": [
+            {
+              "r": 5,
+              "w": 0,
+              "wDisplay": "BW",
+              "note": ""
+            },
+            {
+              "r": 7,
+              "w": 0,
+              "wDisplay": "BW",
+              "note": ""
+            },
+            {
+              "r": 8,
+              "w": 0,
+              "wDisplay": "BW",
+              "note": ""
+            }
+          ]
+        }
+      ],
+      "notes": "­şöÑ Antrenman Yak─▒t─▒: Bilinmiyor\n\nYo─şun bir Pull Day.",
+      "workoutFocus": [
+        "S─▒rt",
+        "├ûn Kol"
+      ],
+      "workoutFuel": "Bilinmiyor",
+      "workoutName": "Pull 1"
+    },
+    "2025-11-02": {
+      "dateISO": "2025-11-02",
+      "items": [
+        {
+          "canonicalName": "Bench Press",
+          "displayName": "Bench Press",
+          "name": "Bench Press",
+          "sets": [
+            {
+              "r": 6,
+              "w": 60,
+              "wDisplay": "60",
+              "note": ""
+            },
+            {
+              "r": 2,
+              "w": 70,
+              "wDisplay": "70",
+              "note": ""
+            },
+            {
+              "r": 3,
+              "w": 65,
+              "wDisplay": "65",
+              "note": ""
+            },
+            {
+              "r": 4,
+              "w": 65,
+              "wDisplay": "65",
+              "note": ""
+            }
+          ]
+        },
+        {
+          "canonicalName": "Incline Dumbbell Press",
+          "displayName": "Incline Dumbbell Press",
+          "name": "Incline Dumbbell Press",
+          "sets": [
+            {
+              "r": 8,
+              "w": 20,
+              "wDisplay": "20",
+              "note": ""
+            },
+            {
+              "r": 8,
+              "w": 20,
+              "wDisplay": "20",
+              "note": ""
+            },
+            {
+              "r": 10,
+              "w": 20,
+              "wDisplay": "20",
+              "note": ""
+            }
+          ]
+        },
+        {
+          "canonicalName": "Lateral Raise",
+          "displayName": "Lateral Raise",
+          "name": "Lateral Raise",
+          "sets": [
+            {
+              "r": 8,
+              "w": 12.5,
+              "wDisplay": "12.5",
+              "note": ""
+            },
+            {
+              "r": 5,
+              "w": 12.5,
+              "wDisplay": "12.5",
+              "note": ""
+            },
+            {
+              "r": 12,
+              "w": 10,
+              "wDisplay": "10",
+              "note": ""
+            }
+          ]
+        },
+        {
+          "canonicalName": "Overhead Press",
+          "displayName": "Overhead Press",
+          "name": "Overhead Press",
+          "sets": [
+            {
+              "r": 8,
+              "w": 20,
+              "wDisplay": "20",
+              "note": ""
+            },
+            {
+              "r": 8,
+              "w": 20,
+              "wDisplay": "20",
+              "note": ""
+            },
+            {
+              "r": 10,
+              "w": 20,
+              "wDisplay": "20",
+              "note": ""
+            }
+          ]
+        },
+        {
+          "canonicalName": "Face Pull",
+          "displayName": "Face Pull",
+          "name": "Face Pull",
+          "sets": [
+            {
+              "r": 15,
+              "w": 48,
+              "wDisplay": "48",
+              "note": ""
+            },
+            {
+              "r": 15,
+              "w": 48,
+              "wDisplay": "48",
+              "note": ""
+            },
+            {
+              "r": 15,
+              "w": 48,
+              "wDisplay": "48",
+              "note": ""
+            }
+          ]
+        },
+        {
+          "canonicalName": "Triceps Pushdown",
+          "displayName": "Triceps Pushdown",
+          "name": "Triceps Pushdown",
+          "sets": [
+            {
+              "r": 10,
+              "w": 60,
+              "wDisplay": "60",
+              "note": ""
+            },
+            {
+              "r": 8,
+              "w": 60,
+              "wDisplay": "60",
+              "note": ""
+            },
+            {
+              "r": 7,
+              "w": 60,
+              "wDisplay": "60",
+              "note": ""
+            }
+          ]
+        }
+      ],
+      "notes": "\n\n─░yi bir iti┼ş g├╝n├╝yd├╝. Sa─ş omuz g├╝├ğlenmi┼ş ve sakatl─▒k hissi vermedi. Kilo ald─▒k├ğa kilolar─▒n daha da artaca─ş─▒ inanc─▒ peki┼şti.",
+      "workoutFocus": [
+        "G├Â─ş├╝s",
+        "Omuz",
+        "Arka Kol"
+      ],
+      "workoutFuel": "2 Yumurta, 1 Muz, Kafein (200mg)",
+      "workoutName": "Push 2"
+    },
+    "2025-11-03": {
+      "dateISO": "2025-11-03",
+      "items": [
+        {
+          "canonicalName": "Pull Up",
+          "displayName": "Pull-up",
+          "name": "Pull-up",
+          "sets": [
+            {
+              "r": 6,
+              "w": 75,
+              "wDisplay": "BW",
+              "note": ""
+            },
+            {
+              "r": 8,
+              "w": 75,
+              "wDisplay": "BW",
+              "note": ""
+            }
+          ]
+        },
+        {
+          "canonicalName": "Lat Pulldown",
+          "displayName": "Lat Pulldown",
+          "name": "Lat Pulldown",
+          "sets": [
+            {
+              "r": 7,
+              "w": 72,
+              "wDisplay": "72",
+              "note": ""
+            },
+            {
+              "r": 8,
+              "w": 72,
+              "wDisplay": "72",
+              "note": ""
+            }
+          ]
+        },
+        {
+          "canonicalName": "Barbell Row",
+          "displayName": "Barbell Row",
+          "name": "Barbell Row",
+          "sets": [
+            {
+              "r": 15,
+              "w": 15,
+              "wDisplay": "15",
+              "note": ""
+            },
+            {
+              "r": 10,
+              "w": 17.5,
+              "wDisplay": "17.5",
+              "note": ""
+            },
+            {
+              "r": 10,
+              "w": 17.5,
+              "wDisplay": "17.5",
+              "note": ""
+            },
+            {
+              "r": 10,
+              "w": 17.5,
+              "wDisplay": "17.5",
+              "note": ""
+            }
+          ]
+        },
+        {
+          "canonicalName": "Cable Row",
+          "displayName": "Cable Pull",
+          "name": "Cable Pull",
+          "sets": [
+            {
+              "r": 10,
+              "w": 66,
+              "wDisplay": "66",
+              "note": ""
+            },
+            {
+              "r": 12,
+              "w": 60,
+              "wDisplay": "60",
+              "note": ""
+            },
+            {
+              "r": 12,
+              "w": 60,
+              "wDisplay": "60",
+              "note": ""
+            }
+          ]
+        },
+        {
+          "canonicalName": "Rope Pullover",
+          "displayName": "Rope Pullover",
+          "name": "Rope Pullover",
+          "sets": [
+            {
+              "r": 12,
+              "w": 42,
+              "wDisplay": "42",
+              "note": ""
+            },
+            {
+              "r": 10,
+              "w": 36,
+              "wDisplay": "36",
+              "note": ""
+            },
+            {
+              "r": 10,
+              "w": 36,
+              "wDisplay": "36",
+              "note": ""
+            }
+          ]
+        },
+        {
+          "canonicalName": "Barbell Curl",
+          "displayName": "Barbell Curl",
+          "name": "Barbell Curl",
+          "sets": [
+            {
+              "r": 10,
+              "w": 23,
+              "wDisplay": "23",
+              "note": ""
+            },
+            {
+              "r": 10,
+              "w": 23,
+              "wDisplay": "23",
+              "note": ""
+            },
+            {
+              "r": 6,
+              "w": 23,
+              "wDisplay": "23",
+              "note": "─░zole"
+            }
+          ]
+        },
+        {
+          "canonicalName": "Dumbbell Curl",
+          "displayName": "Dumbbell Curl",
+          "name": "Dumbbell Curl",
+          "sets": [
+            {
+              "r": 8,
+              "w": 15,
+              "wDisplay": "15",
+              "note": ""
+            },
+            {
+              "r": 8,
+              "w": 15,
+              "wDisplay": "15",
+              "note": ""
+            },
+            {
+              "r": 8,
+              "w": 12.5,
+              "wDisplay": "12.5",
+              "note": ""
+            },
+            {
+              "r": 8,
+              "w": 12.5,
+              "wDisplay": "12.5",
+              "note": ""
+            }
+          ]
+        }
+      ],
+      "notes": "─░yi bir Pull Day antrenman─▒yd─▒.",
+      "workoutFocus": [
+        "S─▒rt",
+        "├ûn Kol"
+      ],
+      "workoutFuel": "1 Muz, Kafein (200mg)",
+      "workoutName": "Pull Day"
+    },
+    "2025-11-05": {
+      "dateISO": "2025-11-05",
+      "items": [
+        {
+          "canonicalName": "Bench Press",
+          "displayName": "Bench Press",
+          "name": "Bench Press",
+          "sets": [
+            {
+              "r": 1,
+              "w": 70,
+              "wDisplay": "70",
+              "note": ""
+            },
+            {
+              "r": 1,
+              "w": 70,
+              "wDisplay": "70",
+              "note": ""
+            },
+            {
+              "r": 1,
+              "w": 70,
+              "wDisplay": "70",
+              "note": ""
+            },
+            {
+              "r": 1,
+              "w": 70,
+              "wDisplay": "70",
+              "note": ""
+            },
+            {
+              "r": 1,
+              "w": 70,
+              "wDisplay": "70",
+              "note": ""
+            }
+          ]
+        },
+        {
+          "canonicalName": "Chest Fly",
+          "displayName": "Chest Fly",
+          "name": "Chest Fly",
+          "sets": [
+            {
+              "r": 15,
+              "w": 60,
+              "wDisplay": "60",
+              "note": ""
+            },
+            {
+              "r": 15,
+              "w": 60,
+              "wDisplay": "60",
+              "note": ""
+            },
+            {
+              "r": 15,
+              "w": 60,
+              "wDisplay": "60",
+              "note": ""
+            }
+          ]
+        },
+        {
+          "canonicalName": "Overhead Press",
+          "displayName": "Overhead Press",
+          "name": "Overhead Press",
+          "sets": [
+            {
+              "r": 10,
+              "w": 20,
+              "wDisplay": "20",
+              "note": ""
+            },
+            {
+              "r": 6,
+              "w": 20,
+              "wDisplay": "20",
+              "note": ""
+            },
+            {
+              "r": 8,
+              "w": 20,
+              "wDisplay": "20",
+              "note": ""
+            },
+            {
+              "r": 8,
+              "w": 20,
+              "wDisplay": "20",
+              "note": ""
+            }
+          ]
+        },
+        {
+          "canonicalName": "Lateral Raise",
+          "displayName": "Lateral Raise",
+          "name": "Lateral Raise",
+          "sets": [
+            {
+              "r": 8,
+              "w": 12.5,
+              "wDisplay": "12.5",
+              "note": ""
+            },
+            {
+              "r": 8,
+              "w": 12.5,
+              "wDisplay": "12.5",
+              "note": ""
+            },
+            {
+              "r": 8,
+              "w": 12.5,
+              "wDisplay": "12.5",
+              "note": ""
+            },
+            {
+              "r": 8,
+              "w": 10,
+              "wDisplay": "10",
+              "note": ""
+            }
+          ]
+        },
+        {
+          "canonicalName": "Skull Crusher",
+          "displayName": "Skull Crusher",
+          "name": "Skull Crusher",
+          "sets": [
+            {
+              "r": 10,
+              "w": 16,
+              "wDisplay": "16",
+              "note": ""
+            },
+            {
+              "r": 10,
+              "w": 16,
+              "wDisplay": "16",
+              "note": ""
+            },
+            {
+              "r": 10,
+              "w": 16,
+              "wDisplay": "16",
+              "note": ""
+            },
+            {
+              "r": 10,
+              "w": 16,
+              "wDisplay": "16",
+              "note": ""
+            }
+          ]
+        },
+        {
+          "canonicalName": "Triceps Pushdown",
+          "displayName": "Triceps Pushdown",
+          "name": "Triceps Pushdown",
+          "sets": [
+            {
+              "r": 10,
+              "w": 60,
+              "wDisplay": "60",
+              "note": ""
+            },
+            {
+              "r": 10,
+              "w": 60,
+              "wDisplay": "60",
+              "note": ""
+            },
+            {
+              "r": 9,
+              "w": 60,
+              "wDisplay": "60",
+              "note": ""
+            }
+          ]
+        }
+      ],
+      "notes": "Bench press her sette t├╝keni┼şi denedim ama 1 tam tekrar cikti",
+      "workoutFocus": [
+        "G├Â─ş├╝s.Omuz.Triceps"
+      ],
+      "workoutFuel": "Aksam yemegi",
+      "workoutName": "Push Day"
+    },
+    "2025-11-06": {
+      "dateISO": "2025-11-06",
+      "items": [
+        {
+          "canonicalName": "Lat Pulldown",
+          "displayName": "Lat Pulldown",
+          "name": "Lat Pulldown",
+          "sets": [
+            {
+              "r": 8,
+              "w": 72,
+              "wDisplay": "72",
+              "note": ""
+            },
+            {
+              "r": 8,
+              "w": 72,
+              "wDisplay": "72",
+              "note": ""
+            },
+            {
+              "r": 10,
+              "w": 72,
+              "wDisplay": "72",
+              "note": ""
+            },
+            {
+              "r": 8,
+              "w": 72,
+              "wDisplay": "72",
+              "note": ""
+            }
+          ]
+        },
+        {
+          "canonicalName": "Barbell Row",
+          "displayName": "Barbell Row",
+          "name": "Barbell Row",
+          "sets": [
+            {
+              "r": 10,
+              "w": 17.5,
+              "wDisplay": "17.5",
+              "note": ""
+            },
+            {
+              "r": 12,
+              "w": 17.5,
+              "wDisplay": "17.5",
+              "note": ""
+            },
+            {
+              "r": 10,
+              "w": 17.5,
+              "wDisplay": "17.5",
+              "note": ""
+            },
+            {
+              "r": 10,
+              "w": 17.5,
+              "wDisplay": "17.5",
+              "note": ""
+            }
+          ]
+        },
+        {
+          "canonicalName": "Cable Row",
+          "displayName": "Cable Row",
+          "name": "Cable Row",
+          "sets": [
+            {
+              "r": 12,
+              "w": 66,
+              "wDisplay": "66",
+              "note": ""
+            },
+            {
+              "r": 10,
+              "w": 66,
+              "wDisplay": "66",
+              "note": ""
+            },
+            {
+              "r": 12,
+              "w": 60,
+              "wDisplay": "60",
+              "note": ""
+            }
+          ]
+        },
+        {
+          "canonicalName": "Rope Pullover",
+          "displayName": "Rope Pullover",
+          "name": "Rope Pullover",
+          "sets": [
+            {
+              "r": 10,
+              "w": 36,
+              "wDisplay": "36",
+              "note": ""
+            },
+            {
+              "r": 12,
+              "w": 36,
+              "wDisplay": "36",
+              "note": ""
+            },
+            {
+              "r": 15,
+              "w": 36,
+              "wDisplay": "36",
+              "note": ""
+            }
+          ]
+        },
+        {
+          "canonicalName": "Incline Dumbbell Curl",
+          "displayName": "Incline Dumbbell Curl",
+          "name": "Incline Dumbbell Curl",
+          "sets": [
+            {
+              "r": 8,
+              "w": 15,
+              "wDisplay": "15",
+              "note": ""
+            },
+            {
+              "r": 8,
+              "w": 15,
+              "wDisplay": "15",
+              "note": ""
+            },
+            {
+              "r": 8,
+              "w": 15,
+              "wDisplay": "15",
+              "note": ""
+            },
+            {
+              "r": 8,
+              "w": 15,
+              "wDisplay": "15",
+              "note": ""
+            }
+          ]
+        },
+        {
+          "canonicalName": "Chin Up",
+          "displayName": "Chin Up",
+          "name": "Chin Up",
+          "sets": [
+            {
+              "r": 3,
+              "w": 77,
+              "wDisplay": "BW",
+              "note": ""
+            }
+          ]
+        }
+      ],
+      "notes": "",
+      "workoutFuel": "",
+      "workoutName": "Pull",
+      "workoutFocus": []
+    },
+    "2025-11-09": {
+      "dateISO": "2025-11-09",
+      "items": [
+        {
+          "canonicalName": "Bench Press",
+          "displayName": "Bench Press",
+          "name": "Bench Press",
+          "sets": [
+            {
+              "r": 3,
+              "w": 60,
+              "wDisplay": "60",
+              "note": ""
+            },
+            {
+              "r": 2,
+              "w": 70,
+              "wDisplay": "70",
+              "note": ""
+            },
+            {
+              "r": 2,
+              "w": 70,
+              "wDisplay": "70",
+              "note": ""
+            },
+            {
+              "r": 6,
+              "w": 60,
+              "wDisplay": "60",
+              "note": ""
+            }
+          ]
+        },
+        {
+          "canonicalName": "Incline Dumbbell Press",
+          "displayName": "Incline Dumbbell Press",
+          "name": "Incline Dumbbell Press",
+          "sets": [
+            {
+              "r": 10,
+              "w": 20,
+              "wDisplay": "20",
+              "note": ""
+            },
+            {
+              "r": 10,
+              "w": 20,
+              "wDisplay": "20",
+              "note": ""
+            },
+            {
+              "r": 10,
+              "w": 20,
+              "wDisplay": "20",
+              "note": ""
+            }
+          ]
+        },
+        {
+          "canonicalName": "Chest Fly",
+          "displayName": "Chest Fly",
+          "name": "Chest Fly",
+          "sets": [
+            {
+              "r": 12,
+              "w": 60,
+              "wDisplay": "60",
+              "note": ""
+            },
+            {
+              "r": 15,
+              "w": 60,
+              "wDisplay": "60",
+              "note": ""
+            },
+            {
+              "r": 15,
+              "w": 60,
+              "wDisplay": "60",
+              "note": ""
+            }
+          ]
+        },
+        {
+          "canonicalName": "Overhead Press",
+          "displayName": "Overhead Press",
+          "name": "Overhead Press",
+          "sets": [
+            {
+              "r": 6,
+              "w": 20,
+              "wDisplay": "20",
+              "note": ""
+            },
+            {
+              "r": 5,
+              "w": 20,
+              "wDisplay": "20",
+              "note": ""
+            },
+            {
+              "r": 5,
+              "w": 20,
+              "wDisplay": "20",
+              "note": ""
+            }
+          ]
+        },
+        {
+          "canonicalName": "Lateral Raise",
+          "displayName": "Lateral Raise",
+          "name": "Lateral Raise",
+          "sets": [
+            {
+              "r": 6,
+              "w": 12.5,
+              "wDisplay": "12.5",
+              "note": ""
+            },
+            {
+              "r": 8,
+              "w": 12.5,
+              "wDisplay": "12.5",
+              "note": ""
+            },
+            {
+              "r": 10,
+              "w": 10,
+              "wDisplay": "10",
+              "note": ""
+            },
+            {
+              "r": 10,
+              "w": 7.5,
+              "wDisplay": "7.5",
+              "note": ""
+            }
+          ]
+        },
+        {
+          "canonicalName": "Skull Crusher",
+          "displayName": "Skull Crusher",
+          "name": "Skull Crusher",
+          "sets": [
+            {
+              "r": 12,
+              "w": 16,
+              "wDisplay": "16",
+              "note": ""
+            },
+            {
+              "r": 10,
+              "w": 16,
+              "wDisplay": "16",
+              "note": ""
+            },
+            {
+              "r": 12,
+              "w": 16,
+              "wDisplay": "16",
+              "note": ""
+            }
+          ]
+        },
+        {
+          "canonicalName": "Front Shoulder",
+          "displayName": "Front Shoulder",
+          "name": "Front Shoulder",
+          "sets": [
+            {
+              "r": 10,
+              "w": 10,
+              "wDisplay": "10",
+              "note": ""
+            },
+            {
+              "r": 8,
+              "w": 10,
+              "wDisplay": "10",
+              "note": ""
+            },
+            {
+              "r": 10,
+              "w": 10,
+              "wDisplay": "10",
+              "note": ""
+            }
+          ]
+        },
+        {
+          "canonicalName": "Rope Pushdown",
+          "displayName": "Rope Pushdown",
+          "name": "Rope Pushdown",
+          "sets": [
+            {
+              "r": 12,
+              "w": 36,
+              "wDisplay": "36",
+              "note": ""
+            },
+            {
+              "r": 12,
+              "w": 36,
+              "wDisplay": "36",
+              "note": ""
+            },
+            {
+              "r": 15,
+              "w": 30,
+              "wDisplay": "30",
+              "note": ""
+            }
+          ]
+        },
+        {
+          "canonicalName": "Face Pull",
+          "displayName": "Face Pull",
+          "name": "Face Pull",
+          "sets": [
+            {
+              "r": 12,
+              "w": 36,
+              "wDisplay": "36",
+              "note": ""
+            },
+            {
+              "r": 12,
+              "w": 36,
+              "wDisplay": "36",
+              "note": ""
+            },
+            {
+              "r": 15,
+              "w": 36,
+              "wDisplay": "36",
+              "note": ""
+            }
+          ]
+        }
+      ],
+      "notes": "\nFace pull\n36kg 12+12+15\n\n",
+      "workoutFuel": "Kahvalti , kafein",
+      "workoutName": "Push Day",
+      "workoutFocus": []
+    },
+    "2025-11-10": {
+      "dateISO": "2025-11-10",
+      "items": [
+        {
+          "canonicalName": "Lat Pulldown",
+          "displayName": "Lat Pulldown",
+          "name": "Lat Pulldown",
+          "sets": [
+            {
+              "r": 8,
+              "w": 72,
+              "wDisplay": "72",
+              "note": ""
+            },
+            {
+              "r": 10,
+              "w": 72,
+              "wDisplay": "72",
+              "note": ""
+            }
+          ]
+        },
+        {
+          "canonicalName": "Pull Up",
+          "displayName": "Pull Up",
+          "name": "Pull Up",
+          "sets": [
+            {
+              "r": 4,
+              "w": 76,
+              "wDisplay": "BW",
+              "note": ""
+            },
+            {
+              "r": 7,
+              "w": 76,
+              "wDisplay": "BW",
+              "note": ""
+            },
+            {
+              "r": 6,
+              "w": 76,
+              "wDisplay": "BW",
+              "note": ""
+            },
+            {
+              "r": 3,
+              "w": 76,
+              "wDisplay": "BW",
+              "note": ""
+            }
+          ]
+        },
+        {
+          "canonicalName": "Cable Row",
+          "displayName": "Cable Row",
+          "name": "Cable Row",
+          "sets": [
+            {
+              "r": 12,
+              "w": 66,
+              "wDisplay": "66",
+              "note": ""
+            },
+            {
+              "r": 12,
+              "w": 66,
+              "wDisplay": "66",
+              "note": ""
+            },
+            {
+              "r": 12,
+              "w": 66,
+              "wDisplay": "66",
+              "note": ""
+            }
+          ]
+        },
+        {
+          "canonicalName": "Barbell Curl",
+          "displayName": "Barbell Curl",
+          "name": "Barbell Curl",
+          "sets": [
+            {
+              "r": 8,
+              "w": 28,
+              "wDisplay": "28",
+              "note": ""
+            },
+            {
+              "r": 8,
+              "w": 28,
+              "wDisplay": "28",
+              "note": ""
+            },
+            {
+              "r": 8,
+              "w": 28,
+              "wDisplay": "28",
+              "note": ""
+            },
+            {
+              "r": 8,
+              "w": 28,
+              "wDisplay": "28",
+              "note": ""
+            }
+          ]
+        },
+        {
+          "canonicalName": "Dumbbell Curl",
+          "displayName": "Dumbbell Curl",
+          "name": "Dumbbell Curl",
+          "sets": [
+            {
+              "r": 4,
+              "w": 20,
+              "wDisplay": "20",
+              "note": ""
+            },
+            {
+              "r": 8,
+              "w": 17.5,
+              "wDisplay": "17.5",
+              "note": ""
+            },
+            {
+              "r": 8,
+              "w": 17.5,
+              "wDisplay": "17.5",
+              "note": ""
+            },
+            {
+              "r": 8,
+              "w": 17.5,
+              "wDisplay": "17.5",
+              "note": ""
+            }
+          ]
+        }
+      ],
+      "notes": "",
+      "workoutFuel": "",
+      "workoutName": "Pull Day",
+      "workoutFocus": []
+    },
+    "2025-11-12": {
+      "dateISO": "2025-11-12",
+      "items": [
+        {
+          "canonicalName": "Bench Press",
+          "displayName": "Bench Press",
+          "name": "Bench Press",
+          "sets": [
+            {
+              "r": 3,
+              "w": 70,
+              "wDisplay": "70",
+              "note": ""
+            },
+            {
+              "r": 2,
+              "w": 70,
+              "wDisplay": "70",
+              "note": ""
+            },
+            {
+              "r": 2,
+              "w": 70,
+              "wDisplay": "70",
+              "note": ""
+            },
+            {
+              "r": 1,
+              "w": 70,
+              "wDisplay": "70",
+              "note": ""
+            },
+            {
+              "r": 7,
+              "w": 60,
+              "wDisplay": "60",
+              "note": ""
+            }
+          ]
+        },
+        {
+          "canonicalName": "Overhead Press",
+          "displayName": "Overhead Press",
+          "name": "Overhead Press",
+          "sets": [
+            {
+              "r": 8,
+              "w": 20,
+              "wDisplay": "20",
+              "note": ""
+            },
+            {
+              "r": 8,
+              "w": 20,
+              "wDisplay": "20",
+              "note": ""
+            },
+            {
+              "r": 10,
+              "w": 20,
+              "wDisplay": "20",
+              "note": ""
+            }
+          ]
+        },
+        {
+          "canonicalName": "Chest Fly",
+          "displayName": "Chest Fly",
+          "name": "Chest Fly",
+          "sets": [
+            {
+              "r": 10,
+              "w": 60,
+              "wDisplay": "60",
+              "note": ""
+            },
+            {
+              "r": 12,
+              "w": 54,
+              "wDisplay": "54",
+              "note": ""
+            },
+            {
+              "r": 15,
+              "w": 54,
+              "wDisplay": "54",
+              "note": ""
+            },
+            {
+              "r": 15,
+              "w": 54,
+              "wDisplay": "54",
+              "note": ""
+            }
+          ]
+        },
+        {
+          "canonicalName": "Dip",
+          "displayName": "Dips",
+          "name": "Dips",
+          "sets": [
+            {
+              "r": 5,
+              "w": 77.5,
+              "wDisplay": "BW",
+              "note": ""
+            },
+            {
+              "r": 5,
+              "w": 77.5,
+              "wDisplay": "BW",
+              "note": ""
+            },
+            {
+              "r": 6,
+              "w": 77.5,
+              "wDisplay": "BW",
+              "note": ""
+            }
+          ]
+        },
+        {
+          "canonicalName": "Lateral Raise",
+          "displayName": "Lateral Raise",
+          "name": "Lateral Raise",
+          "sets": [
+            {
+              "r": 8,
+              "w": 12.5,
+              "wDisplay": "12.5",
+              "note": ""
+            },
+            {
+              "r": 8,
+              "w": 12.5,
+              "wDisplay": "12.5",
+              "note": ""
+            },
+            {
+              "r": 8,
+              "w": 10,
+              "wDisplay": "10",
+              "note": ""
+            },
+            {
+              "r": 8,
+              "w": 7.5,
+              "wDisplay": "7.5",
+              "note": ""
+            }
+          ]
+        },
+        {
+          "canonicalName": "Rear Delt Fly",
+          "displayName": "Rear Delt Fly",
+          "name": "Rear Delt Fly",
+          "sets": [
+            {
+              "r": 15,
+              "w": 54,
+              "wDisplay": "54",
+              "note": ""
+            },
+            {
+              "r": 15,
+              "w": 54,
+              "wDisplay": "54",
+              "note": ""
+            },
+            {
+              "r": 15,
+              "w": 54,
+              "wDisplay": "54",
+              "note": ""
+            }
+          ]
+        },
+        {
+          "canonicalName": "Hip Thrust",
+          "displayName": "Hip Thrust",
+          "name": "Hip Thrust",
+          "sets": [
+            {
+              "r": 15,
+              "w": 23,
+              "wDisplay": "23",
+              "note": ""
+            },
+            {
+              "r": 15,
+              "w": 23,
+              "wDisplay": "23",
+              "note": ""
+            },
+            {
+              "r": 15,
+              "w": 23,
+              "wDisplay": "23",
+              "note": ""
+            }
+          ]
+        },
+        {
+          "canonicalName": "Skull Crusher",
+          "displayName": "Skull Crusher",
+          "name": "Skull Crusher",
+          "sets": [
+            {
+              "r": 10,
+              "w": 16,
+              "wDisplay": "16",
+              "note": ""
+            },
+            {
+              "r": 10,
+              "w": 16,
+              "wDisplay": "16",
+              "note": ""
+            },
+            {
+              "r": 8,
+              "w": 16,
+              "wDisplay": "16",
+              "note": ""
+            }
+          ]
+        }
+      ],
+      "notes": "",
+      "workoutFuel": "",
+      "workoutName": "Push Day",
+      "workoutFocus": []
+    },
+    "2025-11-13": {
+      "dateISO": "2025-11-13",
+      "items": [
+        {
+          "canonicalName": "Pull Up",
+          "displayName": "Pull Up",
+          "name": "Pull Up",
+          "sets": [
+            {
+              "r": 7,
+              "w": 78,
+              "wDisplay": "BW",
+              "note": ""
+            },
+            {
+              "r": 5,
+              "w": 78,
+              "wDisplay": "BW",
+              "note": ""
+            },
+            {
+              "r": 4,
+              "w": 78,
+              "wDisplay": "BW",
+              "note": ""
+            }
+          ]
+        },
+        {
+          "canonicalName": "Lat Pulldown",
+          "displayName": "Lat Pulldown",
+          "name": "Lat Pulldown",
+          "sets": [
+            {
+              "r": 8,
+              "w": 72,
+              "wDisplay": "72",
+              "note": ""
+            },
+            {
+              "r": 8,
+              "w": 72,
+              "wDisplay": "72",
+              "note": ""
+            }
+          ]
+        },
+        {
+          "canonicalName": "Cable Row",
+          "displayName": "Cable Row",
+          "name": "Cable Row",
+          "sets": [
+            {
+              "r": 12,
+              "w": 66,
+              "wDisplay": "66",
+              "note": ""
+            },
+            {
+              "r": 12,
+              "w": 66,
+              "wDisplay": "66",
+              "note": ""
+            },
+            {
+              "r": 10,
+              "w": 66,
+              "wDisplay": "66",
+              "note": ""
+            }
+          ]
+        },
+        {
+          "canonicalName": "Barbell Row",
+          "displayName": "Barbell Row",
+          "name": "Barbell Row",
+          "sets": [
+            {
+              "r": 10,
+              "w": 17.5,
+              "wDisplay": "17.5",
+              "note": ""
+            },
+            {
+              "r": 8,
+              "w": 15,
+              "wDisplay": "15",
+              "note": ""
+            },
+            {
+              "r": 10,
+              "w": 15,
+              "wDisplay": "15",
+              "note": ""
+            },
+            {
+              "r": 18,
+              "w": 10,
+              "wDisplay": "10",
+              "note": ""
+            }
+          ]
+        },
+        {
+          "canonicalName": "Chin Up",
+          "displayName": "Chin Up",
+          "name": "Chin Up",
+          "sets": [
+            {
+              "r": 7,
+              "w": 78,
+              "wDisplay": "BW",
+              "note": ""
+            },
+            {
+              "r": 6,
+              "w": 78,
+              "wDisplay": "BW",
+              "note": ""
+            }
+          ]
+        },
+        {
+          "canonicalName": "Cable Curl",
+          "displayName": "Cable Curl",
+          "name": "Cable Curl",
+          "sets": [
+            {
+              "r": 10,
+              "w": 24,
+              "wDisplay": "24",
+              "note": ""
+            },
+            {
+              "r": 10,
+              "w": 24,
+              "wDisplay": "24",
+              "note": ""
+            },
+            {
+              "r": 10,
+              "w": 24,
+              "wDisplay": "24",
+              "note": ""
+            }
+          ]
+        }
+      ],
+      "notes": "Cable curl \n24 kg 3 set 10 reps",
+      "workoutFuel": "Gece antrenmani",
+      "workoutName": "Pull Day",
+      "workoutFocus": []
+    },
+    "2025-11-14": {
+      "dateISO": "2025-11-14",
+      "items": [
+        {
+          "canonicalName": "Goblet Squad",
+          "displayName": "Goblet Squad",
+          "name": "Goblet Squad",
+          "sets": [
+            {
+              "r": 20,
+              "w": 0,
+              "wDisplay": "BW",
+              "note": ""
+            }
+          ]
+        },
+        {
+          "canonicalName": "Bulgarian Split Squat",
+          "displayName": "Bulgarian Split Squat",
+          "name": "Bulgarian Split Squat",
+          "sets": [
+            {
+              "r": 12,
+              "w": 0,
+              "wDisplay": "BW",
+              "note": ""
+            },
+            {
+              "r": 14,
+              "w": 0,
+              "wDisplay": "BW",
+              "note": ""
+            },
+            {
+              "r": 14,
+              "w": 5,
+              "wDisplay": "5",
+              "note": ""
+            }
+          ]
+        }
+      ],
+      "notes": "",
+      "workoutFuel": "",
+      "workoutName": "Leg Day",
+      "workoutFocus": []
+    },
+    "2025-11-16": {
+      "dateISO": "2025-11-16",
+      "items": [
+        {
+          "canonicalName": "Bench Press",
+          "displayName": "Bench Press",
+          "name": "Bench Press",
+          "sets": [
+            {
+              "r": 3,
+              "w": 70,
+              "wDisplay": "70",
+              "note": ""
+            },
+            {
+              "r": 2,
+              "w": 70,
+              "wDisplay": "70",
+              "note": ""
+            },
+            {
+              "r": 2,
+              "w": 70,
+              "wDisplay": "70",
+              "note": ""
+            },
+            {
+              "r": 2,
+              "w": 70,
+              "wDisplay": "70",
+              "note": ""
+            }
+          ]
+        },
+        {
+          "canonicalName": "Incline Dumbbell Press",
+          "displayName": "Incline Dumbbell Press",
+          "name": "Incline Dumbbell Press",
+          "sets": [
+            {
+              "r": 10,
+              "w": 20,
+              "wDisplay": "20",
+              "note": ""
+            },
+            {
+              "r": 4,
+              "w": 27.5,
+              "wDisplay": "27.5",
+              "note": ""
+            },
+            {
+              "r": 3,
+              "w": 27.5,
+              "wDisplay": "27.5",
+              "note": ""
+            }
+          ]
+        },
+        {
+          "canonicalName": "Chest Fly",
+          "displayName": "Chest Fly",
+          "name": "Chest Fly",
+          "sets": [
+            {
+              "r": 12,
+              "w": 60,
+              "wDisplay": "60",
+              "note": ""
+            },
+            {
+              "r": 12,
+              "w": 60,
+              "wDisplay": "60",
+              "note": ""
+            },
+            {
+              "r": 15,
+              "w": 60,
+              "wDisplay": "60",
+              "note": ""
+            }
+          ]
+        },
+        {
+          "canonicalName": "barbell overhead press",
+          "displayName": "barbell overhead press",
+          "name": "barbell overhead press",
+          "sets": [
+            {
+              "r": 5,
+              "w": 5,
+              "wDisplay": "5",
+              "note": ""
+            },
+            {
+              "r": 5,
+              "w": 10,
+              "wDisplay": "10",
+              "note": ""
+            },
+            {
+              "r": 7,
+              "w": 7.5,
+              "wDisplay": "7.5",
+              "note": ""
+            },
+            {
+              "r": 10,
+              "w": 5,
+              "wDisplay": "5",
+              "note": ""
+            }
+          ]
+        },
+        {
+          "canonicalName": "Lateral Raise",
+          "displayName": "Lateral Raise",
+          "name": "Lateral Raise",
+          "sets": [
+            {
+              "r": 10,
+              "w": 12.5,
+              "wDisplay": "12.5",
+              "note": ""
+            },
+            {
+              "r": 10,
+              "w": 10,
+              "wDisplay": "10",
+              "note": ""
+            },
+            {
+              "r": 7,
+              "w": 7.5,
+              "wDisplay": "7.5",
+              "note": ""
+            },
+            {
+              "r": 8,
+              "w": 10,
+              "wDisplay": "10",
+              "note": ""
+            },
+            {
+              "r": 5,
+              "w": 7.5,
+              "wDisplay": "7.5",
+              "note": ""
+            },
+            {
+              "r": 10,
+              "w": 7.5,
+              "wDisplay": "7.5",
+              "note": ""
+            }
+          ]
+        },
+        {
+          "canonicalName": "Triceps Pushdown",
+          "displayName": "Triceps Pushdown",
+          "name": "Triceps Pushdown",
+          "sets": [
+            {
+              "r": 12,
+              "w": 54,
+              "wDisplay": "54",
+              "note": ""
+            },
+            {
+              "r": 10,
+              "w": 54,
+              "wDisplay": "54",
+              "note": ""
+            },
+            {
+              "r": 8,
+              "w": 54,
+              "wDisplay": "54",
+              "note": ""
+            },
+            {
+              "r": 10,
+              "w": 54,
+              "wDisplay": "54",
+              "note": ""
+            }
+          ]
+        }
+      ],
+      "notes": "",
+      "workoutFuel": "Sabah antrenmani, muz, cafein, cikolata ekmek",
+      "workoutName": "Push Day",
+      "workoutFocus": []
+    },
+    "2025-11-17": {
+      "dateISO": "2025-11-17",
+      "items": [
+        {
+          "canonicalName": "Pull Up",
+          "displayName": "Pull Up",
+          "name": "Pull Up",
+          "sets": [
+            {
+              "r": 7,
+              "w": 78,
+              "wDisplay": "BW",
+              "note": ""
+            },
+            {
+              "r": 5,
+              "w": 78,
+              "wDisplay": "BW",
+              "note": ""
+            }
+          ]
+        },
+        {
+          "canonicalName": "Lat Pulldown",
+          "displayName": "Lat Pulldown",
+          "name": "Lat Pulldown",
+          "sets": [
+            {
+              "r": 8,
+              "w": 72,
+              "wDisplay": "72",
+              "note": ""
+            },
+            {
+              "r": 8,
+              "w": 72,
+              "wDisplay": "72",
+              "note": ""
+            },
+            {
+              "r": 10,
+              "w": 72,
+              "wDisplay": "72",
+              "note": ""
+            }
+          ]
+        },
+        {
+          "canonicalName": "Cable Row",
+          "displayName": "Cable Row",
+          "name": "Cable Row",
+          "sets": [
+            {
+              "r": 10,
+              "w": 66,
+              "wDisplay": "66",
+              "note": ""
+            },
+            {
+              "r": 12,
+              "w": 60,
+              "wDisplay": "60",
+              "note": ""
+            },
+            {
+              "r": 12,
+              "w": 60,
+              "wDisplay": "60",
+              "note": ""
+            }
+          ]
+        },
+        {
+          "canonicalName": "Barbell Curl",
+          "displayName": "Barbell Curl",
+          "name": "Barbell Curl",
+          "sets": [
+            {
+              "r": 10,
+              "w": 7.5,
+              "wDisplay": "7.5",
+              "note": ""
+            },
+            {
+              "r": 10,
+              "w": 7.5,
+              "wDisplay": "7.5",
+              "note": ""
+            },
+            {
+              "r": 10,
+              "w": 7.5,
+              "wDisplay": "7.5",
+              "note": ""
+            },
+            {
+              "r": 10,
+              "w": 7.5,
+              "wDisplay": "7.5",
+              "note": ""
+            }
+          ]
+        },
+        {
+          "canonicalName": "Dumbbell Curl",
+          "displayName": "Dumbbell Curl",
+          "name": "Dumbbell Curl",
+          "sets": [
+            {
+              "r": 8,
+              "w": 15,
+              "wDisplay": "15",
+              "note": ""
+            },
+            {
+              "r": 8,
+              "w": 15,
+              "wDisplay": "15",
+              "note": ""
+            },
+            {
+              "r": 8,
+              "w": 15,
+              "wDisplay": "15",
+              "note": ""
+            }
+          ]
+        }
+      ],
+      "notes": "",
+      "workoutFuel": "",
+      "workoutName": "Pull Day",
+      "workoutFocus": []
+    },
+    "2025-11-19": {
+      "dateISO": "2025-11-19",
+      "items": [
+        {
+          "canonicalName": "Push Up",
+          "displayName": "Push Up",
+          "name": "Push Up",
+          "sets": [
+            {
+              "r": 20,
+              "w": 77,
+              "wDisplay": "BW",
+              "note": ""
+            },
+            {
+              "r": 20,
+              "w": 77,
+              "wDisplay": "BW",
+              "note": ""
+            },
+            {
+              "r": 12,
+              "w": 77,
+              "wDisplay": "BW",
+              "note": ""
+            }
+          ]
+        },
+        {
+          "canonicalName": "Incline Dumbbell Press",
+          "displayName": "Incline Dumbbell Press",
+          "name": "Incline Dumbbell Press",
+          "sets": [
+            {
+              "r": 10,
+              "w": 20,
+              "wDisplay": "20",
+              "note": ""
+            },
+            {
+              "r": 10,
+              "w": 20,
+              "wDisplay": "20",
+              "note": ""
+            },
+            {
+              "r": 10,
+              "w": 20,
+              "wDisplay": "20",
+              "note": ""
+            }
+          ]
+        },
+        {
+          "canonicalName": "Overhead Press",
+          "displayName": "Overhead Press",
+          "name": "Overhead Press",
+          "sets": [
+            {
+              "r": 6,
+              "w": 20,
+              "wDisplay": "20",
+              "note": ""
+            },
+            {
+              "r": 7,
+              "w": 20,
+              "wDisplay": "20",
+              "note": ""
+            },
+            {
+              "r": 5,
+              "w": 20,
+              "wDisplay": "20",
+              "note": ""
+            }
+          ]
+        },
+        {
+          "canonicalName": "Lateral Raise",
+          "displayName": "Lateral Raise",
+          "name": "Lateral Raise",
+          "sets": [
+            {
+              "r": 6,
+              "w": 12.5,
+              "wDisplay": "12.5",
+              "note": ""
+            },
+            {
+              "r": 4,
+              "w": 10,
+              "wDisplay": "10",
+              "note": ""
+            },
+            {
+              "r": 10,
+              "w": 10,
+              "wDisplay": "10",
+              "note": ""
+            },
+            {
+              "r": 12,
+              "w": 10,
+              "wDisplay": "10",
+              "note": ""
+            },
+            {
+              "r": 8,
+              "w": 10,
+              "wDisplay": "10",
+              "note": ""
+            },
+            {
+              "r": 5,
+              "w": 7.5,
+              "wDisplay": "7.5",
+              "note": ""
+            },
+            {
+              "r": 5,
+              "w": 5,
+              "wDisplay": "5",
+              "note": ""
+            }
+          ]
+        },
+        {
+          "canonicalName": "Dip",
+          "displayName": "Dip",
+          "name": "Dip",
+          "sets": [
+            {
+              "r": 8,
+              "w": 77,
+              "wDisplay": "BW",
+              "note": ""
+            },
+            {
+              "r": 10,
+              "w": 77,
+              "wDisplay": "BW",
+              "note": ""
+            },
+            {
+              "r": 10,
+              "w": 77,
+              "wDisplay": "BW",
+              "note": ""
+            }
+          ]
+        },
+        {
+          "canonicalName": "Chest Fly",
+          "displayName": "Chest Fly",
+          "name": "Chest Fly",
+          "sets": [
+            {
+              "r": 12,
+              "w": 66,
+              "wDisplay": "66",
+              "note": ""
+            },
+            {
+              "r": 10,
+              "w": 66,
+              "wDisplay": "66",
+              "note": ""
+            },
+            {
+              "r": 10,
+              "w": 60,
+              "wDisplay": "60",
+              "note": ""
+            }
+          ]
+        },
+        {
+          "canonicalName": "Rear Delt Fly",
+          "displayName": "Rear Delt Fly",
+          "name": "Rear Delt Fly",
+          "sets": [
+            {
+              "r": 12,
+              "w": 54,
+              "wDisplay": "54",
+              "note": ""
+            },
+            {
+              "r": 13,
+              "w": 54,
+              "wDisplay": "54",
+              "note": ""
+            },
+            {
+              "r": 12,
+              "w": 54,
+              "wDisplay": "54",
+              "note": ""
+            }
+          ]
+        },
+        {
+          "canonicalName": "Rope Pushdown",
+          "displayName": "Rope Pushdown",
+          "name": "Rope Pushdown",
+          "sets": [
+            {
+              "r": 12,
+              "w": 36,
+              "wDisplay": "36",
+              "note": ""
+            },
+            {
+              "r": 13,
+              "w": 30,
+              "wDisplay": "30",
+              "note": ""
+            },
+            {
+              "r": 10,
+              "w": 30,
+              "wDisplay": "30",
+              "note": ""
+            },
+            {
+              "r": 12,
+              "w": 30,
+              "wDisplay": "30",
+              "note": ""
+            }
+          ]
+        }
+      ],
+      "notes": "Kotu uyku , vucut sinir sistemi yorgun, futbol sonraki g├╝n",
+      "workoutFuel": "Kafein, dusuk karb",
+      "workoutName": "Push Day",
+      "workoutFocus": []
+    }
+  },
+  "bodyWeight": {
+    "2025-03-16": 79,
+    "2025-06-11": 75,
+    "2025-06-15": 75,
+    "2025-07-30": 75,
+    "2025-10-23": 74,
+    "2025-11-02": 74,
+    "2025-11-03": 75,
+    "2025-11-05": 77,
+    "2025-11-06": 77,
+    "2025-11-09": 76,
+    "2025-11-10": 76,
+    "2025-11-12": 77.5,
+    "2025-11-13": 78,
+    "2025-11-17": 78,
+    "2025-11-19": 77
+  },
+  "improvements": {
+    "1c221b5c-13cb-4556-8f6a-1ea75d958c4c": {
+      "content": "Bir yere yazi yazacagim zaman ekran yakinlasiyor ve oyle kaliyor. Ekran yakinlasmasin ayni sekilde kalsin",
+      "createdAt": 1763145152797,
+      "id": "1c221b5c-13cb-4556-8f6a-1ea75d958c4c",
+      "title": "Ekran hizalama problemi",
+      "updatedAt": 1763145152797
+    },
+    "491132a0-1282-4e2e-82b4-49a42bc62501": {
+      "content": "Ana sayfada bir egzersize bast─▒─ş─▒m zaman o egzersize ait setler ekrana gelsin ve ordan o gun yaptigim setleri degistirebilmeliyim ve set ekleyebileyim. Ve orda bir buton olsun bastigim zaman antrenman detayi sayfasina gitsin",
+      "createdAt": 1763573726414,
+      "id": "491132a0-1282-4e2e-82b4-49a42bc62501",
+      "title": "Set girme ekran─▒",
+      "updatedAt": 1763573726414
+    },
+    "8d10d21f-cd34-4198-8567-384bec5496b2": {
+      "content": "Bir yere bisey yazcam zaman ekran otomatik yaklasiyor ve duzelmiyor, egzersizleri tekrar sayilarini veya kg degistirirken 2 kez ard arda bastigim zaman ekran yakinlasiyor. Egzersiz ekle yerinde arama yaparken yazmaya basladigim zaman egzersizler assagi kayiyor ve goremiyorum. Sayfanin en ustunde olsun arama cubugu ve yazdikca hareket etmesin sayfa. Ekran hicbir sekilde yaklasmasin hep ayni boyutlarinda kalsin",
+      "createdAt": 1763289246122,
+      "id": "8d10d21f-cd34-4198-8567-384bec5496b2",
+      "title": "Mobilde ekran yakinlasmasi",
+      "updatedAt": 1763289275215
+    }
+  }
+}

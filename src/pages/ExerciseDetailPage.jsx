@@ -9,7 +9,7 @@ import {
   fromISO,
   normalizeExerciseName,
   getBodyWeightCollection,
-} from '../utils/storage';
+} from '../utils/storage-client';
 import { getExerciseInfo, MUSCLE_OPTIONS } from '../utils/exerciseMetadata';
 import { Area, AreaChart, CartesianGrid, Tooltip, ResponsiveContainer, XAxis, YAxis, ReferenceLine } from 'recharts';
 
@@ -296,15 +296,9 @@ export default function ExerciseDetailPage() {
       const r = Number(reps);
       
       if (!Number.isFinite(w) || w < 0 || !Number.isFinite(r) || r <= 0) return 0;
-
-      const isBodyWeight = BODYWEIGHT_KEYWORDS.some(kw => canonicalName.toLowerCase().includes(kw));
       
-      if (isBodyWeight) {
-        const dates = Object.keys(bodyWeights).sort();
-        const relevantDate = dates.filter(d => d <= dateISO).pop();
-        const bw = relevantDate ? bodyWeights[relevantDate] : 0;
-        if (bw > 0) w += bw;
-      }
+      // Removed double-counting bodyweight logic. 
+      // getSetWeight already returns the Total Mass (Weight + BW if applicable), so we shouldn't add it again.
 
       if (w === 0) return 0;
       return Number((w * (1 + r / 30)).toFixed(1));
@@ -337,9 +331,25 @@ export default function ExerciseDetailPage() {
 
         const maxWeight = Math.max(...validSets.map(s => s.weight));
         const sessionVolume = validSets.reduce((acc, s) => acc + (s.weight * s.reps), 0);
-        const sessionPeakOneRm = Math.max(...validSets.map(s => estimateOneRepMax(s.weight, s.reps, iso)));
+        
+        // OLD: Max 1RM of the session
+        // const sessionPeakOneRm = Math.max(...validSets.map(s => estimateOneRepMax(s.weight, s.reps, iso)));
+        
+        // NEW: Average 1RM of the session (Sum of all sets' 1RM / Set count)
+        const allOneRms = validSets.map(s => estimateOneRepMax(s.weight, s.reps, iso));
+        const sessionAvgOneRm = allOneRms.reduce((a, b) => a + b, 0) / allOneRms.length;
+
+        // For display consistency, we use the AVERAGED 1RM as the day's representative value
+        const sessionOneRmValue = Number(sessionAvgOneRm.toFixed(1));
+
+        // Note: For "Personal Record" (Hall of Fame), we might still want the PEAK performance? 
+        // User asked to determine "that day's 1RM", which usually implies the chart data points.
+        // However, usually PRs are "Peak" efforts.
+        // If we want to keep "Best Ever 1RM" as a PEAK value, we should calculate peak separately for the hall of fame.
+        const sessionPeakOneRm = Math.max(...allOneRms);
 
         // Check for PR
+
         let prStatus = 'none'; // 'new', 'equal', 'none'
         if (maxWeight > runningMaxWeight) {
           prStatus = 'new';
@@ -364,7 +374,7 @@ export default function ExerciseDetailPage() {
           when,
           maxWeight,
           totalVolume: sessionVolume,
-          oneRm: sessionPeakOneRm,
+          oneRm: sessionOneRmValue, // Using AVERAGE for charts & history list
           prStatus,
           sets: setsData,
           previousMax: runningMaxWeight // Snapshot of max before this workout (approx)
@@ -405,8 +415,8 @@ export default function ExerciseDetailPage() {
     let filteredHistoryForChart = historyData;
     const now = new Date();
     if (timeRange === 'weekly') {
-        const oneWeekAgo = new Date(now.getTime() - 7 * 24 * 60 * 60 * 1000);
-        filteredHistoryForChart = historyData.filter(h => h.when >= oneWeekAgo);
+        // "1H" (Weekly) now shows LAST 3 WORKOUTS regardless of date
+        filteredHistoryForChart = historyData.slice(-3);
     } else if (timeRange === 'monthly') {
         const oneMonthAgo = new Date(now.getTime() - 30 * 24 * 60 * 60 * 1000);
         filteredHistoryForChart = historyData.filter(h => h.when >= oneMonthAgo);
@@ -435,6 +445,11 @@ export default function ExerciseDetailPage() {
       chartData
     };
   }, [workouts, canonicalName, resolveBodyWeight, timeRange]);
+
+  const currentViewMax = useMemo(() => {
+    if (!chartData || chartData.length === 0) return 0;
+    return Math.max(...chartData.map(d => Number(d[chartMetric] || 0)));
+  }, [chartData, chartMetric]);
 
   if (isLoading) {
     return (
@@ -484,7 +499,7 @@ export default function ExerciseDetailPage() {
             <div className="relative overflow-hidden rounded-2xl border border-yellow-500/20 bg-gradient-to-br from-yellow-500/10 to-transparent p-3">
                  <div className="flex items-center gap-2">
                     <span className="material-symbols-outlined text-yellow-400 text-lg">emoji_events</span>
-                    <span className="text-[10px] font-bold uppercase tracking-wider text-yellow-200/70">En İyi (KG)</span>
+                    <span className="text-[10px] font-bold uppercase tracking-wider text-yellow-200/70">En İyi</span>
                  </div>
                  <p className="mt-1 text-xl font-bold text-yellow-400">{hallOfFame.maxWeight.value} kg</p>
                  {hallOfFame.maxWeight.date && (
@@ -501,7 +516,7 @@ export default function ExerciseDetailPage() {
                  </div>
                  {hallOfFame.oneRmTrend ? (
                     <>
-                        <p className={`mt-1 text-xl font-bold ${hallOfFame.oneRmTrend.percent >= 0 ? 'text-green-400' : 'text-red-400'}`}>
+                        <p className={`mt-1 text-xl font-bold ${hallOfFame.oneRmTrend.percent >= 0 ? 'text-blue-400' : 'text-red-400'}`}>
                             {hallOfFame.oneRmTrend.percent > 0 ? '+' : ''}{hallOfFame.oneRmTrend.percent}%
                         </p>
                         <p className="text-[10px] text-gray-500 mt-0.5">Son 3 antrenman ort.</p>
@@ -610,28 +625,17 @@ export default function ExerciseDetailPage() {
                   fill="url(#colorMetric)" 
                 />
                 {/* Reference Lines */}
-                {chartMetric === 'weight' && hallOfFame.maxWeight.value > 0 && (
+                {currentViewMax > 0 && (
                   <ReferenceLine 
-                    y={hallOfFame.maxWeight.value} 
-                    stroke="#FACC15" 
+                    y={currentViewMax} 
+                    stroke={chartMetric === 'weight' ? '#FACC15' : chartMetric === 'oneRm' ? '#F43F5E' : '#FFFFFF'} 
                     strokeDasharray="3 3" 
-                    label={{ value: 'Max Kilo', position: 'right', fill: '#FACC15', fontSize: 10 }} 
-                  />
-                )}
-                {chartMetric === 'oneRm' && hallOfFame.oneRm.value > 0 && (
-                  <ReferenceLine 
-                    y={hallOfFame.oneRm.value} 
-                    stroke="#F43F5E" 
-                    strokeDasharray="3 3" 
-                    label={{ value: 'Max Güç', position: 'right', fill: '#F43F5E', fontSize: 10 }} 
-                  />
-                )}
-                {chartMetric === 'volume' && hallOfFame.volume.value > 0 && (
-                  <ReferenceLine 
-                    y={hallOfFame.volume.value} 
-                    stroke="#FFFFFF" 
-                    strokeDasharray="3 3" 
-                    label={{ value: 'Max Hacim', position: 'right', fill: '#FFFFFF', fontSize: 10 }} 
+                    label={{ 
+                      value: timeRange === 'all' ? 'Genel Max' : 'Dönem Max', 
+                      position: 'right', 
+                      fill: chartMetric === 'weight' ? '#FACC15' : chartMetric === 'oneRm' ? '#F43F5E' : '#FFFFFF', 
+                      fontSize: 10 
+                    }} 
                   />
                 )}
               </AreaChart>

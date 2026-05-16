@@ -4,8 +4,8 @@
   "start_url": "/",
   "id": "/",
   "display": "standalone",
-  "background_color": "#0b1713",
-  "theme_color": "#0df293",
+  "background_color": "#0B1121",
+  "theme_color": "#3b82f6",
   "description": "Strength training tracker for logging workouts and progress.",
   "icons": [
     {

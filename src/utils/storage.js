@@ -81,6 +81,18 @@ export function normalizeExerciseName(name) {
 }
 
 const BODY_WEIGHT_KEYWORDS = ['body weight', 'bodyweight', 'bw', 'vücut ağırlığı', 'vucut ağırlığı'];
+const BODY_WEIGHT_EXERCISES = new Set([
+  'pull up',
+  'pull-up',
+  'chin up',
+  'chin-up',
+  'muscle up',
+  'muscle-up',
+  'dip',
+  'dips',
+  'push up',
+  'push-up',
+]);
 
 // =====================================================================
 // FIREBASE HELPER FUNCTIONS
@@ -100,7 +112,7 @@ let cachedData = {
   }
 };
 
-const CACHE_DURATION = 5000; // 5 saniye cache
+const CACHE_DURATION = 60000; // 60 saniye cache
 
 function getUserPath(key) {
   const user = auth.currentUser;
@@ -622,6 +634,7 @@ export async function renameExerciseEverywhere(oldName, newDisplayName, newCanon
 
   if (hasChanges) {
     await setFirebaseData(STORAGE.WORKOUTS, all);
+    updateCache(STORAGE.WORKOUTS, all);
   }
 }
 
@@ -719,8 +732,7 @@ export async function saveWorkout(workout) {
   // Body Weight değerini al
   const bodyWeightInfo = await getBodyWeightInfo(workout.dateISO);
   const bodyWeightKg = bodyWeightInfo.value || 0;
-  console.log('Body Weight:', bodyWeightKg, 'kg');
-
+  
   // Items'ı normalize et ve Body Weight setlerini gerçek değere çevir
   const normalizedItems = normalizeWorkoutItems((workout.items || []).map((it) => ({ ...it, dateISO: workout.dateISO })));
   
@@ -760,16 +772,30 @@ export async function saveWorkout(workout) {
     items: resolvedItems,
   };
 
-  console.log('Normalized workout:', normalizedWorkout);
+  // GRANULAR UPDATE: Sadece ilgili günü güncelle (Race condition ve performans için)
+  
+  // 1. Firebase Yazma (Sadece bu günü)
+  // users/{uid}/workouts/{dateISO}
+  try {
+    const workoutsPath = getUserPath(STORAGE.WORKOUTS);
+    const specificWorkoutPath = `${workoutsPath}/${normalizedWorkout.dateISO}`;
+    const dataRef = ref(database, specificWorkoutPath);
+    await set(dataRef, normalizedWorkout);
+    console.log('Granular save successful:', specificWorkoutPath);
+  } catch (error) {
+    console.error('Granular save failed:', error);
+    throw error;
+  }
 
-  const all = await getWorkouts();
-  console.log('Mevcut workouts sayısı:', Object.keys(all || {}).length);
-  
-  all[normalizedWorkout.dateISO] = normalizedWorkout;
-  console.log('Workout eklendi, yeni sayı:', Object.keys(all).length);
-  
-  await setFirebaseData(STORAGE.WORKOUTS, all);
-  console.log('Firebase\'e yazıldı:', normalizedWorkout.dateISO);
+  // 2. Cache Güncelleme
+  // Eğer workouts cache yüklenmişse, sadece ilgili günü güncelle
+  if (cachedData.workouts) {
+    cachedData.workouts[normalizedWorkout.dateISO] = normalizedWorkout;
+    // Partial update yaptığımız için cache hala geçerli ve güncel.
+    // Cache süresini uzatıyoruz ki hemen ardından yapılan okumalar (örn: sayfa geçişleri)
+    // gereksiz yere sunucuya gitmesin ve olası senkronizasyon gecikmelerinden etkilenmesin.
+    cachedData.lastFetch.workouts = Date.now();
+  }
 
   // PR güncellemeleri
   for (const it of normalizedWorkout.items) {
@@ -827,14 +853,20 @@ export function resolveWeightValue(weightInput, exerciseName, dateISO) {
   }
 
   const raw = typeof weightInput === 'string' ? weightInput.trim() : '';
-  if (!raw) {
-    return { value, display };
-  }
 
   const normalizedName = normalizeExerciseName(exerciseName || '');
+  const normalizedLower = normalizedName.toLowerCase();
   const lower = raw.toLowerCase();
   const isBodyWeightKeyword = BODY_WEIGHT_KEYWORDS.some((keyword) => lower.startsWith(keyword));
-  const isBodyWeightExercise = normalizedName.toLowerCase() === 'pull up';
+  const isBodyWeightExercise = BODY_WEIGHT_EXERCISES.has(normalizedLower);
+
+  if (!raw) {
+    // Bodyweight egzersizlerinde boş ağırlığı BW kabul et ki set silinmesin
+    if (isBodyWeightExercise) {
+      return { value: 0, display: 'BW' };
+    }
+    return { value, display };
+  }
 
   console.log('resolveWeightValue:', { 
     raw, 
@@ -879,9 +911,15 @@ export function resolveWeightValue(weightInput, exerciseName, dateISO) {
 }
 
 export async function deleteWorkout(dateISO) {
-  const all = await getWorkouts();
-  delete all[dateISO];
-  await setFirebaseData(STORAGE.WORKOUTS, all);
+  // GRANULAR DELETE: Sadece ilgili günü sil
+  const path = `${STORAGE.WORKOUTS}/${dateISO}`;
+  await removeFirebaseData(path);
+  
+  // Cache güncelleme
+  if (cachedData.workouts) {
+    // delete operatörü ile nesneden sil
+    delete cachedData.workouts[dateISO];
+  }
 }
 
 export async function exportAllData() {

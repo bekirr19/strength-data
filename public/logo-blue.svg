@@ -2,8 +2,8 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256">
   <defs>
     <linearGradient id="mark-bg" x1="0%" y1="0%" x2="100%" y2="100%">
-      <stop offset="0%" stop-color="#0b1713" />
-      <stop offset="100%" stop-color="#0f1f19" />
+      <stop offset="0%" stop-color="#0B1121" />
+      <stop offset="100%" stop-color="#1e3a8a" />
     </linearGradient>
     <filter id="mark-glow" x="-40%" y="-40%" width="180%" height="180%">
       <feGaussianBlur stdDeviation="4" result="glow" />
@@ -14,7 +14,7 @@
     </filter>
   </defs>
   <rect fill="url(#mark-bg)" width="256" height="256" rx="40" />
-  <g fill="none" stroke="#0df293" stroke-width="12" stroke-linecap="round" stroke-linejoin="round" filter="url(#mark-glow)">
+  <g fill="none" stroke="#3b82f6" stroke-width="12" stroke-linecap="round" stroke-linejoin="round" filter="url(#mark-glow)">
     <path d="M80 64v120M176 64v120" />
     <path d="M68 82h120" />
     <path d="M56 110h22M178 110h22" />

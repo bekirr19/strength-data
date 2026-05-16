@@ -2,23 +2,23 @@ export const WORKOUT_TYPE_META = {
   push: {
     label: 'PUSH',
     badgeLabel: 'Push Day',
-    buttonClass: 'bg-orange-600/30 text-orange-100 border border-orange-500/50 font-bold shadow-[0_0_15px_rgba(249,115,22,0.3)]',
-    badgeClass: 'bg-orange-500/20 text-orange-100 border border-orange-500/40 font-bold',
-    dotClass: 'bg-orange-500',
+    buttonClass: 'bg-push/20 text-push border border-push/50 font-bold shadow-[0_0_15px_rgba(249,115,22,0.3)]',
+    badgeClass: 'bg-push/20 text-push border border-push/40 font-bold',
+    dotClass: 'bg-push',
   },
   pull: {
     label: 'PULL',
     badgeLabel: 'Pull Day',
-    buttonClass: 'bg-blue-600/30 text-blue-100 border border-blue-500/50 font-bold shadow-[0_0_15px_rgba(59,130,246,0.3)]',
-    badgeClass: 'bg-blue-500/20 text-blue-100 border border-blue-500/40 font-bold',
-    dotClass: 'bg-blue-500',
+    buttonClass: 'bg-pull/20 text-pull border border-pull/50 font-bold shadow-[0_0_15px_rgba(59,130,246,0.3)]',
+    badgeClass: 'bg-pull/20 text-pull border border-pull/40 font-bold',
+    dotClass: 'bg-pull',
   },
   leg: {
     label: 'LEG',
     badgeLabel: 'Leg Day',
-    buttonClass: 'bg-emerald-600/30 text-emerald-100 border border-emerald-500/50 font-bold shadow-[0_0_15px_rgba(16,185,129,0.3)]',
-    badgeClass: 'bg-emerald-500/20 text-emerald-100 border border-emerald-500/40 font-bold',
-    dotClass: 'bg-emerald-500',
+    buttonClass: 'bg-leg/20 text-leg border border-leg/50 font-bold shadow-[0_0_15px_rgba(59,130,246,0.3)]',
+    badgeClass: 'bg-leg/20 text-leg border border-leg/40 font-bold',
+    dotClass: 'bg-leg',
   },
   // Combinations
   'pull-push': {
