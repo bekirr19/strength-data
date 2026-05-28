@@ -1034,8 +1034,10 @@ export default function WorkoutDetailPage() {
                         <div className="flex-1 h-8 bg-black/40 flex items-center justify-center rounded-md border border-white/5">
                           <input
                             type="text"
+                            inputMode="decimal"
                             value={set.w}
                             onChange={(e) => handleSetChange(exerciseIdx, setIdx, 'w', e.target.value)}
+                            onBlur={(e) => { if (e.target.value.trim() === '0') handleSetChange(exerciseIdx, setIdx, 'w', 'bw'); }}
                             className="w-full bg-transparent text-center text-white font-bold text-base focus:outline-none"
                             placeholder="0"
                             autoFocus={focusTarget?.exerciseIdx === exerciseIdx && focusTarget?.setIdx === setIdx && focusTarget?.field === 'w'}
@@ -1065,11 +1067,13 @@ export default function WorkoutDetailPage() {
                         </button>
                         <div className="flex-1 h-8 bg-black/40 flex items-center justify-center rounded-md border border-white/5">
                           <input
-                            type="number"
+                            type="text"
+                            inputMode="numeric"
                             value={set.r}
                             onChange={(e) => handleSetChange(exerciseIdx, setIdx, 'r', e.target.value)}
                             className="w-full bg-transparent text-center text-white font-bold text-base focus:outline-none"
                             placeholder="0"
+                            onFocus={(e) => e.target.select()}
                           />
                         </div>
                         <button
