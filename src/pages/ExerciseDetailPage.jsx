@@ -12,6 +12,7 @@ import {
 } from '../utils/storage-client';
 import { getExerciseInfo, MUSCLE_OPTIONS } from '../utils/exerciseMetadata';
 import { Area, AreaChart, CartesianGrid, Tooltip, ResponsiveContainer, XAxis, YAxis, ReferenceLine } from 'recharts';
+import ExerciseEditModal from '../components/ExerciseEditModal';
 
 const BODYWEIGHT_KEYWORDS = ['pull up', 'pull-up', 'chin up', 'chin-up', 'dip', 'dips', 'muscle up', 'muscle-up', 'barfix'];
 
@@ -36,7 +37,7 @@ export default function ExerciseDetailPage() {
   const [timeRange, setTimeRange] = useState('monthly'); // 'weekly' | 'monthly' | 'yearly' | 'all'
 
   // Edit Modal State
-  const [editForm, setEditForm] = useState({ name: '', category: 'other', muscles: [] });
+  const [editForm, setEditForm] = useState({ name: '', category: 'other', muscles: [], weightStep: 2.5 });
   const [editModalState, setEditModalState] = useState({
     isOpen: false,
     isNew: true,
@@ -84,6 +85,7 @@ export default function ExerciseDetailPage() {
         (Array.isArray(matchedExercise?.customMuscles) && matchedExercise.customMuscles.length > 0
           ? matchedExercise.customMuscles
           : info.muscles) || [],
+      weightStep: matchedExercise?.weightStep ?? 2.5,
     });
     setEditModalState({
       isOpen: true,
@@ -95,18 +97,8 @@ export default function ExerciseDetailPage() {
 
   const closeEditModal = () => {
     setEditModalState({ isOpen: false, isNew: true, editingKey: '', originalName: '' });
-    setEditForm({ name: '', category: 'other', muscles: [] });
+    setEditForm({ name: '', category: 'other', muscles: [], weightStep: 2.5 });
     setIsSavingEdit(false);
-  };
-
-  const toggleEditMuscle = (muscleKey) => {
-    setEditForm((prev) => {
-      const exists = prev.muscles.includes(muscleKey);
-      return {
-        ...prev,
-        muscles: exists ? prev.muscles.filter((m) => m !== muscleKey) : [...prev.muscles, muscleKey],
-      };
-    });
   };
 
   const handleExerciseEditSave = async () => {
@@ -125,6 +117,7 @@ export default function ExerciseDetailPage() {
     const newKey = normalizedNew.toLowerCase();
     const nextCategory = editForm.category || 'other';
     const nextMuscles = Array.isArray(editForm.muscles) ? editForm.muscles.filter(Boolean) : [];
+    const nextWeightStep = editForm.weightStep ?? 2.5;
 
     try {
       setIsSavingEdit(true);
@@ -152,6 +145,7 @@ export default function ExerciseDetailPage() {
           canonicalName: normalizedNew,
           customCategory: nextCategory,
           customMuscles: nextMuscles,
+          weightStep: nextWeightStep,
           createdAt: Date.now(),
           used: 0,
         });
@@ -166,6 +160,7 @@ export default function ExerciseDetailPage() {
             canonicalName: normalizedNew,
             customCategory: nextCategory,
             customMuscles: nextMuscles,
+            weightStep: nextWeightStep,
             createdAt: Date.now(),
             used: 0,
           });
@@ -177,6 +172,7 @@ export default function ExerciseDetailPage() {
             canonicalName: normalizedNew,
             customCategory: nextCategory,
             customMuscles: nextMuscles,
+            weightStep: nextWeightStep,
           };
         }
       }
@@ -696,72 +692,16 @@ export default function ExerciseDetailPage() {
       </main>
 
       {/* Edit Modal */}
-      {editModalState.isOpen && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 backdrop-blur-sm px-4">
-          <div className="w-full max-w-md rounded-2xl bg-[#1C1C1E] border border-white/10 p-6 shadow-2xl">
-            <h2 className="text-xl font-bold text-white mb-6">Egzersizi Düzenle</h2>
-            
-            <div className="space-y-4">
-              <div>
-                <label className="block text-xs font-bold text-gray-500 uppercase tracking-wider mb-2">İsim</label>
-                <input
-                  type="text"
-                  value={editForm.name}
-                  onChange={(e) => setEditForm(prev => ({ ...prev, name: e.target.value }))}
-                  className="w-full rounded-xl bg-black/40 border border-white/10 px-4 py-3 text-white focus:border-primary focus:outline-none focus:ring-1 focus:ring-primary"
-                />
-              </div>
-
-              <div>
-                <label className="block text-xs font-bold text-gray-500 uppercase tracking-wider mb-2">Kas Grupları</label>
-                <div className="flex flex-wrap gap-2">
-                  {MUSCLE_OPTIONS.map((option) => {
-                    const isSelected = editForm.muscles.includes(option.key);
-                    return (
-                      <button
-                        key={option.key}
-                        type="button"
-                        onClick={() => toggleEditMuscle(option.key)}
-                        className={`rounded-lg px-3 py-1.5 text-xs font-bold transition border ${
-                          isSelected
-                            ? 'bg-primary text-background-dark border-primary'
-                            : 'bg-white/5 text-gray-400 border-white/5 hover:bg-white/10'
-                        }`}
-                      >
-                        {option.label}
-                      </button>
-                    );
-                  })}
-                </div>
-              </div>
-            </div>
-
-            <div className="mt-8 flex gap-3">
-              {!editModalState.isNew && (
-                <button
-                  onClick={handleExerciseDelete}
-                  className="flex items-center justify-center rounded-xl bg-red-500/10 px-4 py-3 text-red-400 font-bold hover:bg-red-500/20 transition"
-                >
-                  <span className="material-symbols-outlined">delete</span>
-                </button>
-              )}
-              <button
-                onClick={closeEditModal}
-                className="flex-1 rounded-xl bg-white/5 px-4 py-3 font-bold text-white hover:bg-white/10 transition"
-              >
-                İptal
-              </button>
-              <button
-                onClick={handleExerciseEditSave}
-                disabled={isSavingEdit}
-                className="flex-1 rounded-xl bg-primary px-4 py-3 font-bold text-background-dark hover:bg-primary/90 transition"
-              >
-                {isSavingEdit ? 'Kaydediliyor...' : 'Kaydet'}
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
+      <ExerciseEditModal
+        isOpen={editModalState.isOpen}
+        title={editModalState.isNew ? 'Yeni Egzersiz' : 'Egzersizi Düzenle'}
+        form={editForm}
+        onChange={(partial) => setEditForm((prev) => ({ ...prev, ...partial }))}
+        onClose={closeEditModal}
+        onSave={handleExerciseEditSave}
+        onDelete={editModalState.isNew ? undefined : handleExerciseDelete}
+        isSaving={isSavingEdit}
+      />
     </div>
   );
 }

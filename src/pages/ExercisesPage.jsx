@@ -5,8 +5,8 @@ import {
   EXERCISE_CATEGORY_META,
   getExerciseInfo,
   SUGGESTED_EXERCISES,
-  MUSCLE_OPTIONS,
 } from '../utils/exerciseMetadata';
+import ExerciseEditModal from '../components/ExerciseEditModal';
 
 const canonicalNameFromParts = (canonical, name) => normalizeExerciseName(canonical || name || '');
 const canonicalKeyFromParts = (canonical, name) => canonicalNameFromParts(canonical, name).toLowerCase();
@@ -30,7 +30,7 @@ export default function ExercisesPage() {
   const [workouts, setWorkouts] = useState({});
   const [editingKey, setEditingKey] = useState(null);
   const [editingOriginalName, setEditingOriginalName] = useState('');
-  const [editForm, setEditForm] = useState({ name: '', category: 'other', muscles: [] });
+  const [editForm, setEditForm] = useState({ name: '', category: 'other', muscles: [], weightStep: 2.5 });
   const [isLoading, setIsLoading] = useState(true);
   const [isCreatingNew, setIsCreatingNew] = useState(false);
 
@@ -90,7 +90,7 @@ export default function ExercisesPage() {
   const closeEditor = () => {
     setEditingKey(null);
     setEditingOriginalName('');
-    setEditForm({ name: '', category: 'other', muscles: [] });
+    setEditForm({ name: '', category: 'other', muscles: [], weightStep: 2.5 });
     setIsCreatingNew(false);
   };
 
@@ -98,19 +98,7 @@ export default function ExercisesPage() {
     setIsCreatingNew(true);
     setEditingKey(null);
     setEditingOriginalName('');
-    setEditForm({ name: '', category: 'other', muscles: [] });
-  };
-
-  const toggleMuscle = (muscleKey) => {
-    setEditForm((prev) => {
-      const exists = prev.muscles.includes(muscleKey);
-      return {
-        ...prev,
-        muscles: exists
-          ? prev.muscles.filter((m) => m !== muscleKey)
-          : [...prev.muscles, muscleKey],
-      };
-    });
+    setEditForm({ name: '', category: 'other', muscles: [], weightStep: 2.5 });
   };
 
   const handleEditSave = async () => {
@@ -139,6 +127,7 @@ export default function ExercisesPage() {
     const nextMuscles = Array.isArray(editForm.muscles)
       ? editForm.muscles.filter((m) => m)
       : [];
+    const nextWeightStep = editForm.weightStep ?? 2.5;
 
     if (isCreatingNew) {
       const newEntry = {
@@ -147,6 +136,7 @@ export default function ExercisesPage() {
         canonicalName: normalizedNew,
         customCategory: nextCategory,
         customMuscles: nextMuscles,
+        weightStep: nextWeightStep,
         createdAt: Date.now(),
         used: 0,
       };
@@ -164,6 +154,7 @@ export default function ExercisesPage() {
           canonicalName: normalizedNew,
           customCategory: nextCategory,
           customMuscles: nextMuscles,
+          weightStep: nextWeightStep,
         };
       });
 
@@ -366,7 +357,7 @@ export default function ExercisesPage() {
         </div>
 
         {/* Exercise List */}
-        <div className="flex flex-col gap-2 md:gap-3 py-4">
+        <div className="flex flex-col gap-2 py-4">
           {orderedExercises.map(({ exercise, info }) => {
             const displayName = exercise.displayName || exercise.name;
             const canonicalName = canonicalNameFromParts(exercise.canonicalName, exercise.name);
@@ -374,48 +365,35 @@ export default function ExercisesPage() {
             const stat = exerciseStats[statsKey] || {};
             const meta = EXERCISE_CATEGORY_META[info.category] || EXERCISE_CATEGORY_META.other;
             const lastPerformedLabel = stat.lastPerformed
-              ? `Son: ${formatDateShort(stat.lastPerformed)}`
-              : 'Henüz kayıt yok';
+              ? formatDateShort(stat.lastPerformed)
+              : null;
             const usageLabel = stat.count > 0 ? `${stat.count} kayıt` : 'İlk kaydı ekle';
+            const metaParts = [usageLabel];
+            if (lastPerformedLabel) metaParts.push(`Son ${lastPerformedLabel}`);
 
             return (
               <button
                 type="button"
                 key={canonicalName}
                 onClick={() => navigate(`/exercise/${encodeURIComponent(displayName)}`)}
-                className="flex w-full items-center justify-between gap-3 md:gap-4 rounded-2xl border border-white/10 bg-white/5 px-3 py-3 md:px-4 md:py-4 text-left transition hover:border-primary/40 hover:bg-white/10"
+                className="group flex w-full items-center gap-3 rounded-2xl border border-white/5 bg-white/[0.03] px-4 py-3.5 text-left transition hover:border-white/10 hover:bg-white/[0.06]"
               >
-                <div className="flex flex-1 flex-col min-w-0 gap-2">
+                <div className="flex flex-1 flex-col min-w-0 gap-1">
                   <div className="flex items-center gap-2">
-                    <p className="font-medium text-white text-sm md:text-base truncate">{displayName}</p>
-                    <span className={`text-[10px] md:text-xs px-2 py-0.5 rounded-full ${meta.badgeClass}`}>
+                    <p className="font-semibold text-white text-sm md:text-base truncate">{displayName}</p>
+                    <span className={`shrink-0 text-[10px] px-2 py-0.5 rounded-full ${meta.badgeClass}`}>
                       {meta.label}
                     </span>
                   </div>
-                  <div className="flex flex-wrap gap-2 text-[11px] md:text-xs text-gray-300">
-                    <span className="inline-flex items-center gap-1 rounded-full bg-black/30 px-2 py-0.5">
-                      <span className="material-symbols-outlined text-[14px] text-primary">calendar_month</span>
-                      {lastPerformedLabel}
-                    </span>
-                    <span className="inline-flex items-center gap-1 rounded-full bg-black/30 px-2 py-0.5">
-                      <span className="material-symbols-outlined text-[14px] text-primary">fitness_center</span>
-                      {usageLabel}
-                    </span>
-                  </div>
-                  {info.muscleLabels.length > 0 && (
-                    <div className="flex flex-wrap gap-1.5">
-                      {info.muscleLabels.map((label) => (
-                        <span
-                          key={label}
-                          className="text-[10px] md:text-[11px] px-2 py-0.5 rounded-full bg-black/30 text-gray-200"
-                        >
-                          {label}
-                        </span>
-                      ))}
-                    </div>
-                  )}
+                  <p className="text-[11px] md:text-xs text-white/40 truncate">
+                    {metaParts.join(' · ')}
+                    {info.muscleLabels.length > 0 && (
+                      <span className="text-white/30"> · {info.muscleLabels.join(', ')}</span>
+                    )}
+                  </p>
                 </div>
-                <span className="material-symbols-outlined text-gray-200 text-lg md:text-xl flex-shrink-0">
+
+                <span className="material-symbols-outlined text-white/30 text-xl shrink-0 transition group-hover:translate-x-0.5 group-hover:text-white/60">
                   chevron_right
                 </span>
               </button>
@@ -423,8 +401,12 @@ export default function ExercisesPage() {
           })}
 
           {orderedExercises.length === 0 && (
-            <div className="text-center py-12 text-gray-400">
-              <p className="text-sm md:text-base">Egzersiz bulunamadı</p>
+            <div className="flex flex-col items-center justify-center py-16 text-center">
+              <div className="flex size-14 items-center justify-center rounded-2xl bg-white/[0.03] border border-white/5">
+                <span className="material-symbols-outlined text-2xl text-white/30">search_off</span>
+              </div>
+              <p className="mt-4 text-sm text-white/60">Egzersiz bulunamadı</p>
+              <p className="mt-1 text-xs text-white/30">Farklı bir arama veya filtre dene</p>
             </div>
           )}
         </div>
@@ -433,114 +415,21 @@ export default function ExercisesPage() {
       <button
         type="button"
         onClick={openNewExerciseModal}
-        className="fixed bottom-5 right-4 md:right-6 md:bottom-6 flex items-center gap-2 rounded-full bg-primary px-4 py-3 text-sm font-semibold text-background-dark shadow-lg shadow-primary/30 hover:bg-primary/90 transition"
+        className="fixed bottom-5 right-4 md:right-6 md:bottom-6 flex items-center gap-2 rounded-full bg-primary px-5 py-3.5 text-sm font-bold text-background-dark shadow-xl shadow-primary/30 hover:bg-primary/90 active:scale-[0.97] transition"
       >
-        <span className="material-symbols-outlined text-base">add</span>
+        <span className="material-symbols-outlined text-lg">add</span>
         Yeni Egzersiz
       </button>
 
-      {(editingKey || isCreatingNew) && (
-        <div className="fixed inset-0 z-50 flex flex-col justify-end bg-black/60">
-          <button type="button" className="absolute inset-0" onClick={closeEditor} aria-label="Modali kapat"></button>
-          <div className="relative w-full max-w-xl mx-auto rounded-t-3xl bg-background-dark border border-white/10 px-5 py-6 md:px-6 shadow-2xl">
-            <div className="mx-auto mb-4 h-1 w-12 rounded-full bg-white/20" aria-hidden></div>
-            <div className="flex items-center justify-between mb-2">
-              <div>
-                <p className="text-xs uppercase tracking-wide text-primary/70">
-                  {isCreatingNew ? 'Yeni Egzersiz' : 'Egzersiz Ayrıntıları'}
-                </p>
-                <h2 className="text-white text-lg md:text-xl font-semibold">
-                  {isCreatingNew ? 'Egzersiz Oluştur' : 'Egzersizi Düzenle'}
-                </h2>
-              </div>
-              <button type="button" onClick={closeEditor} className="text-gray-400 hover:text-white transition rounded-full p-1">
-                <span className="material-symbols-outlined text-2xl">close</span>
-              </button>
-            </div>
-
-            <div className="flex flex-col gap-4 mt-4">
-              <label className="flex flex-col gap-1">
-                <span className="text-sm text-gray-300">Egzersiz Adı</span>
-                <input
-                  value={editForm.name}
-                  onChange={(e) => setEditForm((prev) => ({ ...prev, name: e.target.value }))}
-                  className="rounded-lg border border-gray-700 bg-black/40 px-3 py-2 text-sm md:text-base text-white focus:outline-none focus:ring-2 focus:ring-primary"
-                />
-              </label>
-
-              <label className="flex flex-col gap-1">
-                <span className="text-sm text-gray-300">Etiket / Gün</span>
-                <select
-                  value={editForm.category}
-                  onChange={(e) => setEditForm((prev) => ({ ...prev, category: e.target.value }))}
-                  className="rounded-lg border border-gray-700 bg-black/40 px-3 py-2 text-sm md:text-base text-white focus:outline-none focus:ring-2 focus:ring-primary"
-                >
-                  {['push', 'pull', 'leg', 'other'].map((key) => (
-                    <option key={key} value={key}>
-                      {EXERCISE_CATEGORY_META[key].label} — {EXERCISE_CATEGORY_META[key].subtitle}
-                    </option>
-                  ))}
-                </select>
-              </label>
-
-              <div className="flex flex-col gap-2">
-                <span className="text-sm text-gray-300">Çalışan Kaslar</span>
-                <div className="grid grid-cols-2 gap-2">
-                  {MUSCLE_OPTIONS.map((option) => {
-                    const checked = editForm.muscles.includes(option.key);
-                    return (
-                      <label
-                        key={option.key}
-                        className={`flex items-center gap-2 rounded-lg border px-3 py-2 text-xs md:text-sm ${
-                          checked
-                            ? 'border-primary bg-primary/20 text-white'
-                            : 'border-gray-700 bg-black/40 text-gray-300'
-                        }`}
-                      >
-                        <input
-                          type="checkbox"
-                          checked={checked}
-                          onChange={() => toggleMuscle(option.key)}
-                          className="accent-primary"
-                        />
-                        <span>{option.label}</span>
-                      </label>
-                    );
-                  })}
-                </div>
-              </div>
-            </div>
-
-            <div className="mt-5 flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
-              {!isCreatingNew && (
-                <button
-                  type="button"
-                  onClick={handleDeleteExercise}
-                  className="rounded-lg border border-red-500/50 px-4 py-2 text-sm md:text-base font-semibold text-red-300 hover:bg-red-500/10 transition"
-                >
-                  Egzersizi Sil
-                </button>
-              )}
-              <div className="flex justify-end gap-3">
-                <button
-                  type="button"
-                  onClick={closeEditor}
-                  className="rounded-lg border border-gray-700 px-4 py-2 text-sm md:text-base font-semibold text-gray-300 hover:bg-gray-700/40 transition"
-                >
-                  İptal
-                </button>
-                <button
-                  type="button"
-                  onClick={handleEditSave}
-                  className="rounded-lg bg-primary px-4 py-2 text-sm md:text-base font-semibold text-background-dark hover:bg-primary/90 transition"
-                >
-                  Kaydet
-                </button>
-              </div>
-            </div>
-          </div>
-        </div>
-      )}
+      <ExerciseEditModal
+        isOpen={Boolean(editingKey || isCreatingNew)}
+        title={isCreatingNew ? 'Yeni Egzersiz' : 'Egzersizi Düzenle'}
+        form={editForm}
+        onChange={(partial) => setEditForm((prev) => ({ ...prev, ...partial }))}
+        onClose={closeEditor}
+        onSave={handleEditSave}
+        onDelete={isCreatingNew ? undefined : handleDeleteExercise}
+      />
     </div>
   );
 }

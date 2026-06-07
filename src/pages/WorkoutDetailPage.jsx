@@ -1,7 +1,8 @@
 import { useState, useEffect, useMemo, useRef } from 'react';
 import { useNavigate, useParams, useLocation } from 'react-router-dom';
 import { getWorkoutByDate, getWorkouts, saveWorkout, deleteWorkout, formatDateTRFull, resolveWeightValue, getExercises, saveExercises, renameExerciseEverywhere, normalizeExerciseName } from '../utils/storage-client';
-import { getExerciseInfo, EXERCISE_CATEGORY_META, MUSCLE_OPTIONS } from '../utils/exerciseMetadata';
+import { getExerciseInfo } from '../utils/exerciseMetadata';
+import ExerciseEditModal from '../components/ExerciseEditModal';
 
 const CATEGORY_ORDER = ['push', 'pull', 'leg', 'other'];
 
@@ -86,6 +87,7 @@ export default function WorkoutDetailPage() {
       name: '',
       category: 'other',
       muscles: [],
+      weightStep: 2.5,
     },
   });
   const [isSavingExerciseEdit, setIsSavingExerciseEdit] = useState(false);
@@ -466,6 +468,7 @@ export default function WorkoutDetailPage() {
         name: baseName,
         category,
         muscles,
+        weightStep: match?.weightStep ?? 2.5,
       },
     });
   };
@@ -480,6 +483,7 @@ export default function WorkoutDetailPage() {
         name: '',
         category: 'other',
         muscles: [],
+        weightStep: 2.5,
       },
     });
     setIsSavingExerciseEdit(false);
@@ -494,18 +498,6 @@ export default function WorkoutDetailPage() {
           ...prev.form,
           ...nextForm,
         },
-      };
-    });
-  };
-
-  const toggleExerciseEditMuscle = (muscleKey) => {
-    updateExerciseEditForm((prevForm) => {
-      const exists = prevForm.muscles.includes(muscleKey);
-      return {
-        ...prevForm,
-        muscles: exists
-          ? prevForm.muscles.filter((m) => m !== muscleKey)
-          : [...prevForm.muscles, muscleKey],
       };
     });
   };
@@ -534,6 +526,7 @@ export default function WorkoutDetailPage() {
     const muscles = Array.isArray(editExerciseModal.form.muscles)
       ? editExerciseModal.form.muscles.filter(Boolean)
       : [];
+    const weightStep = editExerciseModal.form.weightStep ?? 2.5;
 
     try {
       setIsSavingExerciseEdit(true);
@@ -563,6 +556,7 @@ export default function WorkoutDetailPage() {
           canonicalName: normalized,
           customCategory: category,
           customMuscles: muscles,
+          weightStep,
           createdAt: Date.now(),
           used: 0,
         });
@@ -574,6 +568,7 @@ export default function WorkoutDetailPage() {
           canonicalName: normalized,
           customCategory: category,
           customMuscles: muscles,
+          weightStep,
         };
       }
 
@@ -968,7 +963,11 @@ export default function WorkoutDetailPage() {
           </div>
         </div>
         <div className="flex flex-col gap-4 md:gap-6">
-          {sortedItems.map(({ item, idx: exerciseIdx }, loopIdx) => (
+          {sortedItems.map(({ item, idx: exerciseIdx }, loopIdx) => {
+            const itemKey = canonicalKeyFromParts(item.canonicalName, item.displayName || item.name);
+            const libEntry = exerciseLibrary.find((e) => canonicalKeyFromParts(e.canonicalName, e.name) === itemKey);
+            const weightStep = libEntry?.weightStep ?? 2.5;
+            return (
             <div key={exerciseIdx} className="rounded-3xl bg-[#1C1C1E] p-5 shadow-lg border border-white/5">
               {/* Header */}
               <div className="flex items-start justify-between mb-6">
@@ -1026,7 +1025,7 @@ export default function WorkoutDetailPage() {
                       <div className="flex items-center gap-1">
                         <button
                           type="button"
-                          onClick={() => handleSetChange(exerciseIdx, setIdx, 'w', adjustWeight(set.w, -2.5))}
+                          onClick={() => handleSetChange(exerciseIdx, setIdx, 'w', adjustWeight(set.w, -weightStep))}
                           className="flex items-center justify-center w-7 h-8 rounded-md bg-white/5 text-gray-400 hover:text-white hover:bg-white/10 transition"
                         >
                           <span className="material-symbols-outlined text-base">remove</span>
@@ -1046,7 +1045,7 @@ export default function WorkoutDetailPage() {
                         </div>
                         <button
                           type="button"
-                          onClick={() => handleSetChange(exerciseIdx, setIdx, 'w', adjustWeight(set.w, 2.5))}
+                          onClick={() => handleSetChange(exerciseIdx, setIdx, 'w', adjustWeight(set.w, weightStep))}
                           className="flex items-center justify-center w-7 h-8 rounded-md bg-white/5 text-gray-400 hover:text-white hover:bg-white/10 transition"
                         >
                           <span className="material-symbols-outlined text-base">add</span>
@@ -1108,7 +1107,8 @@ export default function WorkoutDetailPage() {
                 Yeni Set Ekle
               </button>
             </div>
-          ))}
+            );
+          })}
         </div>
 
         <div className="mt-4 mb-2">
@@ -1152,104 +1152,14 @@ export default function WorkoutDetailPage() {
         </div>
       </main>
 
-      {editExerciseModal.isOpen && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 backdrop-blur-sm px-4">
-          <div className="w-full max-w-md rounded-3xl bg-[#1C1C1E] border border-white/10 p-6 shadow-2xl">
-            <div className="flex items-center justify-between mb-6">
-              <h2 className="text-white text-xl font-bold">Egzersizi Düzenle</h2>
-              <button
-                type="button"
-                onClick={closeExerciseEditModal}
-                className="text-gray-400 hover:text-white transition p-1 hover:bg-white/5 rounded-full"
-              >
-                <span className="material-symbols-outlined text-2xl">close</span>
-              </button>
-            </div>
-
-            <div className="flex flex-col gap-5">
-              <label className="flex flex-col gap-2">
-                <span className="text-xs font-bold text-gray-500 uppercase tracking-widest">Egzersiz Adı</span>
-                <input
-                  value={editExerciseModal.form.name}
-                  onChange={(e) => updateExerciseEditForm({ name: e.target.value })}
-                  className="rounded-xl border border-white/10 bg-black/40 px-4 py-3 text-base text-white focus:outline-none focus:ring-2 focus:ring-primary placeholder:text-gray-600"
-                  placeholder="Egzersiz adı girin"
-                />
-              </label>
-
-              <label className="flex flex-col gap-2">
-                <span className="text-xs font-bold text-gray-500 uppercase tracking-widest">Etiket / Gün</span>
-                <div className="relative">
-                  <select
-                    value={editExerciseModal.form.category}
-                    onChange={(e) => updateExerciseEditForm({ category: e.target.value })}
-                    className="w-full appearance-none rounded-xl border border-white/10 bg-black/40 px-4 py-3 text-base text-white focus:outline-none focus:ring-2 focus:ring-primary"
-                  >
-                    {['push', 'pull', 'leg', 'other'].map((key) => (
-                      <option key={key} value={key} className="bg-[#1C1C1E]">
-                        {EXERCISE_CATEGORY_META[key]?.label || key}
-                      </option>
-                    ))}
-                  </select>
-                  <span className="material-symbols-outlined absolute right-4 top-1/2 -translate-y-1/2 text-gray-400 pointer-events-none">
-                    expand_more
-                  </span>
-                </div>
-              </label>
-
-              <div className="flex flex-col gap-2">
-                <span className="text-xs font-bold text-gray-500 uppercase tracking-widest">Çalışan Kaslar</span>
-                <div className="grid grid-cols-2 gap-2 max-h-48 overflow-y-auto pr-1 custom-scrollbar">
-                  {MUSCLE_OPTIONS.map((option) => {
-                    const checked = editExerciseModal.form.muscles.includes(option.key);
-                    return (
-                      <label
-                        key={option.key}
-                        className={`flex items-center gap-3 rounded-xl border px-3 py-2.5 text-sm cursor-pointer transition ${
-                          checked
-                            ? 'border-primary bg-primary/10 text-white'
-                            : 'border-white/5 bg-black/40 text-gray-400 hover:bg-white/5'
-                        }`}
-                      >
-                        <div className={`flex items-center justify-center size-5 rounded border ${
-                          checked ? 'bg-primary border-primary' : 'border-gray-600 bg-transparent'
-                        }`}>
-                          {checked && <span className="material-symbols-outlined text-sm text-black font-bold">check</span>}
-                        </div>
-                        <input
-                          type="checkbox"
-                          checked={checked}
-                          onChange={() => toggleExerciseEditMuscle(option.key)}
-                          className="hidden"
-                        />
-                        <span className="font-medium">{option.label}</span>
-                      </label>
-                    );
-                  })}
-                </div>
-              </div>
-            </div>
-
-            <div className="mt-8 flex justify-end gap-3">
-              <button
-                type="button"
-                onClick={closeExerciseEditModal}
-                className="rounded-xl border border-white/10 px-6 py-3 text-sm font-bold text-gray-300 hover:bg-white/5 transition"
-              >
-                İptal
-              </button>
-              <button
-                type="button"
-                onClick={handleExerciseEditSave}
-                disabled={isSavingExerciseEdit}
-                className="rounded-xl bg-primary px-6 py-3 text-sm font-bold text-background-dark hover:bg-primary/90 disabled:cursor-not-allowed disabled:opacity-60 transition shadow-lg shadow-primary/20"
-              >
-                {isSavingExerciseEdit ? 'Kaydediliyor...' : 'Kaydet'}
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
+      <ExerciseEditModal
+        isOpen={editExerciseModal.isOpen}
+        form={editExerciseModal.form}
+        onChange={updateExerciseEditForm}
+        onClose={closeExerciseEditModal}
+        onSave={handleExerciseEditSave}
+        isSaving={isSavingExerciseEdit}
+      />
 
       {isPickerOpen && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 backdrop-blur-sm p-4">

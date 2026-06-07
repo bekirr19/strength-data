@@ -5,7 +5,6 @@ import { useAuth } from '../contexts/AuthContext';
 import { toISODate, formatDateTRFull, fromISO, turkishWeekdays, turkishWeekdaysShort, getWorkouts, getBodyWeightInfo, saveBodyWeight, clearBodyWeight, saveWorkout, resolveWeightValue, getExercises, normalizeExerciseName } from '../utils/storage-client';
 import WeekStrip from '../components/WeekStrip';
 import CalendarModal from '../components/CalendarModal';
-import ImportWorkoutModal from '../components/ImportWorkoutModal';
 import BodyWeightModal from '../components/BodyWeightModal';
 import LoadingSpinner from '../components/LoadingSpinner';
 import { detectWorkoutType, WORKOUT_TYPE_META } from '../utils/workoutTypes';
@@ -75,7 +74,6 @@ export default function MainPage() {
   }, [selectedDate]);
 
   const [isCalendarOpen, setIsCalendarOpen] = useState(false);
-  const [isImportOpen, setIsImportOpen] = useState(false);
   const [isProfileMenuOpen, setIsProfileMenuOpen] = useState(false);
   const [showWelcomeToast, setShowWelcomeToast] = useState(false);
   const [refreshKey, setRefreshKey] = useState(0);
@@ -577,7 +575,7 @@ export default function MainPage() {
       touchStateRef.current.active = false;
       return;
     }
-    if (isCalendarOpen || isImportOpen || isWeightEditorOpen) {
+    if (isCalendarOpen || isWeightEditorOpen) {
       touchStateRef.current.active = false;
       return;
     }
@@ -1133,63 +1131,58 @@ export default function MainPage() {
             </section>
           </div>
         ) : (
-          <div className="flex flex-col gap-4 animate-slide-in">
-            <section className="rounded-3xl border border-dashed border-white/15 bg-black/20 px-6 py-10 md:py-14 text-center shadow-inner shadow-black/20">
-              <div className="flex justify-center mb-4">
-                <span className="material-symbols-outlined text-4xl text-white/40">fitness_center</span>
-              </div>
-              <p className="text-sm md:text-base text-white/70">Bu gün için antrenman kaydı yok</p>
-              <p className="text-[12px] md:text-xs text-white/40 mt-1">Yeni bir antrenman planlamak için aşağıdaki seçenekleri kullan.</p>
-              <div className="mt-6 flex flex-col sm:flex-row justify-center gap-3">
-                <button
-                  onClick={() => navigate(`/workout/${selectedDate}`)}
-                  className="flex items-center justify-center gap-2 rounded-2xl bg-blue-500 px-5 md:px-6 py-2.5 md:py-3 font-semibold text-white shadow-lg shadow-blue-500/30 hover:bg-blue-600 transition text-sm md:text-base"
-                >
-                  <span className="material-symbols-outlined text-lg md:text-xl">add</span>
-                  Manuel Ekle
-                </button>
-                <button
-                  onClick={() => setIsImportOpen(true)}
-                  className="flex items-center justify-center gap-2 rounded-2xl border border-white/15 bg-white/5 px-5 md:px-6 py-2.5 md:py-3 font-semibold text-white hover:border-primary/40 hover:text-primary transition text-sm md:text-base"
-                >
-                  <span className="material-symbols-outlined text-lg md:text-xl">upload_file</span>
-                  JSON ile Ekle
-                </button>
-              </div>
-              <div className="mt-6 flex justify-center">
-                {renderBodyWeightBadge()}
-              </div>
-            </section>
+          <div className="flex flex-col items-center justify-center px-6 py-16 md:py-24 text-center animate-slide-in">
+            <div className="flex size-16 items-center justify-center rounded-2xl bg-white/[0.03] border border-white/5">
+              <span className="material-symbols-outlined text-3xl text-white/30">fitness_center</span>
+            </div>
+            <p className="mt-5 text-base font-semibold text-white/80">Bu gün için kayıt yok</p>
+            <p className="mt-1 text-xs text-white/40">Antrenmanını ekleyerek başla</p>
+
+            <button
+              onClick={() => navigate(`/workout/${selectedDate}`)}
+              className="mt-8 flex items-center justify-center gap-2 rounded-full bg-blue-500 px-7 py-3 font-bold text-white shadow-lg shadow-blue-500/25 hover:bg-blue-600 active:scale-[0.98] transition"
+            >
+              <span className="material-symbols-outlined text-xl">add</span>
+              Manuel Ekle
+            </button>
+
+            <div className="mt-4">
+              {renderBodyWeightBadge()}
+            </div>
           </div>
         )}
       </main>
 
-      {/* Bottom Nav - Mobile Only */}
-      <nav className="fixed bottom-4 left-4 right-4 z-20 flex flex-row items-center gap-3 md:bottom-6 md:left-6 md:right-6">
-        <button
-          type="button"
-          onClick={handleGoToday}
-          className="flex h-12 w-12 items-center justify-center rounded-full border border-white/10 bg-[#1C1C1E] text-gray-300 shadow-lg shadow-black/40 hover:bg-white/10 hover:text-white transition"
-          aria-label="Bugün'e git"
-        >
-          <span className="material-symbols-outlined text-xl">today</span>
-        </button>
-        
-        <button
-          onClick={() => navigate('/exercises')}
-          className="flex h-12 w-12 items-center justify-center rounded-full border border-white/10 bg-[#1C1C1E] text-gray-300 shadow-lg shadow-black/40 hover:bg-white/10 hover:text-white transition"
-          aria-label="Egzersizler"
-        >
-          <span className="material-symbols-outlined text-xl">list_alt</span>
-        </button>
+      {/* Bottom Nav */}
+      <nav className="fixed bottom-4 left-4 right-4 z-20 md:bottom-6 md:left-1/2 md:right-auto md:w-full md:max-w-md md:-translate-x-1/2">
+        <div className="flex items-center gap-1.5 rounded-full border border-white/10 bg-[#1C1C1E]/80 p-1.5 shadow-2xl shadow-black/60 backdrop-blur-xl">
+          <button
+            type="button"
+            onClick={handleGoToday}
+            className="flex h-11 w-11 shrink-0 items-center justify-center rounded-full text-gray-300 hover:bg-white/10 hover:text-white active:scale-95 transition"
+            aria-label="Bugün'e git"
+          >
+            <span className="material-symbols-outlined text-xl">today</span>
+          </button>
 
-        <button
-          onClick={openExercisePicker}
-          className="inline-flex flex-1 items-center justify-center gap-2 rounded-full bg-blue-500 text-white px-6 py-3 font-bold shadow-xl shadow-blue-500/25 hover:shadow-blue-500/40 hover:bg-blue-600 transition text-base"
-        >
-          <span className="material-symbols-outlined text-2xl">add</span>
-          <span>Egzersiz Ekle</span>
-        </button>
+          <button
+            type="button"
+            onClick={() => navigate('/exercises')}
+            className="flex h-11 w-11 shrink-0 items-center justify-center rounded-full text-gray-300 hover:bg-white/10 hover:text-white active:scale-95 transition"
+            aria-label="Egzersizler"
+          >
+            <span className="material-symbols-outlined text-xl">list_alt</span>
+          </button>
+
+          <button
+            type="button"
+            onClick={openExercisePicker}
+            className="inline-flex flex-1 items-center justify-center gap-2 rounded-full bg-blue-500 text-white px-6 py-3 font-bold shadow-lg shadow-blue-500/30 hover:bg-blue-600 active:scale-[0.98] transition text-base"
+          >
+            <span className="material-symbols-outlined text-2xl">add</span>
+            <span>Egzersiz Ekle</span>
+          </button>
+        </div>
       </nav>
 
       {/* Calendar Modal */}
@@ -1289,16 +1282,6 @@ export default function MainPage() {
         </div>
       )}
 
-      {/* Import Modal */}
-      <ImportWorkoutModal
-        isOpen={isImportOpen}
-        onClose={() => setIsImportOpen(false)}
-        selectedDate={selectedDate}
-        onSuccess={() => {
-          setIsImportOpen(false);
-          setRefreshKey(prev => prev + 1);
-        }}
-      />
 
       {/* Body Weight Modal */}
       <BodyWeightModal
@@ -1312,7 +1295,11 @@ export default function MainPage() {
       />
 
       {/* Quick Edit Modal */}
-      {editingExercise && (
+      {editingExercise && (() => {
+        const qeKey = (editingExercise.data.canonicalName || normalizeExerciseName(editingExercise.data.displayName || editingExercise.data.name || '')).toLowerCase();
+        const qeLibEntry = exerciseLibrary.find((e) => (e.canonicalName || normalizeExerciseName(e.name || '')).toLowerCase() === qeKey);
+        const qeWeightStep = qeLibEntry?.weightStep ?? 2.5;
+        return (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 backdrop-blur-sm px-4">
           <div className="w-full max-w-md rounded-3xl bg-[#1C1C1E] border border-white/10 p-5 shadow-2xl max-h-[90vh] overflow-y-auto custom-scrollbar relative">
             
@@ -1365,7 +1352,7 @@ export default function MainPage() {
                     <div className="flex items-center gap-1">
                       <button
                         type="button"
-                        onClick={() => handleQuickEditSetChange(setIdx, 'w', adjustWeight(set.w, -2.5))}
+                        onClick={() => handleQuickEditSetChange(setIdx, 'w', adjustWeight(set.w, -qeWeightStep))}
                         className="flex items-center justify-center w-7 h-8 rounded-md bg-white/5 text-gray-400 hover:text-white hover:bg-white/10 transition"
                       >
                         <span className="material-symbols-outlined text-base">remove</span>
@@ -1373,6 +1360,7 @@ export default function MainPage() {
                       <div className="flex-1 h-8 bg-black/40 flex items-center justify-center rounded-md border border-white/5">
                         <input
                           type="text"
+                          inputMode="decimal"
                           value={set.w}
                           onChange={(e) => handleQuickEditSetChange(setIdx, 'w', e.target.value)}
                           className="w-full bg-transparent text-center text-white font-bold text-base focus:outline-none"
@@ -1383,7 +1371,7 @@ export default function MainPage() {
                       </div>
                       <button
                         type="button"
-                        onClick={() => handleQuickEditSetChange(setIdx, 'w', adjustWeight(set.w, 2.5))}
+                        onClick={() => handleQuickEditSetChange(setIdx, 'w', adjustWeight(set.w, qeWeightStep))}
                         className="flex items-center justify-center w-7 h-8 rounded-md bg-white/5 text-gray-400 hover:text-white hover:bg-white/10 transition"
                       >
                         <span className="material-symbols-outlined text-base">add</span>
@@ -1404,11 +1392,13 @@ export default function MainPage() {
                       </button>
                       <div className="flex-1 h-8 bg-black/40 flex items-center justify-center rounded-md border border-white/5">
                         <input
-                          type="number"
+                          type="text"
+                          inputMode="numeric"
                           value={set.r}
                           onChange={(e) => handleQuickEditSetChange(setIdx, 'r', e.target.value)}
                           className="w-full bg-transparent text-center text-white font-bold text-base focus:outline-none"
                           placeholder="0"
+                          onFocus={(e) => e.target.select()}
                         />
                       </div>
                       <button
@@ -1464,7 +1454,8 @@ export default function MainPage() {
             </div>
           </div>
         </div>
-      )}
+        );
+      })()}
     </div>
   );
 }
