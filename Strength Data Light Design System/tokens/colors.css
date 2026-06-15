@@ -1,0 +1,84 @@
+/* ============================================================
+   Strength Data — Color tokens
+   Light, clean, blue-accented. Base palette + semantic aliases.
+   ============================================================ */
+:root {
+  /* ---- Neutrals (slate/gray) ---- */
+  --white: #ffffff;
+  --gray-50: #f7f8fa;   /* app / page background */
+  --gray-100: #f1f3f5;  /* recessed fills, hover */
+  --gray-150: #eceef1;  /* track fills */
+  --gray-200: #e5e7eb;  /* hairline borders */
+  --gray-300: #d1d5db;  /* strong borders, disabled text */
+  --gray-400: #9ca3af;  /* placeholder, muted icons */
+  --gray-500: #6b7280;  /* secondary text */
+  --gray-600: #4b5563;  /* body on tinted surfaces */
+  --gray-700: #374151;  /* strong body */
+  --gray-900: #1f2937;  /* primary text (slate) */
+
+  /* ---- Primary (blue) ---- */
+  --blue-50: #eff6ff;
+  --blue-100: #dbeafe;
+  --blue-200: #bfdbfe;
+  --blue-400: #60a5fa;
+  --blue-500: #3b82f6;  /* primary accent */
+  --blue-600: #2563eb;  /* primary pressed / links */
+  --blue-700: #1d4ed8;  /* text-on-tint */
+
+  /* ---- Category accents ---- */
+  --push-500: #f97316;  /* orange */
+  --push-700: #c2410b;
+  --push-tint: #fff3eb;
+
+  --pull-500: #3b82f6;  /* blue */
+  --pull-700: #1d4ed8;
+  --pull-tint: #eff6ff;
+
+  --leg-500: #6366f1;   /* indigo — a distinct, subtle blue for leg day */
+  --leg-700: #4338ca;
+  --leg-tint: #eef0ff;
+
+  --other-500: #9ca3af; /* gray */
+  --other-700: #4b5563;
+  --other-tint: #f3f4f6;
+
+  /* ---- Status / records ---- */
+  --gold-500: #f59e0b;  /* new PR */
+  --gold-tint: #fffbeb;
+  --cyan-500: #06b6d4;  /* tied PR */
+  --cyan-tint: #ecfeff;
+  --green-500: #16a34a; /* positive trend / success */
+  --green-tint: #f0fdf4;
+  --red-500: #ef4444;   /* destructive / negative trend */
+  --red-600: #dc2626;
+  --red-tint: #fef2f2;
+
+  /* ============================================================
+     Semantic aliases — reference these in components
+     ============================================================ */
+  /* Surfaces */
+  --surface-page: var(--gray-50);
+  --surface-card: var(--white);
+  --surface-sunken: var(--gray-100);
+  --surface-hover: var(--gray-100);
+
+  /* Text */
+  --text-primary: var(--gray-900);
+  --text-secondary: var(--gray-500);
+  --text-tertiary: var(--gray-400);
+  --text-on-accent: var(--white);
+  --text-link: var(--blue-600);
+
+  /* Borders */
+  --border-subtle: var(--gray-200);
+  --border-strong: var(--gray-300);
+  --border-focus: var(--blue-500);
+
+  /* Accent */
+  --accent: var(--blue-500);
+  --accent-hover: var(--blue-600);
+  --accent-tint: var(--blue-50);
+
+  /* Focus ring */
+  --ring: rgba(59, 130, 246, 0.35);
+}

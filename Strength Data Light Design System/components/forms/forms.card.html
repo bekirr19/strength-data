@@ -1,0 +1,71 @@
+<!-- @dsCard group="Components" viewport="700x230" name="Forms" subtitle="Input · segmented control · stepper" -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<link rel="stylesheet" href="../../styles.css" />
+<style>
+  body { margin: 0; padding: 24px; background: var(--surface-page); }
+  .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 18px 24px; align-items: start; }
+  .label { font-size: var(--text-3xs); font-weight: 700; text-transform: uppercase; letter-spacing: .12em; color: var(--text-tertiary); margin-bottom: 8px; }
+  .stack { display: flex; flex-direction: column; gap: 10px; }
+</style>
+</head>
+<body>
+<div id="root"></div>
+<script src="https://unpkg.com/react@18.3.1/umd/react.production.min.js"></script>
+<script src="https://unpkg.com/react-dom@18.3.1/umd/react-dom.production.min.js"></script>
+<script src="https://unpkg.com/@babel/standalone@7.29.0/babel.min.js"></script>
+<script src="https://unpkg.com/lucide@0.460.0/dist/umd/lucide.min.js"></script>
+<script src="../../_ds_bundle.js"></script>
+<script type="text/babel" data-presets="react">
+  const { Input, SegmentedControl, Stepper, IconButton } = window.StrengthDataDesignSystem_5c629b;
+  const I = (name, size = 18) => {
+    const n = lucide[name];
+    let svg = '';
+    if (n && Array.isArray(n)) {
+      const a = { ...n[1], width: size, height: size, 'stroke-width': 2 };
+      const at = Object.entries(a).map(([k, v]) => k + '="' + v + '"').join(' ');
+      const kids = (n[2] || []).map(c => '<' + c[0] + ' ' + Object.entries(c[1]).map(([k, v]) => k + '="' + v + '"').join(' ') + '/>').join('');
+      svg = '<svg ' + at + '>' + kids + '</svg>';
+    }
+    return <span dangerouslySetInnerHTML={{ __html: svg }} style={{ display: 'inline-flex' }} />;
+  };
+  function Demo() {
+    const [metric, setMetric] = React.useState('1RM');
+    const [range, setRange] = React.useState('1m');
+    const [w, setW] = React.useState('60');
+    const [r, setR] = React.useState('8');
+    const [show, setShow] = React.useState(false);
+    return (
+      <div className="grid">
+        <div>
+          <div className="label">Inputs</div>
+          <div className="stack">
+            <Input icon={I('Mail')} placeholder="Email address" />
+            <Input type={show ? 'text' : 'password'} icon={I('Lock')} value="strongpass"
+              trailing={<IconButton ariaLabel="Toggle" variant="ghost" size="sm" onClick={() => setShow(s => !s)}>{I(show ? 'EyeOff' : 'Eye')}</IconButton>} />
+            <Input icon={I('Search')} placeholder="Search exercises…" />
+          </div>
+        </div>
+        <div>
+          <div className="label">Segmented &amp; stepper</div>
+          <div className="stack">
+            <SegmentedControl options={['Weight','1RM','Volume']} value={metric} onChange={setMetric} />
+            <SegmentedControl size="sm" fill={false}
+              options={[{value:'1w',label:'1W'},{value:'1m',label:'1M'},{value:'1y',label:'1Y'},{value:'all',label:'All'}]}
+              value={range} onChange={setRange} />
+            <div style={{ display: 'flex', gap: 10 }}>
+              <Stepper label="kg" value={w} onDecrement={() => setW(String(+w - 2.5))} onIncrement={() => setW(String(+w + 2.5))} onChange={e => setW(e.target.value)} />
+              <Stepper label="Reps" value={r} onDecrement={() => setR(String(Math.max(0, +r - 1)))} onIncrement={() => setR(String(+r + 1))} onChange={e => setR(e.target.value)} />
+            </div>
+          </div>
+        </div>
+      </div>
+    );
+  }
+  ReactDOM.createRoot(document.getElementById('root')).render(<Demo />);
+</script>
+</body>
+</html>

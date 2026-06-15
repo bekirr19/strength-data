@@ -1,0 +1,24 @@
+<!-- @dsCard group="Spacing" viewport="700x170" name="Spacing Scale" subtitle="4px base — gaps & padding from space-1 to space-12" -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<link rel="stylesheet" href="../styles.css" />
+<style>
+  body { margin: 0; padding: 22px; background: var(--surface-card); font-family: var(--font-sans); }
+  .row { display: flex; align-items: center; gap: 12px; padding: 4px 0; }
+  .name { width: 70px; font-size: 0.625rem; font-weight: 700; color: var(--text-primary); }
+  .bar { height: 14px; background: var(--accent); border-radius: 3px; }
+  .val { font-size: 0.5625rem; color: var(--text-secondary); font-variant-numeric: tabular-nums; }
+</style>
+</head>
+<body>
+  <div class="row"><div class="name">space-1</div><div class="bar" style="width:4px"></div><div class="val">4px</div></div>
+  <div class="row"><div class="name">space-2</div><div class="bar" style="width:8px"></div><div class="val">8px</div></div>
+  <div class="row"><div class="name">space-3</div><div class="bar" style="width:12px"></div><div class="val">12px · chip gaps</div></div>
+  <div class="row"><div class="name">space-4</div><div class="bar" style="width:16px"></div><div class="val">16px · card padding</div></div>
+  <div class="row"><div class="name">space-6</div><div class="bar" style="width:24px"></div><div class="val">24px · card padding (lg)</div></div>
+  <div class="row"><div class="name">space-8</div><div class="bar" style="width:32px"></div><div class="val">32px · section gaps</div></div>
+  <div class="row"><div class="name">space-12</div><div class="bar" style="width:48px"></div><div class="val">48px</div></div>
+</body>
+</html>

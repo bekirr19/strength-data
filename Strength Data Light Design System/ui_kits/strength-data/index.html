@@ -1,0 +1,86 @@
+<!-- @dsCard group="Strength Data App" viewport="480x880" name="Strength Data — App Kit" subtitle="Interactive light-theme PWA: login, today, workout, exercises, detail, profile" -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Strength Data — UI Kit</title>
+<link rel="stylesheet" href="../../styles.css" />
+<style>
+  body { margin: 0; background: var(--surface-page); font-family: var(--font-sans); }
+  .stage { min-height: 100vh; display: flex; flex-direction: column; align-items: center; gap: 16px; padding: 22px 16px 36px; box-sizing: border-box; }
+  .switcher { display: flex; flex-wrap: wrap; gap: 6px; justify-content: center; max-width: 440px; }
+  .switcher button { height: 32px; padding: 0 12px; border-radius: var(--radius-full); border: 1px solid var(--border-subtle); background: var(--surface-card); color: var(--text-secondary); font-family: var(--font-sans); font-size: var(--text-xs); font-weight: 700; cursor: pointer; transition: all var(--dur-fast) var(--ease-standard); }
+  .switcher button.active { background: var(--accent); border-color: var(--accent); color: #fff; box-shadow: var(--shadow-accent-sm); }
+  .phone { width: 414px; max-width: 100%; height: 820px; background: #fff; border-radius: 44px; border: 1px solid var(--border-subtle); box-shadow: var(--shadow-xl); padding: 12px; box-sizing: border-box; position: relative; }
+  .notch { position: absolute; top: 12px; left: 50%; transform: translateX(-50%); width: 126px; height: 26px; background: #fff; border-bottom-left-radius: 14px; border-bottom-right-radius: 14px; z-index: 50; }
+  .notch::after { content: ''; position: absolute; top: 9px; left: 50%; transform: translateX(-50%); width: 46px; height: 5px; border-radius: 3px; background: var(--gray-200); }
+  .screen { width: 100%; height: 100%; border-radius: 32px; overflow: hidden; position: relative; background: var(--surface-page); }
+  @media (max-width: 460px) {
+    .phone { border-radius: 0; height: 760px; padding: 0; border: none; box-shadow: var(--shadow-md); }
+    .screen { border-radius: 0; }
+    .notch { display: none; }
+  }
+</style>
+</head>
+<body>
+<div class="stage">
+  <div class="switcher" id="switcher"></div>
+  <div class="phone">
+    <div class="notch"></div>
+    <div class="screen" id="screen"></div>
+  </div>
+</div>
+
+<script src="https://unpkg.com/react@18.3.1/umd/react.production.min.js"></script>
+<script src="https://unpkg.com/react-dom@18.3.1/umd/react-dom.production.min.js"></script>
+<script src="https://unpkg.com/@babel/standalone@7.29.0/babel.min.js"></script>
+<script src="https://unpkg.com/lucide@0.460.0/dist/umd/lucide.min.js"></script>
+<script src="../../_ds_bundle.js"></script>
+<script type="text/babel" data-presets="react" src="data.jsx"></script>
+<script type="text/babel" data-presets="react" src="Chart.jsx"></script>
+<script type="text/babel" data-presets="react" src="screens-auth-today.jsx"></script>
+<script type="text/babel" data-presets="react" src="screens-workout-exercises.jsx"></script>
+<script type="text/babel" data-presets="react" src="screens-detail-profile.jsx"></script>
+<script type="text/babel" data-presets="react">
+  const SCREENS = [
+    ['today', 'Today', 'TodayScreen'],
+    ['workout', 'Workout', 'WorkoutDetailScreen'],
+    ['exercises', 'Exercises', 'ExercisesScreen'],
+    ['detail', 'Exercise Detail', 'ExerciseDetailScreen'],
+    ['profile', 'Profile', 'ProfileScreen'],
+    ['login', 'Login', 'LoginScreen'],
+  ];
+  const KEY = 'sd_kit_screen';
+
+  function App() {
+    const [screen, setScreen] = React.useState(() => {
+      try { return localStorage.getItem(KEY) || 'today'; } catch { return 'today'; }
+    });
+    const go = React.useCallback((s) => {
+      setScreen(s);
+      try { localStorage.setItem(KEY, s); } catch {}
+    }, []);
+    const nav = React.useMemo(() => ({ go }), [go]);
+
+    React.useEffect(() => {
+      const sw = document.getElementById('switcher');
+      sw.innerHTML = '';
+      SCREENS.forEach(([key, label]) => {
+        const b = document.createElement('button');
+        b.textContent = label;
+        b.className = key === screen ? 'active' : '';
+        b.onclick = () => go(key);
+        sw.appendChild(b);
+      });
+    }, [screen, go]);
+
+    const entry = SCREENS.find((s) => s[0] === screen) || SCREENS[0];
+    const Comp = window[entry[2]];
+    return Comp ? <Comp nav={nav} /> : null;
+  }
+
+  ReactDOM.createRoot(document.getElementById('screen')).render(<App />);
+</script>
+</body>
+</html>

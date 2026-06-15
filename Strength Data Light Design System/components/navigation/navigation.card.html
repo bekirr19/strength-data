@@ -1,0 +1,71 @@
+<!-- @dsCard group="Components" viewport="700x250" name="Navigation" subtitle="Floating bottom nav · week-strip day cells" -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<link rel="stylesheet" href="../../styles.css" />
+<style>
+  body { margin: 0; padding: 24px; background: var(--surface-page); }
+  .label { font-size: var(--text-3xs); font-weight: 700; text-transform: uppercase; letter-spacing: .12em; color: var(--text-tertiary); margin-bottom: 10px; }
+  .strip { display: flex; gap: 8px; overflow-x: auto; padding-bottom: 4px; margin-bottom: 22px; }
+</style>
+</head>
+<body>
+<div id="root"></div>
+<script src="https://unpkg.com/react@18.3.1/umd/react.production.min.js"></script>
+<script src="https://unpkg.com/react-dom@18.3.1/umd/react-dom.production.min.js"></script>
+<script src="https://unpkg.com/@babel/standalone@7.29.0/babel.min.js"></script>
+<script src="https://unpkg.com/lucide@0.460.0/dist/umd/lucide.min.js"></script>
+<script src="../../_ds_bundle.js"></script>
+<script type="text/babel" data-presets="react">
+  const { BottomNav, WeekDay } = window.StrengthDataDesignSystem_5c629b;
+  const I = (name, size = 20) => {
+    const n = lucide[name];
+    let svg = '';
+    if (n && Array.isArray(n)) {
+      const a = { ...n[1], width: size, height: size, 'stroke-width': 2 };
+      const at = Object.entries(a).map(([k, v]) => k + '="' + v + '"').join(' ');
+      const kids = (n[2] || []).map(c => '<' + c[0] + ' ' + Object.entries(c[1]).map(([k, v]) => k + '="' + v + '"').join(' ') + '/>').join('');
+      svg = '<svg ' + at + '>' + kids + '</svg>';
+    }
+    return <span dangerouslySetInnerHTML={{ __html: svg }} style={{ display: 'inline-flex' }} />;
+  };
+  function Demo() {
+    const [tab, setTab] = React.useState('today');
+    const [sel, setSel] = React.useState(14);
+    const days = [
+      { wd: 'Mon', d: 11, cat: 'push' },
+      { wd: 'Tue', d: 12, cat: null },
+      { wd: 'Wed', d: 13, cat: 'pull' },
+      { wd: 'Thu', d: 14, cat: 'leg', cap: 'Leg' },
+      { wd: 'Fri', d: 15, cat: null },
+      { wd: 'Sat', d: 16, cat: 'other' },
+      { wd: 'Sun', d: 17, cat: null, today: true },
+    ];
+    return (
+      <div>
+        <div className="label">Week strip</div>
+        <div className="strip">
+          {days.map(x => (
+            <WeekDay key={x.d} weekday={x.wd} day={x.d} category={x.cat} caption={x.cap}
+              selected={sel === x.d} today={x.today} onClick={() => setSel(x.d)} />
+          ))}
+        </div>
+        <div className="label">Bottom navigation</div>
+        <BottomNav
+          activeKey={tab}
+          onSelect={setTab}
+          items={[
+            { key: 'today', label: 'Today', icon: I('CalendarDays') },
+            { key: 'exercises', label: 'Exercises', icon: I('ListChecks') },
+          ]}
+          primary={{ label: 'Add Exercise', icon: I('Plus', 22) }}
+        />
+      </div>
+    );
+  }
+  ReactDOM.createRoot(document.getElementById('root')).render(<Demo />);
+</script>
+</body>
+</html>
