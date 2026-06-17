@@ -4,7 +4,7 @@ import { useAuth } from '../contexts/AuthContext';
 import { exportAllData, getLastSyncAt } from '../utils/storage-client';
 import { ArrowLeft, Lock, Trash2, Download, Upload, ChevronRight, ChevronUp, Sparkles, LogOut, ShieldCheck, CircleCheck, CircleAlert } from 'lucide-react';
 import ImportWorkoutModal from '../components/ImportWorkoutModal';
-import Wrapped2025Modal from '../components/Wrapped2025Modal';
+import YearInReviewModal from '../components/YearInReviewModal';
 import { IconButton } from '../ds/components/buttons/IconButton';
 import { Button } from '../ds/components/buttons/Button';
 import { Input } from '../ds/components/forms/Input';
@@ -195,7 +195,8 @@ export default function ProfilePage() {
         onSuccess={() => { setIsImportOpen(false); push({ tone: 'success', title: 'Imported', message: 'Your data was restored.' }); }}
       />
 
-      <Wrapped2025Modal isOpen={isWrappedOpen} onClose={() => setIsWrappedOpen(false)} />
+      <YearInReviewModal isOpen={isWrappedOpen} onClose={() => setIsWrappedOpen(false)} />
     </div>
   );
 }
+
