@@ -1,0 +1,56 @@
+<!-- @dsCard group="Components" viewport="700x230" name="Animated Numbers & Workout Types" subtitle="Count-up AnimatedNumber · all 8 WorkoutTypeBadge variants" -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<link rel="stylesheet" href="../../styles.css" />
+<style>
+  body { margin: 0; padding: 20px; background: var(--surface-page); }
+  .label { font-size: var(--text-3xs); font-weight: 700; text-transform: uppercase; letter-spacing: .12em; color: var(--text-tertiary); margin: 0 0 10px; }
+  .row { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; margin-bottom: 18px; }
+  .stat { display: flex; flex-direction: column; align-items: center; gap: 2px; padding: 10px 16px; background: var(--surface-card); border: 1px solid var(--border-subtle); border-radius: var(--radius-lg); }
+  .sl { font-size: var(--text-3xs); font-weight: 700; text-transform: uppercase; letter-spacing: .08em; color: var(--text-tertiary); }
+</style>
+</head>
+<body>
+<div id="root"></div>
+<script src="https://unpkg.com/react@18.3.1/umd/react.production.min.js"></script>
+<script src="https://unpkg.com/react-dom@18.3.1/umd/react-dom.production.min.js"></script>
+<script src="https://unpkg.com/@babel/standalone@7.29.0/babel.min.js"></script>
+<script src="../../_ds_bundle.js"></script>
+<script type="text/babel" data-presets="react">
+  const { AnimatedNumber, WorkoutTypeBadge } = window.StrengthDataDesignSystem_5c629b;
+  function Demo() {
+    const [v, setV] = React.useState(4320);
+    React.useEffect(() => {
+      const t = setInterval(() => setV(v => v + Math.floor(Math.random()*500)), 2200);
+      return () => clearInterval(t);
+    }, []);
+    return (
+      <div>
+        <p className="label">AnimatedNumber — live count-up on change</p>
+        <div className="row">
+          <div className="stat"><div className="sl">Volume</div><div style={{fontSize:'var(--text-2xl)',fontWeight:800,color:'var(--text-primary)'}}><AnimatedNumber value={v} suffix=" kg" /></div></div>
+          <div className="stat"><div className="sl">1RM</div><div style={{fontSize:'var(--text-2xl)',fontWeight:800,color:'var(--leg-500)'}}><AnimatedNumber value={124} decimals={1} suffix=" kg" duration={1200} /></div></div>
+          <div className="stat"><div className="sl">Trend</div><div style={{fontSize:'var(--text-2xl)',fontWeight:800,color:'var(--green-500)'}}><AnimatedNumber value={4} prefix="+" suffix="%" /></div></div>
+          <div className="stat"><div className="sl">Workouts</div><div style={{fontSize:'var(--text-2xl)',fontWeight:800,color:'var(--text-primary)'}}><AnimatedNumber value={137} /></div></div>
+        </div>
+        <p className="label">WorkoutTypeBadge — all 8 variants</p>
+        <div className="row">
+          {[['push'],['pull'],['leg'],['other'],['push','pull'],['leg','push'],['leg','pull'],['push','pull','leg']].map((f,i) => (
+            <WorkoutTypeBadge key={i} focus={f} dot />
+          ))}
+        </div>
+        <div className="row">
+          {[['push'],['pull'],['leg'],['other'],['push','pull'],['leg','push'],['leg','pull'],['push','pull','leg']].map((f,i) => (
+            <WorkoutTypeBadge key={i} focus={f} size="sm" />
+          ))}
+        </div>
+      </div>
+    );
+  }
+  ReactDOM.createRoot(document.getElementById('root')).render(<Demo />);
+</script>
+</body>
+</html>

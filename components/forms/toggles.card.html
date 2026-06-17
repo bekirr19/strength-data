@@ -1,0 +1,57 @@
+<!-- @dsCard group="Components" viewport="700x200" name="Toggles & Chips" subtitle="Switch · FilterChip category pills · multi-select muscle chips" -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<link rel="stylesheet" href="../../styles.css" />
+<style>
+  body { margin: 0; padding: 20px; background: var(--surface-page); }
+  .label { font-size: var(--text-3xs); font-weight: 700; text-transform: uppercase; letter-spacing: .12em; color: var(--text-tertiary); margin: 0 0 10px; }
+  .row { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; margin-bottom: 18px; }
+  .pair { display: flex; align-items: center; gap: 10px; font-size: var(--text-sm); font-weight: 600; color: var(--text-primary); }
+</style>
+</head>
+<body>
+<div id="root"></div>
+<script src="https://unpkg.com/react@18.3.1/umd/react.production.min.js"></script>
+<script src="https://unpkg.com/react-dom@18.3.1/umd/react-dom.production.min.js"></script>
+<script src="https://unpkg.com/@babel/standalone@7.29.0/babel.min.js"></script>
+<script src="../../_ds_bundle.js"></script>
+<script type="text/babel" data-presets="react">
+  const { Switch, FilterChip } = window.StrengthDataDesignSystem_5c629b;
+  function Demo() {
+    const [sw1, setSw1] = React.useState(true);
+    const [sw2, setSw2] = React.useState(false);
+    const [cat, setCat] = React.useState('push');
+    const [muscles, setMuscles] = React.useState(new Set(['Chest','Shoulders']));
+    const tog = m => setMuscles(s => { const n = new Set(s); n.has(m) ? n.delete(m) : n.add(m); return n; });
+    const MUSCLES = ['Chest','Shoulders','Triceps','Biceps','Back','Lats','Rear Delts','Legs','Quads','Hamstrings','Glutes','Core'];
+    return (
+      <div>
+        <p className="label">Switch</p>
+        <div className="row">
+          <div className="pair"><Switch checked={sw1} onChange={setSw1} ariaLabel="Toggle A" />Notifications</div>
+          <div className="pair"><Switch checked={sw2} onChange={setSw2} ariaLabel="Toggle B" size="sm" />Compact</div>
+          <div className="pair"><Switch checked={true} disabled ariaLabel="Disabled" />Disabled (on)</div>
+        </div>
+        <p className="label">Category filter chips</p>
+        <div className="row">
+          {['all','push','pull','leg','other'].map(k => (
+            <FilterChip key={k} label={k === 'all' ? 'All' : k.charAt(0).toUpperCase()+k.slice(1)} active={cat===k} onClick={() => setCat(k)}
+              accent={k==='push'?'var(--push-500)':k==='pull'?'var(--pull-500)':k==='leg'?'var(--leg-500)':k==='other'?'var(--other-500)':null} />
+          ))}
+        </div>
+        <p className="label">Muscle multi-select</p>
+        <div className="row">
+          {MUSCLES.map(m => (
+            <FilterChip key={m} label={m} size="sm" active={muscles.has(m)} onClick={() => tog(m)} />
+          ))}
+        </div>
+      </div>
+    );
+  }
+  ReactDOM.createRoot(document.getElementById('root')).render(<Demo />);
+</script>
+</body>
+</html>

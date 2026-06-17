@@ -1,0 +1,66 @@
+<!-- @dsCard group="Components" viewport="700x260" name="Buttons" subtitle="Primary, secondary, ghost, danger · icon · FAB" -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<link rel="stylesheet" href="../../styles.css" />
+<style>
+  body { margin: 0; padding: 24px; background: var(--surface-page); }
+  .row { display: flex; flex-wrap: wrap; align-items: center; gap: 12px; margin-bottom: 16px; }
+  .row:last-child { margin-bottom: 0; }
+  .label { width: 100%; font-size: var(--text-3xs); font-weight: 700; text-transform: uppercase; letter-spacing: .12em; color: var(--text-tertiary); margin-bottom: 2px; }
+</style>
+</head>
+<body>
+<div id="root"></div>
+<script src="https://unpkg.com/react@18.3.1/umd/react.production.min.js"></script>
+<script src="https://unpkg.com/react-dom@18.3.1/umd/react-dom.production.min.js"></script>
+<script src="https://unpkg.com/@babel/standalone@7.29.0/babel.min.js"></script>
+<script src="https://unpkg.com/lucide@0.460.0/dist/umd/lucide.min.js"></script>
+<script src="../../_ds_bundle.js"></script>
+<script type="text/babel" data-presets="react">
+  const { Button, IconButton, Fab } = window.StrengthDataDesignSystem_5c629b;
+  const I = (name, size = 18) => {
+    const n = lucide[name];
+    let svg = '';
+    if (n && Array.isArray(n)) {
+      const a = { ...n[1], width: size, height: size, 'stroke-width': 2 };
+      const at = Object.entries(a).map(([k, v]) => k + '="' + v + '"').join(' ');
+      const kids = (n[2] || []).map(c => '<' + c[0] + ' ' + Object.entries(c[1]).map(([k, v]) => k + '="' + v + '"').join(' ') + '/>').join('');
+      svg = '<svg ' + at + '>' + kids + '</svg>';
+    }
+    return <span dangerouslySetInnerHTML={{ __html: svg }} style={{ display: 'inline-flex' }} />;
+  };
+  function Demo() {
+    return (
+      <div>
+        <div className="row">
+          <div className="label">Variants</div>
+          <Button variant="primary" icon={I('Plus')}>Add Exercise</Button>
+          <Button variant="secondary">Cancel</Button>
+          <Button variant="ghost">Skip</Button>
+          <Button variant="danger" icon={I('Trash2', 16)}>Delete</Button>
+          <Button variant="primary" disabled>Disabled</Button>
+        </div>
+        <div className="row">
+          <div className="label">Sizes</div>
+          <Button size="sm" variant="primary">Small</Button>
+          <Button size="md" variant="primary">Medium</Button>
+          <Button size="lg" variant="primary" trailingIcon={I('ArrowRight', 16)}>Large</Button>
+        </div>
+        <div className="row">
+          <div className="label">Icon &amp; floating</div>
+          <IconButton ariaLabel="Edit" variant="soft">{I('Pencil')}</IconButton>
+          <IconButton ariaLabel="Close" variant="outline" shape="circle">{I('X', 20)}</IconButton>
+          <IconButton ariaLabel="Add" variant="accent">{I('Plus')}</IconButton>
+          <Fab extended icon={I('Plus', 22)}>Add Exercise</Fab>
+          <Fab icon={I('Plus', 22)} ariaLabel="New" />
+        </div>
+      </div>
+    );
+  }
+  ReactDOM.createRoot(document.getElementById('root')).render(<Demo />);
+</script>
+</body>
+</html>

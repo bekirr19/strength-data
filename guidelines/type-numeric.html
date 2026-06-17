@@ -1,0 +1,23 @@
+<!-- @dsCard group="Type" viewport="700x150" name="Numeric — Tabular" subtitle="Tabular figures for weights, reps, dates & charts (.sd-tnum)" -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<link rel="stylesheet" href="../styles.css" />
+<style>
+  body { margin: 0; padding: 22px; background: var(--surface-card); font-family: var(--font-sans); color: var(--text-primary); }
+  .grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 14px; }
+  .cell { border: 1px solid var(--border-subtle); border-radius: var(--radius-lg); padding: 14px 16px; }
+  .lab { font-size: 0.625rem; font-weight: 700; text-transform: uppercase; letter-spacing: .08em; color: var(--text-tertiary); margin-bottom: 6px; }
+  .big { font-size: var(--text-2xl); font-weight: 800; letter-spacing: -.01em; }
+  .stack { display: flex; flex-direction: column; gap: 2px; font-size: var(--text-sm); font-weight: 600; }
+</style>
+</head>
+<body>
+  <div class="grid">
+    <div class="cell"><div class="lab">Weight</div><div class="big sd-tnum">102.5 kg</div></div>
+    <div class="cell"><div class="lab">Reps × Weight</div><div class="stack sd-tnum"><span>12 × 60</span><span>8 × 80</span><span>6 × 100</span></div></div>
+    <div class="cell"><div class="lab">1RM / Volume</div><div class="stack sd-tnum"><span>1RM&nbsp; 124.0 kg</span><span>Vol&nbsp; 4,320 kg</span><span>+4% trend</span></div></div>
+  </div>
+</body>
+</html>

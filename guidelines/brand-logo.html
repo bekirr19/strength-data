@@ -1,0 +1,37 @@
+<!-- @dsCard group="Brand" viewport="700x200" name="Logo & Lockup" subtitle="App icon, inline blue mark & wordmark on light" -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<link rel="stylesheet" href="../styles.css" />
+<style>
+  body { margin: 0; padding: 26px 24px; background: var(--surface-card); font-family: var(--font-sans); }
+  .row { display: flex; align-items: center; gap: 40px; }
+  .item { display: flex; flex-direction: column; align-items: flex-start; gap: 10px; }
+  .cap { font-size: 0.625rem; font-weight: 700; text-transform: uppercase; letter-spacing: .08em; color: var(--text-tertiary); }
+  .lockup { display: flex; align-items: center; gap: 10px; }
+  .word { font-size: var(--text-xl); font-weight: 800; letter-spacing: -.02em; color: var(--text-primary); }
+  .word .data { color: var(--accent); }
+  .onpage { background: var(--surface-page); border: 1px solid var(--border-subtle); border-radius: var(--radius-lg); padding: 14px 18px; }
+</style>
+</head>
+<body>
+  <div class="row">
+    <div class="item">
+      <img src="../assets/mark-app.svg" alt="App icon" width="64" height="64" style="border-radius:18px;box-shadow:var(--shadow-md)" />
+      <div class="cap">App icon</div>
+    </div>
+    <div class="item">
+      <img src="../assets/logo-blue.svg" alt="Original mark" width="64" height="64" style="border-radius:18px;box-shadow:var(--shadow-md)" />
+      <div class="cap">Original mark</div>
+    </div>
+    <div class="item">
+      <div class="onpage lockup">
+        <img src="../assets/mark-blue.svg" alt="Mark" width="34" height="34" />
+        <span class="word">Strength<span class="data">Data</span></span>
+      </div>
+      <div class="cap">Wordmark lockup</div>
+    </div>
+  </div>
+</body>
+</html>

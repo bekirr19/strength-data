@@ -1,4 +1,4 @@
-/* @ds-bundle: {"format":3,"namespace":"StrengthDataDesignSystem_5c629b","components":[{"name":"Button","sourcePath":"components/buttons/Button.jsx"},{"name":"Fab","sourcePath":"components/buttons/Fab.jsx"},{"name":"IconButton","sourcePath":"components/buttons/IconButton.jsx"},{"name":"Badge","sourcePath":"components/data-display/Badge.jsx"},{"name":"CATEGORY_COLORS","sourcePath":"components/data-display/CategoryBadge.jsx"},{"name":"CategoryBadge","sourcePath":"components/data-display/CategoryBadge.jsx"},{"name":"SetChip","sourcePath":"components/data-display/SetChip.jsx"},{"name":"StatCard","sourcePath":"components/data-display/StatCard.jsx"},{"name":"Input","sourcePath":"components/forms/Input.jsx"},{"name":"SegmentedControl","sourcePath":"components/forms/SegmentedControl.jsx"},{"name":"Stepper","sourcePath":"components/forms/Stepper.jsx"},{"name":"Avatar","sourcePath":"components/layout/Avatar.jsx"},{"name":"Card","sourcePath":"components/layout/Card.jsx"},{"name":"BottomNav","sourcePath":"components/navigation/BottomNav.jsx"},{"name":"WeekDay","sourcePath":"components/navigation/WeekDay.jsx"}],"sourceHashes":{"components/buttons/Button.jsx":"620ae24058c5","components/buttons/Fab.jsx":"6e3fdc87116d","components/buttons/IconButton.jsx":"e0f4de12d58b","components/data-display/Badge.jsx":"ca7636fecdb7","components/data-display/CategoryBadge.jsx":"986802907ac0","components/data-display/SetChip.jsx":"e936b5886e21","components/data-display/StatCard.jsx":"5a96c203db15","components/forms/Input.jsx":"3846c97e5160","components/forms/SegmentedControl.jsx":"0442b92b2454","components/forms/Stepper.jsx":"49267bdb35e0","components/layout/Avatar.jsx":"7b58e626eeb6","components/layout/Card.jsx":"f1f90065dff5","components/navigation/BottomNav.jsx":"ec8c4a1fbe17","components/navigation/WeekDay.jsx":"b713fffd1dd3","ui_kits/strength-data/Chart.jsx":"d3f1f5380726","ui_kits/strength-data/data.jsx":"c4ae8630acef","ui_kits/strength-data/screens-auth-today.jsx":"2daf5d7535a5","ui_kits/strength-data/screens-detail-profile.jsx":"8dac5e622788","ui_kits/strength-data/screens-workout-exercises.jsx":"ae2a897a1c4a"},"inlinedExternals":[],"unexposedExports":[]} */
+/* @ds-bundle: {"format":3,"namespace":"StrengthDataDesignSystem_5c629b","components":[{"name":"Button","sourcePath":"components/buttons/Button.jsx"},{"name":"Fab","sourcePath":"components/buttons/Fab.jsx"},{"name":"IconButton","sourcePath":"components/buttons/IconButton.jsx"},{"name":"Badge","sourcePath":"components/data-display/Badge.jsx"},{"name":"CATEGORY_COLORS","sourcePath":"components/data-display/CategoryBadge.jsx"},{"name":"CategoryBadge","sourcePath":"components/data-display/CategoryBadge.jsx"},{"name":"SetChip","sourcePath":"components/data-display/SetChip.jsx"},{"name":"StatCard","sourcePath":"components/data-display/StatCard.jsx"},{"name":"Input","sourcePath":"components/forms/Input.jsx"},{"name":"SegmentedControl","sourcePath":"components/forms/SegmentedControl.jsx"},{"name":"Stepper","sourcePath":"components/forms/Stepper.jsx"},{"name":"Avatar","sourcePath":"components/layout/Avatar.jsx"},{"name":"Card","sourcePath":"components/layout/Card.jsx"},{"name":"BottomNav","sourcePath":"components/navigation/BottomNav.jsx"},{"name":"WeekDay","sourcePath":"components/navigation/WeekDay.jsx"},{"name":"WeekStrip","sourcePath":"components/navigation/WeekStrip.jsx"}],"sourceHashes":{"components/buttons/Button.jsx":"620ae24058c5","components/buttons/Fab.jsx":"6e3fdc87116d","components/buttons/IconButton.jsx":"e0f4de12d58b","components/data-display/Badge.jsx":"ca7636fecdb7","components/data-display/CategoryBadge.jsx":"986802907ac0","components/data-display/SetChip.jsx":"e936b5886e21","components/data-display/StatCard.jsx":"5a96c203db15","components/forms/Input.jsx":"3846c97e5160","components/forms/SegmentedControl.jsx":"0442b92b2454","components/forms/Stepper.jsx":"49267bdb35e0","components/layout/Avatar.jsx":"7b58e626eeb6","components/layout/Card.jsx":"f1f90065dff5","components/navigation/BottomNav.jsx":"ec8c4a1fbe17","components/navigation/WeekDay.jsx":"b713fffd1dd3","ui_kits/strength-data/Chart.jsx":"d3f1f5380726","ui_kits/strength-data/data.jsx":"c4ae8630acef","ui_kits/strength-data/screens-auth-today.jsx":"2daf5d7535a5","ui_kits/strength-data/screens-detail-profile.jsx":"8dac5e622788","ui_kits/strength-data/screens-workout-exercises.jsx":"ae2a897a1c4a"},"inlinedExternals":[],"unexposedExports":[]} */
 
 (() => {
 
@@ -668,11 +668,22 @@ Object.assign(__ds_scope, { Input });
 
 // components/forms/SegmentedControl.jsx
 try { (() => {
+if (typeof document !== 'undefined' && !document.getElementById('sd-segmented-css')) {
+  const s = document.createElement('style');
+  s.id = 'sd-segmented-css';
+  s.textContent = `
+.sd-segmented { position: relative; display: inline-flex; padding: 3px; background: var(--surface-sunken); border-radius: var(--radius-md); }
+.sd-segmented--full { display: flex; width: 100%; }
+.sd-segmented__pill { position: absolute; top: 3px; bottom: 3px; left: 3px; background: var(--surface-card); border-radius: calc(var(--radius-md) - 3px); box-shadow: var(--shadow-sm); transition: transform var(--dur-base) var(--ease-spring), width var(--dur-base) var(--ease-spring); z-index: 0; }
+.sd-segmented__opt { position: relative; z-index: 1; flex: 1; min-width: 0; border: none; background: transparent; cursor: pointer; white-space: nowrap; font-family: var(--font-sans); font-weight: var(--weight-semibold); color: var(--text-secondary); transition: color var(--dur-fast) var(--ease-standard); -webkit-tap-highlight-color: transparent; }
+.sd-segmented__opt:focus-visible { outline: none; box-shadow: 0 0 0 3px var(--ring); border-radius: var(--radius-sm); }
+`;
+  document.head.appendChild(s);
+}
 /**
- * SegmentedControl — pill of mutually-exclusive options on a sunken track.
- * Powers the chart metric toggle (Weight / 1RM / Volume), the time-range
- * tabs (1W / 1M / 1Y / All), and category filter chips.
- * `accent` lets the active segment adopt a category colour.
+ * SegmentedControl — sunken track with a single sliding pill that springs to the
+ * active option. Metric toggle (Weight / 1RM / Volume), range tabs, etc.
+ * `accent` colours the active label; `fill` stretches to full width.
  */
 function SegmentedControl({
   options = [],
@@ -687,50 +698,45 @@ function SegmentedControl({
     sm: {
       h: 30,
       font: 'var(--text-2xs)',
-      pad: '0 10px'
+      pad: '0 12px'
     },
     md: {
       h: 38,
       font: 'var(--text-xs)',
-      pad: '0 14px'
+      pad: '0 16px'
     }
   };
   const s = sizes[size] || sizes.md;
+  const n = options.length || 1;
+  const valOf = o => typeof o === 'string' ? o : o.value;
+  const idx = Math.max(0, options.findIndex(o => valOf(o) === value));
   return /*#__PURE__*/React.createElement("div", {
+    className: ['sd-segmented', fill ? 'sd-segmented--full' : ''].filter(Boolean).join(' '),
+    role: "tablist",
+    style: style
+  }, /*#__PURE__*/React.createElement("span", {
+    className: "sd-segmented__pill",
     style: {
-      display: 'inline-flex',
-      alignItems: 'center',
-      gap: 4,
-      padding: 4,
-      background: 'var(--surface-sunken)',
-      borderRadius: 'var(--radius-md)',
-      ...style
-    }
-  }, options.map(opt => {
-    const val = typeof opt === 'string' ? opt : opt.value;
+      width: `calc((100% - 6px) / ${n})`,
+      transform: `translateX(${idx * 100}%)`
+    },
+    "aria-hidden": "true"
+  }), options.map(opt => {
+    const val = valOf(opt);
     const label = typeof opt === 'string' ? opt : opt.label;
     const active = val === value;
     return /*#__PURE__*/React.createElement("button", {
       key: val,
       type: "button",
+      role: "tab",
+      "aria-selected": active,
       onClick: () => onChange && onChange(val),
-      className: "sd-focus-ring",
+      className: "sd-segmented__opt" + (active ? " sd-segmented__opt--active" : ""),
       style: {
-        flex: fill ? 1 : '0 0 auto',
         height: s.h,
         padding: s.pad,
-        whiteSpace: 'nowrap',
-        border: 'none',
-        borderRadius: 'calc(var(--radius-md) - 3px)',
-        fontFamily: 'var(--font-sans)',
         fontSize: s.font,
-        fontWeight: 'var(--weight-bold)',
-        cursor: 'pointer',
-        background: active ? 'var(--surface-card)' : 'transparent',
-        color: active ? accent : 'var(--text-secondary)',
-        boxShadow: active ? 'var(--shadow-sm)' : 'none',
-        transition: 'background var(--dur-fast) var(--ease-standard), color var(--dur-fast) var(--ease-standard)',
-        WebkitTapHighlightColor: 'transparent'
+        color: active ? accent : 'var(--text-secondary)'
       }
     }, label);
   }));
@@ -956,10 +962,25 @@ Object.assign(__ds_scope, { Card });
 
 // components/navigation/BottomNav.jsx
 try { (() => {
+if (typeof document !== 'undefined' && !document.getElementById('sd-bottomnav-css')) {
+  const s = document.createElement('style');
+  s.id = 'sd-bottomnav-css';
+  s.textContent = `
+.sd-bottomnav { display: flex; align-items: center; justify-content: space-around; gap: 4px; height: var(--nav-height); padding: 0 10px; background: var(--surface-card); border: 1px solid var(--border-subtle); border-radius: var(--radius-full); box-shadow: var(--shadow-lg); }
+.sd-bottomnav__tab { display: inline-flex; flex-direction: column; align-items: center; justify-content: center; gap: 2px; flex: 1; height: 48px; border: none; background: transparent; cursor: pointer; color: var(--text-tertiary); font-family: var(--font-sans); font-size: var(--text-xs); font-weight: var(--weight-medium); border-radius: var(--radius-md); transition: color var(--dur-fast) var(--ease-standard), transform var(--dur-fast) var(--ease-spring); -webkit-tap-highlight-color: transparent; }
+.sd-bottomnav__tab:active { transform: scale(var(--press-scale)); }
+.sd-bottomnav__tab--active { color: var(--accent); }
+.sd-bottomnav__fab { display: inline-flex; align-items: center; justify-content: center; flex: none; width: 56px; height: 56px; margin: 0 4px; border: none; border-radius: 50%; cursor: pointer; background: var(--accent); color: var(--text-on-accent); box-shadow: var(--shadow-accent); transition: background var(--dur-fast) var(--ease-standard), transform var(--dur-fast) var(--ease-spring); -webkit-tap-highlight-color: transparent; }
+.sd-bottomnav__fab:hover { background: var(--accent-hover); }
+.sd-bottomnav__fab:active { transform: scale(0.92); }
+.sd-bottomnav__fab:focus-visible, .sd-bottomnav__tab:focus-visible { outline: none; box-shadow: 0 0 0 3px var(--ring); }
+`;
+  document.head.appendChild(s);
+}
 /**
- * BottomNav — floating pill navigation fixed to the bottom on mobile.
- * Holds icon tabs plus one prominent primary action (Add Exercise).
- * Pass `items` (icon tabs) and an optional `primary` action.
+ * BottomNav — floating pill navigation with a central circular FAB.
+ * `primary={{label,icon,onClick}}` (legacy) becomes the centre FAB; or mark an
+ * item with `fab:true`. Tabs come from `items`; `activeKey` turns one accent.
  */
 function BottomNav({
   items = [],
@@ -968,66 +989,34 @@ function BottomNav({
   onSelect,
   style = {}
 }) {
-  return /*#__PURE__*/React.createElement("nav", {
-    style: {
-      display: 'flex',
-      alignItems: 'center',
-      gap: 6,
-      padding: 6,
-      background: 'var(--surface-card)',
-      border: '1px solid var(--border-subtle)',
-      borderRadius: 'var(--radius-full)',
-      boxShadow: 'var(--shadow-lg)',
-      ...style
-    }
-  }, items.map(it => {
+  const tabs = items.filter(it => !it.fab);
+  const inlineFab = items.find(it => it.fab) || null;
+  const fab = primary || inlineFab;
+  const renderTab = it => {
     const active = it.key === activeKey;
     return /*#__PURE__*/React.createElement("button", {
       key: it.key,
       type: "button",
       "aria-label": it.label,
+      "aria-current": active ? 'page' : undefined,
       onClick: () => it.onClick ? it.onClick() : onSelect && onSelect(it.key),
-      className: "sd-focus-ring",
-      style: {
-        display: 'inline-flex',
-        alignItems: 'center',
-        justifyContent: 'center',
-        width: 44,
-        height: 44,
-        flexShrink: 0,
-        border: 'none',
-        borderRadius: 'var(--radius-full)',
-        background: active ? 'var(--accent-tint)' : 'transparent',
-        color: active ? 'var(--accent-hover)' : 'var(--text-secondary)',
-        cursor: 'pointer',
-        transition: 'background var(--dur-fast) var(--ease-standard), color var(--dur-fast) var(--ease-standard)',
-        WebkitTapHighlightColor: 'transparent'
-      }
-    }, it.icon);
-  }), primary && /*#__PURE__*/React.createElement("button", {
+      className: "sd-bottomnav__tab" + (active ? " sd-bottomnav__tab--active" : "")
+    }, it.icon, it.label && /*#__PURE__*/React.createElement("span", null, it.label));
+  };
+  const renderFab = () => fab && /*#__PURE__*/React.createElement("button", {
+    key: "__fab",
     type: "button",
-    onClick: primary.onClick,
-    className: "sd-focus-ring",
-    style: {
-      display: 'inline-flex',
-      alignItems: 'center',
-      justifyContent: 'center',
-      gap: 8,
-      flex: 1,
-      height: 44,
-      padding: '0 18px',
-      border: 'none',
-      borderRadius: 'var(--radius-full)',
-      background: 'var(--accent)',
-      color: 'var(--text-on-accent)',
-      fontFamily: 'var(--font-sans)',
-      fontSize: 'var(--text-sm)',
-      fontWeight: 'var(--weight-bold)',
-      boxShadow: 'var(--shadow-accent-sm)',
-      cursor: 'pointer',
-      WebkitTapHighlightColor: 'transparent'
-    }
-  }, primary.icon, primary.label));
+    "aria-label": fab.label || 'Add',
+    onClick: () => fab.onClick ? fab.onClick() : onSelect && onSelect(fab.key),
+    className: "sd-bottomnav__fab"
+  }, fab.icon);
+  const mid = Math.ceil(tabs.length / 2);
+  const children = primary ? [...tabs.slice(0, mid).map(renderTab), renderFab(), ...tabs.slice(mid).map(renderTab)] : items.map(it => it.fab ? renderFab() : renderTab(it));
+  return /*#__PURE__*/React.createElement("nav", {
+    className: "sd-bottomnav",
+    "aria-label": "Primary",
+    style: style
+  }, children);
 }
 Object.assign(__ds_scope, { BottomNav });
 })(); } catch (e) { __ds_ns.__errors.push({ path: "components/navigation/BottomNav.jsx", error: String((e && e.message) || e) }); }
@@ -1145,6 +1134,79 @@ function WeekDay({
 }
 Object.assign(__ds_scope, { WeekDay });
 })(); } catch (e) { __ds_ns.__errors.push({ path: "components/navigation/WeekDay.jsx", error: String((e && e.message) || e) }); }
+
+// components/navigation/WeekStrip.jsx
+try { (() => {
+if (typeof document !== 'undefined' && !document.getElementById('sd-weekstrip-css')) {
+  const s = document.createElement('style');
+  s.id = 'sd-weekstrip-css';
+  s.textContent = `
+.sd-weekstrip { position: relative; display: flex; align-items: stretch; padding: 6px; background: var(--surface-card); border: 1px solid var(--border-subtle); border-radius: var(--radius-xl); box-shadow: var(--shadow-sm); touch-action: pan-y; }
+.sd-weekstrip__pill { position: absolute; top: 6px; bottom: 6px; left: 6px; background: var(--accent); border-radius: var(--radius-lg); box-shadow: var(--shadow-accent); transition: transform var(--dur-base) var(--ease-spring), width var(--dur-base) var(--ease-spring); z-index: 0; }
+.sd-weekstrip__day { position: relative; z-index: 1; flex: 1 1 0; min-width: 0; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 3px; padding: 8px 0; border: none; background: transparent; cursor: pointer; border-radius: var(--radius-lg); transition: color var(--dur-fast) var(--ease-standard), transform var(--dur-fast) var(--ease-spring); color: var(--text-secondary); font-family: var(--font-sans); -webkit-tap-highlight-color: transparent; }
+.sd-weekstrip__day:active { transform: scale(var(--press-scale)); }
+.sd-weekstrip__day:focus-visible { outline: none; box-shadow: 0 0 0 3px var(--ring); }
+.sd-weekstrip__dow { font-size: var(--text-xs); font-weight: var(--weight-medium); letter-spacing: var(--tracking-wide); text-transform: uppercase; opacity: 0.85; }
+.sd-weekstrip__num { font-size: var(--text-lg); font-weight: var(--weight-bold); line-height: 1; font-variant-numeric: tabular-nums; }
+.sd-weekstrip__day--today .sd-weekstrip__num { text-decoration: underline; text-underline-offset: 3px; text-decoration-thickness: 2px; }
+.sd-weekstrip__day--selected { color: #fff; }
+.sd-weekstrip__dot { width: 5px; height: 5px; border-radius: 50%; background: var(--sd-dot, transparent); transition: background var(--dur-fast) var(--ease-standard); }
+.sd-weekstrip__day--selected .sd-weekstrip__dot { background: rgba(255,255,255,0.9); }
+`;
+  document.head.appendChild(s);
+}
+const DOT_BY_CATEGORY = {
+  push: 'var(--push-500)',
+  pull: 'var(--pull-500)',
+  leg: 'var(--leg-500)',
+  other: 'var(--other-500)'
+};
+function WeekStrip({
+  days = [],
+  selectedISO,
+  onSelect = () => {},
+  className = '',
+  style = {}
+}) {
+  const isoOf = d => d.iso ?? d.dateISO;
+  const n = days.length || 7;
+  const idx = Math.max(0, days.findIndex(d => isoOf(d) === selectedISO));
+  return /*#__PURE__*/React.createElement("div", {
+    className: ['sd-weekstrip', className].filter(Boolean).join(' '),
+    role: "tablist",
+    "aria-label": "Week",
+    style: style
+  }, /*#__PURE__*/React.createElement("span", {
+    className: "sd-weekstrip__pill",
+    style: {
+      width: `calc((100% - 12px) / ${n})`,
+      transform: `translateX(${idx * 100}%)`
+    },
+    "aria-hidden": "true"
+  }), days.map(d => {
+    const iso = isoOf(d);
+    const selected = iso === selectedISO;
+    const isToday = d.today ?? d.isToday ?? false;
+    const dot = d.category ? DOT_BY_CATEGORY[d.category] || DOT_BY_CATEGORY.other : null;
+    return /*#__PURE__*/React.createElement("button", {
+      key: iso,
+      type: "button",
+      role: "tab",
+      "aria-selected": selected,
+      onClick: () => onSelect(iso),
+      className: ['sd-weekstrip__day', selected ? 'sd-weekstrip__day--selected' : '', isToday ? 'sd-weekstrip__day--today' : ''].filter(Boolean).join(' '),
+      style: dot ? { '--sd-dot': dot } : undefined
+    }, /*#__PURE__*/React.createElement("span", {
+      className: "sd-weekstrip__dow"
+    }, d.wd ?? d.dow ?? ''), /*#__PURE__*/React.createElement("span", {
+      className: "sd-weekstrip__num"
+    }, d.d ?? d.day), /*#__PURE__*/React.createElement("span", {
+      className: "sd-weekstrip__dot"
+    }));
+  }));
+}
+Object.assign(__ds_scope, { WeekStrip });
+})(); } catch (e) { __ds_ns.__errors.push({ path: "components/navigation/WeekStrip.jsx", error: String((e && e.message) || e) }); }
 
 // ui_kits/strength-data/Chart.jsx
 try { (() => {
@@ -1818,7 +1880,7 @@ function TodayScreen({
     IconButton,
     Avatar,
     BottomNav,
-    WeekDay
+    WeekStrip
   } = DS;
   const w = TODAY_WORKOUT;
   const [selected, setSelected] = React.useState('2026-06-15');
@@ -1940,25 +2002,13 @@ function TodayScreen({
       background: 'rgba(247,248,250,0.9)',
       backdropFilter: 'blur(8px)',
       borderBottom: '1px solid var(--border-subtle)',
-      padding: '10px 0'
+      padding: '10px 16px'
     }
-  }, /*#__PURE__*/React.createElement("div", {
-    className: "sd-no-scrollbar",
-    style: {
-      display: 'flex',
-      gap: 8,
-      overflowX: 'auto',
-      padding: '0 16px'
-    }
-  }, WEEK.map(day => /*#__PURE__*/React.createElement(WeekDay, {
-    key: day.iso,
-    weekday: day.wd,
-    day: day.d,
-    category: day.category,
-    caption: day.caption,
-    selected: selected === day.iso,
-    onClick: () => setSelected(day.iso)
-  })))), /*#__PURE__*/React.createElement("main", {
+  }, /*#__PURE__*/React.createElement(WeekStrip, {
+    days: WEEK,
+    selectedISO: selected,
+    onSelect: setSelected
+  })), /*#__PURE__*/React.createElement("main", {
     style: {
       padding: '16px 16px 110px'
     }
@@ -3441,5 +3491,211 @@ __ds_ns.Card = __ds_scope.Card;
 __ds_ns.BottomNav = __ds_scope.BottomNav;
 
 __ds_ns.WeekDay = __ds_scope.WeekDay;
+
+__ds_ns.WeekStrip = __ds_scope.WeekStrip;
+
+// components/data-display/AnimatedNumber.jsx
+try { (() => {
+function AnimatedNumber({ value = 0, duration = 900, decimals = 0, prefix = '', suffix = '', format = true, style = {} }) {
+  const [display, setDisplay] = React.useState(0);
+  const fromRef = React.useRef(0);
+  const rafRef = React.useRef(null);
+  React.useEffect(() => {
+    const reduce = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    const from = fromRef.current;
+    const to = Number(value) || 0;
+    if (reduce || duration <= 0) { setDisplay(to); fromRef.current = to; return; }
+    const start = performance.now();
+    const tick = (now) => {
+      const p = Math.min(1, (now - start) / duration);
+      const eased = 1 - Math.pow(1 - p, 3);
+      setDisplay(from + (to - from) * eased);
+      if (p < 1) { rafRef.current = requestAnimationFrame(tick); } else { fromRef.current = to; }
+    };
+    rafRef.current = requestAnimationFrame(tick);
+    return () => cancelAnimationFrame(rafRef.current);
+  }, [value, duration]);
+  const n = Number(display.toFixed(decimals));
+  const text = format ? n.toLocaleString(undefined, { minimumFractionDigits: decimals, maximumFractionDigits: decimals }) : n.toFixed(decimals);
+  return /*#__PURE__*/React.createElement("span", { className: "sd-tnum", style: { fontVariantNumeric: 'tabular-nums', ...style } }, prefix, text, suffix);
+}
+Object.assign(__ds_scope, { AnimatedNumber });
+})(); } catch (e) { __ds_ns.__errors.push({ path: "components/data-display/AnimatedNumber.jsx", error: String((e && e.message) || e) }); }
+
+// components/data-display/WorkoutTypeBadge.jsx
+try { (() => {
+const WORKOUT_TYPE_COLORS = {
+  push: { tint: 'var(--push-tint)', fg: 'var(--push-700)', dot: 'var(--push-500)', label: 'Push' },
+  pull: { tint: 'var(--pull-tint)', fg: 'var(--pull-700)', dot: 'var(--pull-500)', label: 'Pull' },
+  leg: { tint: 'var(--leg-tint)', fg: 'var(--leg-700)', dot: 'var(--leg-500)', label: 'Leg' },
+  other: { tint: 'var(--other-tint)', fg: 'var(--other-700)', dot: 'var(--other-500)', label: 'Other' },
+  upper: { tint: 'var(--upper-tint)', fg: 'var(--upper-700)', dot: 'var(--upper-500)', label: 'Upper' },
+  legPush: { tint: 'var(--legpush-tint)', fg: 'var(--legpush-700)', dot: 'var(--legpush-500)', label: 'Leg + Push' },
+  legPull: { tint: 'var(--legpull-tint)', fg: 'var(--legpull-700)', dot: 'var(--legpull-500)', label: 'Leg + Pull' },
+  full: { tint: 'var(--full-tint)', fg: 'var(--full-700)', dot: 'var(--full-500)', label: 'Full Body' },
+};
+function workoutTypeOf(focus = []) {
+  const f = new Set(focus); const has = x => f.has(x);
+  if (has('push') && has('pull') && has('leg')) return 'full';
+  if (has('push') && has('pull')) return 'upper';
+  if (has('leg') && has('push')) return 'legPush';
+  if (has('leg') && has('pull')) return 'legPull';
+  if (has('push')) return 'push'; if (has('pull')) return 'pull'; if (has('leg')) return 'leg';
+  return 'other';
+}
+function WorkoutTypeBadge({ type, focus, label, dot = false, size = 'md', onClick, style = {} }) {
+  const key = type || (focus ? workoutTypeOf(focus) : 'other');
+  const c = WORKOUT_TYPE_COLORS[key] || WORKOUT_TYPE_COLORS.other;
+  const sizes = { sm: { h: 20, font: 'var(--text-3xs)', pad: '0 8px' }, md: { h: 24, font: 'var(--text-2xs)', pad: '0 10px' } };
+  const s = sizes[size] || sizes.md;
+  const Tag = onClick ? 'button' : 'span';
+  return /*#__PURE__*/React.createElement(Tag, { type: onClick ? 'button' : undefined, onClick, style: { display:'inline-flex',alignItems:'center',gap:5,height:s.h,padding:s.pad,border:'none',borderRadius:'var(--radius-full)',background:c.tint,color:c.fg,fontFamily:'var(--font-sans)',fontSize:s.font,fontWeight:'var(--weight-bold)',textTransform:'uppercase',letterSpacing:'0.04em',cursor:onClick?'pointer':'default',WebkitTapHighlightColor:'transparent',...style } },
+    dot && /*#__PURE__*/React.createElement("span", { style:{width:6,height:6,borderRadius:'50%',background:c.dot,flexShrink:0} }),
+    label || c.label
+  );
+}
+Object.assign(__ds_scope, { WORKOUT_TYPE_COLORS, workoutTypeOf, WorkoutTypeBadge });
+})(); } catch (e) { __ds_ns.__errors.push({ path: "components/data-display/WorkoutTypeBadge.jsx", error: String((e && e.message) || e) }); }
+
+// components/feedback/EmptyState.jsx
+try { (() => {
+function EmptyState({ icon = null, title, subtitle, action = null, tone = 'neutral', style = {} }) {
+  const tones = { neutral: { bg:'var(--surface-sunken)',fg:'var(--text-tertiary)' }, accent: { bg:'var(--accent-tint)',fg:'var(--accent-hover)' } };
+  const t = tones[tone] || tones.neutral;
+  return /*#__PURE__*/React.createElement("div", { className:"sd-slide-in", style:{display:'flex',flexDirection:'column',alignItems:'center',textAlign:'center',gap:6,padding:'36px 24px',...style} },
+    icon && /*#__PURE__*/React.createElement("span", { style:{display:'inline-flex',alignItems:'center',justifyContent:'center',width:60,height:60,borderRadius:'var(--radius-xl)',background:t.bg,color:t.fg,marginBottom:6} }, icon),
+    /*#__PURE__*/React.createElement("h3", { style:{margin:0,fontSize:'var(--text-base)',fontWeight:700,color:'var(--text-primary)'} }, title),
+    subtitle && /*#__PURE__*/React.createElement("p", { style:{margin:0,maxWidth:280,fontSize:'var(--text-sm)',color:'var(--text-secondary)',lineHeight:1.5} }, subtitle),
+    action && /*#__PURE__*/React.createElement("div", { style:{marginTop:12} }, action)
+  );
+}
+Object.assign(__ds_scope, { EmptyState });
+})(); } catch (e) { __ds_ns.__errors.push({ path: "components/feedback/EmptyState.jsx", error: String((e && e.message) || e) }); }
+
+// components/feedback/Modal.jsx
+try { (() => {
+function Modal({ open, onClose, title, subtitle, eyebrow, headerRight=null, variant='sheet', children, footer=null, maxWidth=420, contained=true }) {
+  React.useEffect(() => {
+    if (!open) return;
+    const onKey = e => { if (e.key === 'Escape') onClose && onClose(); };
+    window.addEventListener('keydown', onKey);
+    return () => window.removeEventListener('keydown', onKey);
+  }, [open, onClose]);
+  if (!open) return null;
+  const isSheet = variant === 'sheet';
+  return /*#__PURE__*/React.createElement("div", { style:{position:contained?'absolute':'fixed',inset:0,zIndex:60,display:'flex',alignItems:isSheet?'flex-end':'center',justifyContent:'center',padding:isSheet?0:18} },
+    /*#__PURE__*/React.createElement("div", { onClick:onClose, style:{position:'absolute',inset:0,background:'rgba(31,41,55,0.34)',animation:'sd-fade-in var(--dur-base) var(--ease-standard)'} }),
+    /*#__PURE__*/React.createElement("div", { role:"dialog","aria-modal":"true", style:{position:'relative',width:'100%',maxWidth:isSheet?'100%':maxWidth,maxHeight:isSheet?'86%':'88%',display:'flex',flexDirection:'column',background:'var(--surface-card)',borderRadius:isSheet?'var(--radius-2xl) var(--radius-2xl) 0 0':'var(--radius-2xl)',boxShadow:'var(--shadow-xl)',paddingBottom:16,animation:isSheet?'sd-sheet-up var(--dur-slow) var(--ease-out)':'sd-pop-in var(--dur-slow) var(--ease-spring)'} },
+      isSheet && /*#__PURE__*/React.createElement("div", {style:{display:'flex',justifyContent:'center',paddingTop:10}}, /*#__PURE__*/React.createElement("div",{style:{width:38,height:4,borderRadius:2,background:'var(--gray-200)'}})),
+      (title||headerRight) && /*#__PURE__*/React.createElement("div", {style:{display:'flex',alignItems:'flex-start',justifyContent:'space-between',gap:10,padding:isSheet?'12px 18px 14px':'18px 18px 14px'}},
+        /*#__PURE__*/React.createElement("div", null,
+          eyebrow && /*#__PURE__*/React.createElement("div", {className:"sd-eyebrow",style:{color:'var(--accent)',marginBottom:4}}, eyebrow),
+          title && /*#__PURE__*/React.createElement("h3", {style:{margin:0,fontSize:'var(--text-xl)',fontWeight:800,letterSpacing:'-0.01em',color:'var(--text-primary)'}}, title),
+          subtitle && /*#__PURE__*/React.createElement("p", {style:{margin:'3px 0 0',fontSize:'var(--text-xs)',color:'var(--text-secondary)'}}, subtitle)
+        ),
+        /*#__PURE__*/React.createElement("div", {style:{display:'flex',alignItems:'center',gap:8,flexShrink:0}}, headerRight)
+      ),
+      /*#__PURE__*/React.createElement("div", {className:"sd-no-scrollbar",style:{overflowY:'auto',padding:'0 18px',flex:'0 1 auto'}}, children),
+      footer && /*#__PURE__*/React.createElement("div", {style:{padding:'14px 18px 0'}}, footer)
+    )
+  );
+}
+Object.assign(__ds_scope, { Modal });
+})(); } catch (e) { __ds_ns.__errors.push({ path: "components/feedback/Modal.jsx", error: String((e && e.message) || e) }); }
+
+// components/feedback/Skeleton.jsx
+try { (() => {
+function Skeleton({ variant='line', width='100%', height, radius, style={} }) {
+  const presets = { line:{width,height:height||12,radius:radius||'var(--radius-sm)'}, text:{width,height:height||14,radius:radius||'4px'}, title:{width:width||'60%',height:height||20,radius:radius||'var(--radius-sm)'}, chip:{width:width||64,height:height||26,radius:radius||'var(--radius-full)'}, block:{width,height:height||80,radius:radius||'var(--radius-lg)'}, card:{width,height:height||120,radius:radius||'var(--radius-2xl)'}, avatar:{width:width||40,height:height||40,radius:radius||'var(--radius-full)'} };
+  const p = presets[variant] || presets.line;
+  return /*#__PURE__*/React.createElement("div", { className:"sd-shimmer","aria-hidden":"true", style:{width:p.width,height:p.height,borderRadius:p.radius,flexShrink:0,...style} });
+}
+function SkeletonGroup({ lines=3, gap=10, lastWidth='70%', style={} }) {
+  return /*#__PURE__*/React.createElement("div", {style:{display:'flex',flexDirection:'column',gap,...style}},
+    Array.from({length:lines}).map((_,i) => /*#__PURE__*/React.createElement(Skeleton,{key:i,variant:"text",width:i===lines-1?lastWidth:'100%'}))
+  );
+}
+Object.assign(__ds_scope, { Skeleton, SkeletonGroup });
+})(); } catch (e) { __ds_ns.__errors.push({ path: "components/feedback/Skeleton.jsx", error: String((e && e.message) || e) }); }
+
+// components/feedback/Toast.jsx
+try { (() => {
+const _TONES = { success:{bar:'var(--green-500)',tint:'var(--green-tint)'}, error:{bar:'var(--red-500)',tint:'var(--red-tint)'}, info:{bar:'var(--accent)',tint:'var(--accent-tint)'} };
+function Toast({ tone='info', title, message, icon=null, onClose, style={} }) {
+  const t = _TONES[tone] || _TONES.info;
+  return /*#__PURE__*/React.createElement("div", {role:"status",style:{display:'flex',alignItems:'flex-start',gap:10,width:'100%',padding:'12px 14px',background:'var(--surface-card)',border:'1px solid var(--border-subtle)',borderLeft:`3px solid ${t.bar}`,borderRadius:'var(--radius-md)',boxShadow:'var(--shadow-lg)',animation:'sd-toast-in var(--dur-slow) var(--ease-out)',...style}},
+    /*#__PURE__*/React.createElement("span",{style:{display:'inline-flex',alignItems:'center',justifyContent:'center',width:24,height:24,borderRadius:'var(--radius-sm)',background:t.tint,color:t.bar,flexShrink:0,marginTop:1}},icon),
+    /*#__PURE__*/React.createElement("div",{style:{flex:1,minWidth:0}},
+      title&&/*#__PURE__*/React.createElement("div",{style:{fontSize:'var(--text-sm)',fontWeight:700,color:'var(--text-primary)'}},title),
+      message&&/*#__PURE__*/React.createElement("div",{style:{fontSize:'var(--text-xs)',color:'var(--text-secondary)',marginTop:title?1:0}},message)
+    ),
+    onClose&&/*#__PURE__*/React.createElement("button",{onClick:onClose,"aria-label":"Dismiss",style:{border:'none',background:'none',padding:2,cursor:'pointer',color:'var(--text-tertiary)',flexShrink:0}},'×')
+  );
+}
+function useToasts(defaultDuration=2600) {
+  const [toasts,setToasts]=React.useState([]);
+  const dismiss=React.useCallback(id=>setToasts(t=>t.filter(x=>x.id!==id)),[]);
+  const push=React.useCallback(toast=>{
+    const id=Math.random().toString(36).slice(2);
+    setToasts(t=>[...t,{...toast,id}]);
+    const dur=toast.duration||defaultDuration;
+    if(dur>0)setTimeout(()=>dismiss(id),dur);
+    return id;
+  },[defaultDuration,dismiss]);
+  const ToastDock=React.useCallback(({renderIcon})=>/*#__PURE__*/React.createElement("div",{style:{position:'absolute',top:12,left:12,right:12,zIndex:80,display:'flex',flexDirection:'column',gap:8,pointerEvents:'none'}},
+    toasts.map(t=>/*#__PURE__*/React.createElement("div",{key:t.id,style:{pointerEvents:'auto'}},
+      /*#__PURE__*/React.createElement(Toast,{tone:t.tone,title:t.title,message:t.message,icon:t.icon||(renderIcon?renderIcon(t):null),onClose:()=>dismiss(t.id)})
+    ))
+  ),[toasts,dismiss]);
+  return {toasts,push,dismiss,ToastDock};
+}
+Object.assign(__ds_scope, { Toast, useToasts });
+})(); } catch (e) { __ds_ns.__errors.push({ path: "components/feedback/Toast.jsx", error: String((e && e.message) || e) }); }
+
+// components/forms/FilterChip.jsx
+try { (() => {
+function FilterChip({ label, active=false, onClick, accent=null, icon=null, count=null, size='md', style={} }) {
+  const sizes={sm:{h:30,font:'var(--text-2xs)',pad:'0 12px'},md:{h:34,font:'var(--text-xs)',pad:'0 16px'}};
+  const s=sizes[size]||sizes.md; const fill=accent||'var(--accent)';
+  return /*#__PURE__*/React.createElement("button",{type:"button",onClick,"aria-pressed":active,className:"sd-focus-ring",
+    style:{display:'inline-flex',alignItems:'center',gap:6,flexShrink:0,height:s.h,padding:s.pad,border:`1px solid ${active?fill:'var(--border-subtle)'}`,borderRadius:'var(--radius-full)',background:active?fill:'var(--surface-card)',color:active?'#fff':'var(--text-secondary)',fontFamily:'var(--font-sans)',fontSize:s.font,fontWeight:'var(--weight-bold)',cursor:'pointer',transition:'background var(--dur-fast) var(--ease-standard), border-color var(--dur-fast) var(--ease-standard), color var(--dur-fast) var(--ease-standard)',WebkitTapHighlightColor:'transparent',...style},
+    onMouseDown:e=>{e.currentTarget.style.transform='scale(var(--press-scale))'},
+    onMouseUp:e=>{e.currentTarget.style.transform='scale(1)'},
+    onMouseLeave:e=>{e.currentTarget.style.transform='scale(1)'}
+  },
+    icon&&/*#__PURE__*/React.createElement("span",{style:{display:'inline-flex'}},icon),
+    label,
+    count!=null&&/*#__PURE__*/React.createElement("span",{className:"sd-tnum",style:{fontSize:'var(--text-3xs)',fontWeight:700,opacity:active?0.85:0.6}},count)
+  );
+}
+Object.assign(__ds_scope, { FilterChip });
+})(); } catch (e) { __ds_ns.__errors.push({ path: "components/forms/FilterChip.jsx", error: String((e && e.message) || e) }); }
+
+// components/forms/Switch.jsx
+try { (() => {
+function Switch({ checked=false, onChange, disabled=false, ariaLabel, size='md', style={} }) {
+  const dims={sm:{w:38,h:22,k:16},md:{w:46,h:28,k:22}};
+  const d=dims[size]||dims.md; const pad=(d.h-d.k)/2;
+  return /*#__PURE__*/React.createElement("button",{type:"button",role:"switch","aria-checked":checked,"aria-label":ariaLabel,disabled,onClick:()=>!disabled&&onChange&&onChange(!checked),className:"sd-focus-ring",
+    style:{position:'relative',width:d.w,height:d.h,flexShrink:0,padding:0,border:'none',borderRadius:'var(--radius-full)',background:checked?'var(--accent)':'var(--gray-300)',cursor:disabled?'not-allowed':'pointer',opacity:disabled?0.5:1,transition:'background var(--dur-base) var(--ease-standard)',WebkitTapHighlightColor:'transparent',...style}
+  },
+    /*#__PURE__*/React.createElement("span",{style:{position:'absolute',top:pad,left:checked?d.w-d.k-pad:pad,width:d.k,height:d.k,borderRadius:'50%',background:'#fff',boxShadow:'var(--shadow-sm)',transition:'left var(--dur-base) var(--ease-spring)'}})
+  );
+}
+Object.assign(__ds_scope, { Switch });
+})(); } catch (e) { __ds_ns.__errors.push({ path: "components/forms/Switch.jsx", error: String((e && e.message) || e) }); }
+
+__ds_ns.AnimatedNumber = __ds_scope.AnimatedNumber;
+__ds_ns.WORKOUT_TYPE_COLORS = __ds_scope.WORKOUT_TYPE_COLORS;
+__ds_ns.workoutTypeOf = __ds_scope.workoutTypeOf;
+__ds_ns.WorkoutTypeBadge = __ds_scope.WorkoutTypeBadge;
+__ds_ns.EmptyState = __ds_scope.EmptyState;
+__ds_ns.Modal = __ds_scope.Modal;
+__ds_ns.Skeleton = __ds_scope.Skeleton;
+__ds_ns.SkeletonGroup = __ds_scope.SkeletonGroup;
+__ds_ns.Toast = __ds_scope.Toast;
+__ds_ns.useToasts = __ds_scope.useToasts;
+__ds_ns.FilterChip = __ds_scope.FilterChip;
+__ds_ns.Switch = __ds_scope.Switch;
 
 })();

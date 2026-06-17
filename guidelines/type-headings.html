@@ -1,0 +1,22 @@
+<!-- @dsCard group="Type" viewport="700x260" name="Display & Headings" subtitle="Inter — bold weights for headings, dates & stat values" -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<link rel="stylesheet" href="../styles.css" />
+<style>
+  body { margin: 0; padding: 22px; background: var(--surface-card); font-family: var(--font-sans); color: var(--text-primary); }
+  .spec { display: flex; align-items: baseline; gap: 16px; padding: 9px 0; border-bottom: 1px solid var(--border-subtle); }
+  .spec:last-child { border-bottom: 0; }
+  .tag { width: 132px; flex-shrink: 0; font-size: 0.625rem; color: var(--text-tertiary); font-weight: 600; text-transform: uppercase; letter-spacing: .08em; }
+  .sample { line-height: 1.1; }
+</style>
+</head>
+<body>
+  <div class="spec"><div class="tag">4xl · 800 · −.02em</div><div class="sample" style="font-size:var(--text-4xl);font-weight:800;letter-spacing:-.02em">120 kg</div></div>
+  <div class="spec"><div class="tag">3xl · 800</div><div class="sample" style="font-size:var(--text-3xl);font-weight:800;letter-spacing:-.02em">June 15</div></div>
+  <div class="spec"><div class="tag">2xl · 700</div><div class="sample" style="font-size:var(--text-2xl);font-weight:700;letter-spacing:-.01em">Workout Detail</div></div>
+  <div class="spec"><div class="tag">lg · 700</div><div class="sample" style="font-size:var(--text-lg);font-weight:700">Bench Press</div></div>
+  <div class="spec"><div class="tag">base · 600</div><div class="sample" style="font-size:var(--text-base);font-weight:600">Incline Dumbbell Press</div></div>
+</body>
+</html>

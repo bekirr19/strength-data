@@ -1,172 +1,100 @@
+import { Pencil, Trash2 } from 'lucide-react';
 import { MUSCLE_OPTIONS, EXERCISE_CATEGORY_META } from '../utils/exerciseMetadata';
+import { Modal } from '../ds/components/feedback/Modal';
+import { Input } from '../ds/components/forms/Input';
+import { FilterChip } from '../ds/components/forms/FilterChip';
+import { Button } from '../ds/components/buttons/Button';
 
 const CATEGORY_KEYS = ['push', 'pull', 'leg', 'other'];
+const CATEGORY_ACCENT = { push: 'var(--push-500)', pull: 'var(--pull-500)', leg: 'var(--leg-500)', other: 'var(--other-500)' };
 const WEIGHT_STEPS = [1, 2.5, 5, 6, 10];
 
+const Label = ({ children }) => (
+  <div style={{ fontSize: 'var(--text-2xs)', fontWeight: 700, color: 'var(--text-secondary)', marginBottom: 8, textTransform: 'uppercase', letterSpacing: '0.06em' }}>{children}</div>
+);
+
 /**
- * Tek bir egzersiz düzenleme/oluşturma modalı.
- * Kontrollü bileşendir: form state'i parent tutar, onChange ile kısmi güncelleme alır.
- *
- * Props:
- *  - isOpen
- *  - title
- *  - form: { name, category, muscles, weightStep }
- *  - onChange(partial)  -> form'a partial'i merge eder
- *  - onClose()
- *  - onSave()
- *  - onDelete()         -> verilirse Sil butonu gösterilir
- *  - isSaving
- *  - saveLabel
+ * Controlled exercise create/edit modal. Parent owns the form state.
+ * Props: isOpen, title, form:{ name, category, muscles, weightStep },
+ *        onChange(partial), onClose(), onSave(), onDelete?, isSaving, saveLabel
  */
 export default function ExerciseEditModal({
   isOpen,
-  title = 'Egzersizi Düzenle',
+  title = 'Edit exercise',
   form,
   onChange,
   onClose,
   onSave,
   onDelete,
   isSaving = false,
-  saveLabel = 'Kaydet',
+  saveLabel = 'Save',
 }) {
   if (!isOpen || !form) return null;
 
   const muscles = Array.isArray(form.muscles) ? form.muscles : [];
-
   const toggleMuscle = (key) => {
     const exists = muscles.includes(key);
     onChange({ muscles: exists ? muscles.filter((m) => m !== key) : [...muscles, key] });
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 backdrop-blur-sm px-4">
-      <div className="w-full max-w-md rounded-3xl bg-[#1C1C1E] border border-white/10 p-6 shadow-2xl max-h-[90vh] overflow-y-auto">
-        <div className="flex items-center justify-between mb-6">
-          <h2 className="text-white text-xl font-bold">{title}</h2>
-          <button
-            type="button"
-            onClick={onClose}
-            className="text-gray-400 hover:text-white transition p-1 hover:bg-white/5 rounded-full"
-            aria-label="Kapat"
-          >
-            <span className="material-symbols-outlined text-2xl">close</span>
-          </button>
-        </div>
-
-        <div className="flex flex-col gap-5">
-          {/* Egzersiz Adı */}
-          <label className="flex flex-col gap-2">
-            <span className="text-xs font-bold text-gray-500 uppercase tracking-widest">Egzersiz Adı</span>
-            <input
-              value={form.name || ''}
-              onChange={(e) => onChange({ name: e.target.value })}
-              className="rounded-xl border border-white/10 bg-black/40 px-4 py-3 text-base text-white focus:outline-none focus:ring-2 focus:ring-primary placeholder:text-gray-600"
-              placeholder="Egzersiz adı girin"
-            />
-          </label>
-
-          {/* Etiket / Gün */}
-          <label className="flex flex-col gap-2">
-            <span className="text-xs font-bold text-gray-500 uppercase tracking-widest">Etiket / Gün</span>
-            <div className="relative">
-              <select
-                value={form.category || 'other'}
-                onChange={(e) => onChange({ category: e.target.value })}
-                className="w-full appearance-none rounded-xl border border-white/10 bg-black/40 px-4 py-3 text-base text-white focus:outline-none focus:ring-2 focus:ring-primary"
-              >
-                {CATEGORY_KEYS.map((key) => (
-                  <option key={key} value={key} className="bg-[#1C1C1E]">
-                    {EXERCISE_CATEGORY_META[key]?.label || key}
-                  </option>
-                ))}
-              </select>
-              <span className="material-symbols-outlined absolute right-4 top-1/2 -translate-y-1/2 text-gray-400 pointer-events-none">
-                expand_more
-              </span>
-            </div>
-          </label>
-
-          {/* Çalışan Kaslar */}
-          <div className="flex flex-col gap-2">
-            <span className="text-xs font-bold text-gray-500 uppercase tracking-widest">Çalışan Kaslar</span>
-            <div className="flex flex-wrap gap-2">
-              {MUSCLE_OPTIONS.map((option) => {
-                const isSelected = muscles.includes(option.key);
-                return (
-                  <button
-                    key={option.key}
-                    type="button"
-                    onClick={() => toggleMuscle(option.key)}
-                    className={`rounded-lg px-3 py-1.5 text-xs font-bold transition border ${
-                      isSelected
-                        ? 'bg-primary text-background-dark border-primary'
-                        : 'bg-white/5 text-gray-400 border-white/5 hover:bg-white/10'
-                    }`}
-                  >
-                    {option.label}
-                  </button>
-                );
-              })}
-            </div>
-          </div>
-
-          {/* Kg Artış Adımı */}
-          <div className="flex flex-col gap-2">
-            <span className="text-xs font-bold text-gray-500 uppercase tracking-widest">Kg Artış Adımı</span>
-            <div className="flex gap-2">
-              {WEIGHT_STEPS.map((step) => {
-                const active = form.weightStep === step;
-                return (
-                  <button
-                    key={step}
-                    type="button"
-                    onClick={() => onChange({ weightStep: step })}
-                    className={`flex-1 py-2 rounded-xl border text-sm font-bold transition ${
-                      active
-                        ? 'bg-primary border-primary text-background-dark'
-                        : 'border-white/10 bg-black/40 text-gray-400 hover:bg-white/5 hover:text-white'
-                    }`}
-                  >
-                    {step}
-                  </button>
-                );
-              })}
-            </div>
-          </div>
-        </div>
-
-        {/* Footer */}
-        <div className={`mt-8 flex gap-3 ${onDelete ? 'justify-between' : 'justify-end'}`}>
+    <Modal
+      open={isOpen}
+      onClose={onClose}
+      variant="sheet"
+      contained={false}
+      eyebrow={onDelete ? 'Edit exercise' : 'New exercise'}
+      title={title}
+      footer={
+        <div style={{ display: 'flex', gap: 10 }}>
           {onDelete && (
-            <button
-              type="button"
-              onClick={onDelete}
-              disabled={isSaving}
-              className="flex items-center justify-center rounded-xl bg-red-500/10 px-4 py-3 text-red-400 font-bold hover:bg-red-500/20 disabled:opacity-60 transition"
-              aria-label="Egzersizi sil"
-            >
-              <span className="material-symbols-outlined">delete</span>
-            </button>
+            <Button variant="danger" onClick={onDelete} disabled={isSaving} icon={<Trash2 size={16} />} style={{ flex: '0 0 auto' }}>Delete</Button>
           )}
-          <div className="flex justify-end gap-3">
-            <button
-              type="button"
-              onClick={onClose}
-              className="rounded-xl border border-white/10 px-6 py-3 text-sm font-bold text-gray-300 hover:bg-white/5 transition"
-            >
-              İptal
-            </button>
-            <button
-              type="button"
-              onClick={onSave}
-              disabled={isSaving}
-              className="rounded-xl bg-primary px-6 py-3 text-sm font-bold text-background-dark hover:bg-primary/90 disabled:cursor-not-allowed disabled:opacity-60 transition shadow-lg shadow-primary/20"
-            >
-              {isSaving ? 'Kaydediliyor...' : saveLabel}
-            </button>
+          <Button variant="secondary" fullWidth onClick={onClose} disabled={isSaving}>Cancel</Button>
+          <Button variant="primary" fullWidth onClick={onSave} disabled={isSaving}>{isSaving ? 'Saving…' : saveLabel}</Button>
+        </div>
+      }
+    >
+      <div style={{ display: 'flex', flexDirection: 'column', gap: 20, paddingBottom: 4 }}>
+        <div>
+          <Label>Exercise name</Label>
+          <Input icon={<Pencil size={18} />} value={form.name || ''} onChange={(e) => onChange({ name: e.target.value })} placeholder="e.g. Incline Bench Press" />
+        </div>
+
+        <div>
+          <Label>Category</Label>
+          <div style={{ display: 'flex', gap: 8 }}>
+            {CATEGORY_KEYS.map((key) => (
+              <FilterChip
+                key={key}
+                label={EXERCISE_CATEGORY_META[key]?.label || key}
+                active={(form.category || 'other') === key}
+                accent={CATEGORY_ACCENT[key]}
+                onClick={() => onChange({ category: key })}
+                style={{ flex: 1, justifyContent: 'center' }}
+              />
+            ))}
+          </div>
+        </div>
+
+        <div>
+          <Label>Target muscles</Label>
+          <div style={{ display: 'flex', flexWrap: 'wrap', gap: 6 }}>
+            {MUSCLE_OPTIONS.map((option) => (
+              <FilterChip key={option.key} label={option.label} size="sm" active={muscles.includes(option.key)} onClick={() => toggleMuscle(option.key)} />
+            ))}
+          </div>
+        </div>
+
+        <div>
+          <Label>Weight increment</Label>
+          <div style={{ display: 'flex', gap: 8 }}>
+            {WEIGHT_STEPS.map((step) => (
+              <FilterChip key={step} label={`${step}`} active={form.weightStep === step} onClick={() => onChange({ weightStep: step })} style={{ flex: 1, justifyContent: 'center' }} />
+            ))}
           </div>
         </div>
       </div>
-    </div>
+    </Modal>
   );
 }

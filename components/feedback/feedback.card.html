@@ -1,0 +1,92 @@
+<!-- @dsCard group="Components" viewport="700x360" name="Feedback — Toast, Skeleton, Empty, Modal" subtitle="Toasts · shimmer skeletons · empty state · spring dialog & sheet" -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<link rel="stylesheet" href="../../styles.css" />
+<style>
+  body { margin: 0; padding: 20px; background: var(--surface-page); }
+  .label { font-size: var(--text-3xs); font-weight: 700; text-transform: uppercase; letter-spacing: .12em; color: var(--text-tertiary); margin: 0 0 8px; }
+  .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 18px 22px; align-items: start; }
+  .stack { display: flex; flex-direction: column; gap: 8px; }
+  .panel { position: relative; height: 250px; border: 1px solid var(--border-subtle); border-radius: var(--radius-2xl); background: var(--surface-card); overflow: hidden; }
+</style>
+</head>
+<body>
+<div id="root"></div>
+<script src="https://unpkg.com/react@18.3.1/umd/react.production.min.js"></script>
+<script src="https://unpkg.com/react-dom@18.3.1/umd/react-dom.production.min.js"></script>
+<script src="https://unpkg.com/@babel/standalone@7.29.0/babel.min.js"></script>
+<script src="https://unpkg.com/lucide@0.460.0/dist/umd/lucide.min.js"></script>
+<script src="../../_ds_bundle.js"></script>
+<script type="text/babel" data-presets="react">
+  const NS = window.StrengthDataDesignSystem_5c629b;
+  const { Toast, Skeleton, SkeletonGroup, EmptyState, Modal, Button } = NS;
+  const I = (name, size = 18) => {
+    const n = lucide[name]; let svg = '';
+    if (n && Array.isArray(n)) {
+      const a = { ...n[1], width: size, height: size, 'stroke-width': 2 };
+      const at = Object.entries(a).map(([k, v]) => k + '="' + v + '"').join(' ');
+      const kids = (n[2] || []).map(c => '<' + c[0] + ' ' + Object.entries(c[1]).map(([k, v]) => k + '="' + v + '"').join(' ') + '/>').join('');
+      svg = '<svg ' + at + '>' + kids + '</svg>';
+    }
+    return <span dangerouslySetInnerHTML={{ __html: svg }} style={{ display: 'inline-flex' }} />;
+  };
+  function Demo() {
+    const [open, setOpen] = React.useState(false);
+    return (
+      <div>
+        <div className="grid">
+          <div>
+            <p className="label">Toasts</p>
+            <div className="stack">
+              <Toast tone="success" title="Workout saved" message="Your changes are synced." icon={I('CircleCheck', 16)} />
+              <Toast tone="error" title="Couldn't save" message="Check your connection." icon={I('CircleAlert', 16)} />
+              <Toast tone="info" title="New PR!" message="Bench Press · 100 kg" icon={I('Info', 16)} />
+            </div>
+          </div>
+          <div>
+            <p className="label">Skeleton loading</p>
+            <div className="stack" style={{ padding: 14, border: '1px solid var(--border-subtle)', borderRadius: 'var(--radius-2xl)', background: 'var(--surface-card)' }}>
+              <div style={{ display: 'flex', gap: 10, alignItems: 'center' }}>
+                <Skeleton variant="avatar" />
+                <div style={{ flex: 1 }}><SkeletonGroup lines={2} /></div>
+              </div>
+              <Skeleton variant="block" height={56} />
+              <div style={{ display: 'flex', gap: 8 }}><Skeleton variant="chip" /><Skeleton variant="chip" width={80} /><Skeleton variant="chip" width={52} /></div>
+            </div>
+          </div>
+          <div>
+            <p className="label">Empty state</p>
+            <div style={{ border: '1px solid var(--border-subtle)', borderRadius: 'var(--radius-2xl)', background: 'var(--surface-card)' }}>
+              <EmptyState tone="accent" icon={I('Dumbbell', 26)}
+                title="No workout logged"
+                subtitle="Add your first exercise to get started."
+                action={<Button variant="primary" size="sm" icon={I('Plus', 16)}>Add manually</Button>} />
+            </div>
+          </div>
+          <div>
+            <p className="label">Modal — sheet &amp; dialog</p>
+            <div className="panel">
+              <div style={{ padding: 16, display: 'flex', gap: 8 }}>
+                <Button variant="secondary" size="sm" onClick={() => setOpen('sheet')}>Open sheet</Button>
+                <Button variant="secondary" size="sm" onClick={() => setOpen('dialog')}>Open dialog</Button>
+              </div>
+              <Modal open={open === 'sheet'} onClose={() => setOpen(false)} variant="sheet" eyebrow="Edit" title="Bench Press"
+                footer={<Button variant="primary" fullWidth size="lg" onClick={() => setOpen(false)}>Save</Button>}>
+                <p style={{ fontSize: 'var(--text-sm)', color: 'var(--text-secondary)', margin: '0 0 8px' }}>Slide-up bottom sheet with a grab handle.</p>
+              </Modal>
+              <Modal open={open === 'dialog'} onClose={() => setOpen(false)} variant="dialog" title="Delete workout?" subtitle="This can't be undone."
+                footer={<div style={{ display: 'flex', gap: 8 }}><Button variant="secondary" fullWidth onClick={() => setOpen(false)}>Cancel</Button><Button variant="danger" fullWidth onClick={() => setOpen(false)}>Delete</Button></div>}>
+              </Modal>
+            </div>
+          </div>
+        </div>
+      </div>
+    );
+  }
+  ReactDOM.createRoot(document.getElementById('root')).render(<Demo />);
+</script>
+</body>
+</html>

@@ -1,0 +1,48 @@
+/* ============================================================
+   Strength Data — base resets & helpers
+   ============================================================ */
+*,
+*::before,
+*::after { box-sizing: border-box; }
+
+html { -webkit-text-size-adjust: 100%; }
+
+body {
+  margin: 0;
+  font-family: var(--font-sans);
+  font-size: var(--text-sm);
+  line-height: var(--leading-normal);
+  color: var(--text-primary);
+  background: var(--surface-page);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* Tabular numerals — apply on numeric values (weights/reps/dates) */
+.sd-tnum { font-variant-numeric: tabular-nums; font-feature-settings: 'tnum' 1; }
+
+/* Hide scrollbars on horizontal strips */
+.sd-no-scrollbar::-webkit-scrollbar { display: none; }
+.sd-no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+
+/* Uppercase micro label / eyebrow */
+.sd-eyebrow {
+  font-size: var(--text-3xs);
+  font-weight: var(--weight-bold);
+  text-transform: uppercase;
+  letter-spacing: var(--tracking-eyebrow);
+  color: var(--text-tertiary);
+}
+
+/* Focus ring used by interactive primitives */
+.sd-focus-ring:focus-visible {
+  outline: none;
+  box-shadow: 0 0 0 3px var(--ring);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.001ms !important;
+    transition-duration: 0.001ms !important;
+  }
+}

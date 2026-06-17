@@ -1,8 +1,13 @@
 import React, { useEffect, useState } from 'react';
 import { Navigate, useNavigate } from 'react-router-dom';
+import { ShieldCheck, X, ChevronDown, ChevronUp, Check, RotateCcw, Trash2 } from 'lucide-react';
 import { useAuth } from '../contexts/AuthContext';
 import { listenAllFeedback, updateFeedbackStatus, deleteFeedback, FEEDBACK_STATUS } from '../utils/feedback';
 import { listenAllUsersMeta } from '../utils/userMeta';
+import { formatDateShortEN } from '../utils/datetime';
+import { IconButton } from '../ds/components/buttons/IconButton';
+import { Button } from '../ds/components/buttons/Button';
+import { Avatar } from '../ds/components/layout/Avatar';
 
 function AdminPanelPage() {
   const navigate = useNavigate();
@@ -12,7 +17,7 @@ function AdminPanelPage() {
   const [usersMeta, setUsersMeta] = useState([]);
   const [isMetaLoading, setIsMetaLoading] = useState(true);
   const [metaError, setMetaError] = useState(null);
-  const [isFeedbackOpen, setIsFeedbackOpen] = useState(false);
+  const [isFeedbackOpen, setIsFeedbackOpen] = useState(true);
   const [isUsersOpen, setIsUsersOpen] = useState(false);
   const [isDoneSectionOpen, setIsDoneSectionOpen] = useState(false);
 
@@ -22,26 +27,15 @@ function AdminPanelPage() {
 
   useEffect(() => {
     setIsLoading(true);
-    const unsubscribe = listenAllFeedback((list) => {
-      setFeedbacks(list);
-      setIsLoading(false);
-    });
+    const unsubscribe = listenAllFeedback((list) => { setFeedbacks(list); setIsLoading(false); });
     return unsubscribe;
   }, []);
 
   useEffect(() => {
     setIsMetaLoading(true);
     const unsubscribe = listenAllUsersMeta(
-      (list) => {
-        setUsersMeta(list);
-        setMetaError(null);
-        setIsMetaLoading(false);
-      },
-      (error) => {
-        console.error('Kullanıcı listesi okunamadı:', error);
-        setMetaError('Kullanıcı listesi alınamadı');
-        setIsMetaLoading(false);
-      }
+      (list) => { setUsersMeta(list); setMetaError(null); setIsMetaLoading(false); },
+      (error) => { console.error('Could not read users:', error); setMetaError('Could not load the users list'); setIsMetaLoading(false); }
     );
     return unsubscribe;
   }, []);
@@ -52,61 +46,49 @@ function AdminPanelPage() {
   };
 
   const handleDelete = async (item) => {
-    const ok = confirm('Bu geri bildirimi silmek istediğine emin misin?');
-    if (!ok) return;
+    if (!confirm('Delete this feedback?')) return;
     await deleteFeedback({ uid: item.userId, feedbackId: item.id });
   };
 
   const openFeedbacks = feedbacks.filter((f) => f.status !== FEEDBACK_STATUS.DONE);
   const doneFeedbacks = feedbacks.filter((f) => f.status === FEEDBACK_STATUS.DONE);
 
+  const sectionStyle = { background: 'var(--surface-card)', border: '1px solid var(--border-subtle)', borderRadius: 'var(--radius-2xl)', boxShadow: 'var(--shadow-sm)', padding: 14 };
+  const sectionBtnStyle = { display: 'flex', alignItems: 'center', justifyContent: 'space-between', width: '100%', border: 'none', background: 'none', cursor: 'pointer', textAlign: 'left', padding: 0 };
+
   return (
-    <div className="min-h-screen bg-black text-white p-6">
-      <header className="mb-4 flex items-center gap-3 relative">
-        <div className="flex h-10 w-10 items-center justify-center rounded-full bg-blue-500/20 text-blue-500">
-          <span className="material-symbols-outlined">shield_person</span>
+    <div style={{ minHeight: '100vh', background: 'var(--surface-page)', padding: 16 }}>
+      <header style={{ display: 'flex', alignItems: 'center', gap: 12, marginBottom: 16, maxWidth: 560, margin: '0 auto 16px' }}>
+        <div style={{ display: 'inline-flex', alignItems: 'center', justifyContent: 'center', width: 40, height: 40, borderRadius: 'var(--radius-md)', background: 'var(--accent-tint)', color: 'var(--accent-hover)', flexShrink: 0 }}>
+          <ShieldCheck size={20} />
         </div>
-        <div>
-          <h1 className="text-2xl font-bold">Admin Paneli</h1>
-          <p className="text-sm text-gray-400">{currentUser?.email || 'Admin'}</p>
+        <div style={{ flex: 1, minWidth: 0 }}>
+          <h1 style={{ margin: 0, fontSize: 'var(--text-xl)', fontWeight: 800, color: 'var(--text-primary)' }}>Admin</h1>
+          <p style={{ margin: 0, fontSize: 'var(--text-xs)', color: 'var(--text-secondary)', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{currentUser?.email || 'Admin'}</p>
         </div>
-        <div className="flex-1" />
-        <button
-          onClick={() => navigate(-1)}
-          className="flex h-10 w-10 items-center justify-center rounded-full bg-white/5 text-gray-300 hover:bg-white/10 hover:text-white transition absolute right-0 top-1"
-          aria-label="Paneli kapat"
-        >
-          <span className="material-symbols-outlined">close</span>
-        </button>
+        <IconButton ariaLabel="Close panel" variant="soft" onClick={() => navigate(-1)}><X size={18} /></IconButton>
       </header>
 
-      <div className="space-y-4">
-        <section className="rounded-2xl border border-white/10 bg-[#1C1C1E] p-3">
-          <button
-            className="w-full flex items-center justify-between text-left"
-            onClick={() => setIsFeedbackOpen((v) => !v)}
-          >
+      <div style={{ display: 'flex', flexDirection: 'column', gap: 12, maxWidth: 560, margin: '0 auto' }}>
+        {/* Feedback */}
+        <section style={sectionStyle}>
+          <button style={sectionBtnStyle} onClick={() => setIsFeedbackOpen((v) => !v)}>
             <div>
-              <h2 className="text-lg font-semibold">Geri Bildirimler</h2>
-              <p className="text-xs text-gray-400">Aktif: {openFeedbacks.length} · Tamamlanan: {doneFeedbacks.length}</p>
+              <h2 style={{ margin: 0, fontSize: 'var(--text-base)', fontWeight: 700, color: 'var(--text-primary)' }}>Feedback</h2>
+              <p style={{ margin: '2px 0 0', fontSize: 'var(--text-2xs)', color: 'var(--text-tertiary)' }}>Open: {openFeedbacks.length} · Done: {doneFeedbacks.length}</p>
             </div>
-            <div className="flex items-center gap-2 text-xs text-gray-400">
-              {isLoading && <span>Yükleniyor...</span>}
-              <span className="material-symbols-outlined text-base">
-                {isFeedbackOpen ? 'expand_less' : 'expand_more'}
-              </span>
-            </div>
+            {isFeedbackOpen ? <ChevronUp size={18} style={{ color: 'var(--text-tertiary)' }} /> : <ChevronDown size={18} style={{ color: 'var(--text-tertiary)' }} />}
           </button>
 
           {isFeedbackOpen && (
-            <div className="mt-3">
+            <div style={{ marginTop: 12 }}>
               {openFeedbacks.length === 0 && doneFeedbacks.length === 0 && !isLoading && (
-                <p className="text-sm text-gray-500">Hiç geri bildirim yok.</p>
+                <p style={{ fontSize: 'var(--text-sm)', color: 'var(--text-tertiary)' }}>No feedback yet.</p>
               )}
 
               {openFeedbacks.length > 0 && (
-                <div className="mb-5 space-y-3">
-                  <h3 className="text-xs font-bold tracking-wider text-gray-500">AKTİF</h3>
+                <div style={{ display: 'flex', flexDirection: 'column', gap: 10, marginBottom: 16 }}>
+                  <div className="sd-eyebrow">Open</div>
                   {openFeedbacks.map((item) => (
                     <FeedbackCard key={item.id} item={item} onToggle={handleToggleStatus} onDelete={handleDelete} />
                   ))}
@@ -114,22 +96,13 @@ function AdminPanelPage() {
               )}
 
               {doneFeedbacks.length > 0 && (
-                <div className="space-y-2">
-                  <button
-                    className="w-full flex items-center justify-between rounded-lg bg-white/5 px-3 py-2 text-left"
-                    onClick={() => setIsDoneSectionOpen((v) => !v)}
-                  >
-                    <div className="flex items-center gap-2">
-                      <span className="text-xs font-bold tracking-wider text-gray-400">TAMAMLANAN</span>
-                      <span className="text-[11px] text-gray-500">{doneFeedbacks.length}</span>
-                    </div>
-                    <span className="material-symbols-outlined text-base text-gray-400">
-                      {isDoneSectionOpen ? 'expand_less' : 'expand_more'}
-                    </span>
+                <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
+                  <button style={{ ...sectionBtnStyle, padding: '8px 12px', background: 'var(--surface-sunken)', borderRadius: 'var(--radius-md)' }} onClick={() => setIsDoneSectionOpen((v) => !v)}>
+                    <span className="sd-eyebrow">Done · {doneFeedbacks.length}</span>
+                    {isDoneSectionOpen ? <ChevronUp size={16} style={{ color: 'var(--text-tertiary)' }} /> : <ChevronDown size={16} style={{ color: 'var(--text-tertiary)' }} />}
                   </button>
-
                   {isDoneSectionOpen && (
-                    <div className="space-y-3">
+                    <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
                       {doneFeedbacks.map((item) => (
                         <FeedbackCard key={item.id} item={item} onToggle={handleToggleStatus} onDelete={handleDelete} />
                       ))}
@@ -141,43 +114,31 @@ function AdminPanelPage() {
           )}
         </section>
 
-        <section className="rounded-2xl border border-white/10 bg-[#1C1C1E] p-3">
-          <button
-            className="w-full flex items-center justify-between text-left"
-            onClick={() => setIsUsersOpen((v) => !v)}
-          >
+        {/* Users */}
+        <section style={sectionStyle}>
+          <button style={sectionBtnStyle} onClick={() => setIsUsersOpen((v) => !v)}>
             <div>
-              <h2 className="text-lg font-semibold">Kullanıcılar</h2>
-              <p className="text-xs text-gray-400">Toplam: {usersMeta.length}</p>
+              <h2 style={{ margin: 0, fontSize: 'var(--text-base)', fontWeight: 700, color: 'var(--text-primary)' }}>Users</h2>
+              <p style={{ margin: '2px 0 0', fontSize: 'var(--text-2xs)', color: 'var(--text-tertiary)' }}>Total: {usersMeta.length}</p>
             </div>
-            <div className="flex items-center gap-2 text-xs text-gray-400">
-              {isMetaLoading && <span>Yükleniyor...</span>}
-              <span className="material-symbols-outlined text-base">
-                {isUsersOpen ? 'expand_less' : 'expand_more'}
-              </span>
-            </div>
+            {isUsersOpen ? <ChevronUp size={18} style={{ color: 'var(--text-tertiary)' }} /> : <ChevronDown size={18} style={{ color: 'var(--text-tertiary)' }} />}
           </button>
 
           {isUsersOpen && (
-            <div className="mt-3">
-              {metaError && (
-                <p className="text-sm text-red-400 mb-2">{metaError}</p>
-              )}
-
-              {!isMetaLoading && usersMeta.length === 0 && (
-                <p className="text-sm text-gray-500">Henüz meta verisi yok.</p>
-              )}
-
-              <div className="space-y-2">
+            <div style={{ marginTop: 12 }}>
+              {metaError && <p style={{ fontSize: 'var(--text-sm)', color: 'var(--red-600)', marginBottom: 8 }}>{metaError}</p>}
+              {!isMetaLoading && usersMeta.length === 0 && <p style={{ fontSize: 'var(--text-sm)', color: 'var(--text-tertiary)' }}>No user data yet.</p>}
+              <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
                 {usersMeta.map((user) => (
-                  <div key={user.uid} className="rounded-xl border border-white/10 bg-white/5 p-3 flex items-center justify-between">
-                    <div className="min-w-0">
-                      <p className="text-sm font-semibold text-white truncate">{user.displayName || user.email || user.uid}</p>
-                      <p className="text-xs text-gray-400 truncate">{user.email || user.uid}</p>
+                  <div key={user.uid} style={{ display: 'flex', alignItems: 'center', gap: 12, padding: 12, border: '1px solid var(--border-subtle)', borderRadius: 'var(--radius-lg)', background: 'var(--surface-card)' }}>
+                    <Avatar name={user.displayName || user.email} size={36} />
+                    <div style={{ flex: 1, minWidth: 0 }}>
+                      <p style={{ margin: 0, fontSize: 'var(--text-sm)', fontWeight: 700, color: 'var(--text-primary)', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{user.displayName || user.email || user.uid}</p>
+                      <p style={{ margin: 0, fontSize: 'var(--text-2xs)', color: 'var(--text-tertiary)', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{user.email || user.uid}</p>
                     </div>
-                    <div className="text-right text-xs text-gray-400">
-                      <p>Son giriş</p>
-                      <p className="text-white">{user.lastLogin ? new Date(user.lastLogin).toLocaleString('tr-TR') : '—'}</p>
+                    <div style={{ textAlign: 'right', fontSize: 'var(--text-2xs)', color: 'var(--text-tertiary)' }}>
+                      <p style={{ margin: 0 }}>Last login</p>
+                      <p style={{ margin: 0, color: 'var(--text-secondary)', fontWeight: 600 }}>{user.lastLogin ? formatDateShortEN(new Date(user.lastLogin)) : '—'}</p>
                     </div>
                   </div>
                 ))}
@@ -191,28 +152,17 @@ function AdminPanelPage() {
 }
 
 function FeedbackCard({ item, onToggle, onDelete }) {
+  const isDone = item.status === FEEDBACK_STATUS.DONE;
   return (
-    <div className="rounded-lg border border-white/10 bg-white/5 p-3">
-      <div className="flex flex-col gap-1.5">
-        <p className="text-sm text-gray-200 leading-snug whitespace-pre-wrap">{item.content || item.title || 'Geri bildirim'}</p>
-        <div className="flex items-center justify-between text-[11px] text-gray-500">
-          <span>{new Date(item.createdAt).toLocaleDateString('tr-TR')}</span>
-          <span className="text-gray-400 truncate">{item.userEmail || item.userId}</span>
-        </div>
+    <div style={{ border: '1px solid var(--border-subtle)', borderRadius: 'var(--radius-lg)', background: 'var(--surface-card)', padding: 12 }}>
+      <p style={{ margin: 0, fontSize: 'var(--text-sm)', color: 'var(--text-primary)', lineHeight: 1.4, whiteSpace: 'pre-wrap' }}>{item.content || item.title || 'Feedback'}</p>
+      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginTop: 6, fontSize: 'var(--text-2xs)', color: 'var(--text-tertiary)' }}>
+        <span>{item.createdAt ? formatDateShortEN(new Date(item.createdAt)) : ''}</span>
+        <span style={{ overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', maxWidth: 180 }}>{item.userEmail || item.userId}</span>
       </div>
-      <div className="mt-2 flex justify-end gap-1.5 text-[11px]">
-        <button
-          onClick={() => onToggle(item)}
-          className="rounded-md border border-white/15 px-2.5 py-1 font-semibold text-white hover:bg-white/10 transition"
-        >
-          {item.status === FEEDBACK_STATUS.DONE ? 'Tekrar aç' : 'Tamamlandı'}
-        </button>
-        <button
-          onClick={() => onDelete(item)}
-          className="rounded-md border border-red-400/40 px-2.5 py-1 font-semibold text-red-200 hover:bg-red-500/10 transition"
-        >
-          Sil
-        </button>
+      <div style={{ marginTop: 10, display: 'flex', justifyContent: 'flex-end', gap: 8 }}>
+        <Button variant="secondary" size="sm" icon={isDone ? <RotateCcw size={14} /> : <Check size={14} />} onClick={() => onToggle(item)}>{isDone ? 'Reopen' : 'Done'}</Button>
+        <Button variant="danger" size="sm" icon={<Trash2 size={14} />} onClick={() => onDelete(item)}>Delete</Button>
       </div>
     </div>
   );

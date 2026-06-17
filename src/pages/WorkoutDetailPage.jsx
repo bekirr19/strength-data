@@ -1,8 +1,17 @@
 import { useState, useEffect, useMemo, useRef } from 'react';
 import { useNavigate, useParams, useLocation } from 'react-router-dom';
-import { getWorkoutByDate, getWorkouts, saveWorkout, deleteWorkout, formatDateTRFull, resolveWeightValue, getExercises, saveExercises, renameExerciseEverywhere, normalizeExerciseName } from '../utils/storage-client';
+import { getWorkoutByDate, getWorkouts, saveWorkout, deleteWorkout, resolveWeightValue, getExercises, saveExercises, renameExerciseEverywhere, normalizeExerciseName } from '../utils/storage-client';
 import { getExerciseInfo } from '../utils/exerciseMetadata';
+import { formatDateLongEN } from '../utils/datetime';
 import ExerciseEditModal from '../components/ExerciseEditModal';
+import { ArrowLeft, Trash2, CalendarCog, Pencil, Copy, Plus, X, Search, History, Check } from 'lucide-react';
+import { Card } from '../ds/components/layout/Card';
+import { Stepper } from '../ds/components/forms/Stepper';
+import { Input } from '../ds/components/forms/Input';
+import { FilterChip } from '../ds/components/forms/FilterChip';
+import { Button } from '../ds/components/buttons/Button';
+import { IconButton } from '../ds/components/buttons/IconButton';
+import { Modal } from '../ds/components/feedback/Modal';
 
 const CATEGORY_ORDER = ['push', 'pull', 'leg', 'other'];
 
@@ -865,289 +874,99 @@ export default function WorkoutDetailPage() {
 
   if (isLoading) {
     return (
-      <div className="relative flex h-screen w-full items-center justify-center bg-background-dark">
-        <div className="flex flex-col items-center gap-4">
-          <div className="h-12 w-12 animate-spin rounded-full border-4 border-gray-700 border-t-primary"></div>
-          <p className="text-sm text-gray-400">Antrenman yükleniyor...</p>
-        </div>
+      <div style={{ minHeight: '100vh', background: 'var(--surface-page)', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: 14 }}>
+        <div style={{ width: 40, height: 40, borderRadius: '50%', border: '3px solid var(--border-subtle)', borderTopColor: 'var(--accent)', animation: 'sd-spin 0.8s linear infinite' }} />
+        <p style={{ fontSize: 'var(--text-sm)', color: 'var(--text-secondary)' }}>Loading workout…</p>
+        <style>{`@keyframes sd-spin { to { transform: rotate(360deg); } }`}</style>
       </div>
     );
   }
 
+  const FOCUS_LABELS = ['Pull', 'Push', 'Leg'];
+
   return (
-    <div className="relative flex min-h-screen w-full flex-col bg-background-dark">
-      <div className="flex items-center p-4 pb-2 justify-between sticky top-0 z-10 bg-background-dark/95 backdrop-blur-sm border-b border-white/5">
-        <button onClick={() => navigate(-1)} className="flex size-10 md:size-12 items-center justify-center hover:bg-white/5 active:bg-white/10 rounded-xl transition -ml-2">
-          <span className="material-symbols-outlined text-white text-xl md:text-2xl">arrow_back</span>
-        </button>
-        <h2 className="text-white text-base md:text-lg font-bold flex-1 text-center px-2">Antrenman Detayı</h2>
-        <button 
-          onClick={handleDelete}
-          className="flex size-10 md:size-12 items-center justify-center hover:bg-red-500/10 active:bg-red-500/20 rounded-xl transition text-red-400"
-          aria-label="Antrenmanı sil"
-        >
-          <span className="material-symbols-outlined text-xl md:text-2xl">delete</span>
-        </button>
-      </div>
+    <div style={{ position: 'relative', minHeight: '100vh', display: 'flex', flexDirection: 'column', background: 'var(--surface-page)' }}>
+      <header style={{ position: 'sticky', top: 0, zIndex: 20, display: 'flex', alignItems: 'center', gap: 8, padding: '10px 12px', background: 'rgba(247,248,250,0.92)', backdropFilter: 'blur(8px)', borderBottom: '1px solid var(--border-subtle)' }}>
+        <IconButton ariaLabel="Back" variant="ghost" onClick={() => navigate(-1)}><ArrowLeft size={20} /></IconButton>
+        <h2 style={{ flex: 1, margin: 0, textAlign: 'center', fontSize: 'var(--text-base)', fontWeight: 700, color: 'var(--text-primary)' }}>Workout Detail</h2>
+        <IconButton ariaLabel="Delete workout" variant="ghost" onClick={handleDelete} style={{ color: 'var(--red-500)' }}><Trash2 size={18} /></IconButton>
+      </header>
 
-      <main className="flex-grow px-4 pb-24 md:pb-8 max-w-4xl mx-auto w-full">
-        <div className="flex items-center gap-3 pb-3 pt-4">
-          <h1 className="text-white text-xl md:text-[28px] font-bold">{formatDateTRFull(date)}</h1>
-          <div className="relative">
-            <button 
-              onClick={() => dateInputRef.current?.showPicker()}
-              className="p-2 hover:bg-white/10 rounded-full text-gray-400 hover:text-white transition"
-            >
-              <span className="material-symbols-outlined text-xl">edit_calendar</span>
-            </button>
-            <input
-              ref={dateInputRef}
-              type="date"
-              className="absolute inset-0 opacity-0 w-0 h-0"
-              onChange={handleDateChange}
-              defaultValue={date}
-            />
+      <main style={{ flex: 1, padding: '16px 16px 96px', maxWidth: 560, margin: '0 auto', width: '100%' }}>
+        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 16 }}>
+          <h1 style={{ margin: 0, fontSize: 'var(--text-2xl)', fontWeight: 800, letterSpacing: '-.02em', color: 'var(--text-primary)' }}>{formatDateLongEN(date)}</h1>
+          <div style={{ position: 'relative' }}>
+            <IconButton ariaLabel="Move workout" variant="outline" onClick={() => dateInputRef.current?.showPicker()}><CalendarCog size={18} /></IconButton>
+            <input ref={dateInputRef} type="date" style={{ position: 'absolute', inset: 0, opacity: 0, width: 0, height: 0 }} onChange={handleDateChange} defaultValue={date} />
           </div>
         </div>
 
-        {/* Antrenman Adı */}
-        <div className="mb-6">
-          <div className="grid grid-cols-3 gap-3">
-            <button
-              type="button"
-              onClick={() => handleToggleFocus('Pull')}
-              className={`p-3 rounded-xl text-sm font-bold transition border tracking-wide ${
-                (workout.workoutFocus || []).includes('Pull')
-                  ? 'bg-primary text-background-dark border-primary shadow-[0_0_15px_rgba(59,130,246,0.3)]'
-                  : 'bg-[#1C1C1E] border-white/5 text-gray-400 hover:bg-white/5 hover:text-white'
-              }`}
-            >
-              PULL
-            </button>
-            <button
-              type="button"
-              onClick={() => handleToggleFocus('Push')}
-              className={`p-3 rounded-xl text-sm font-bold transition border tracking-wide ${
-                (workout.workoutFocus || []).includes('Push')
-                  ? 'bg-primary text-background-dark border-primary shadow-[0_0_15px_rgba(59,130,246,0.3)]'
-                  : 'bg-[#1C1C1E] border-white/5 text-gray-400 hover:bg-white/5 hover:text-white'
-              }`}
-            >
-              PUSH
-            </button>
-            <button
-              type="button"
-              onClick={() => handleToggleFocus('Leg')}
-              className={`p-3 rounded-xl text-sm font-bold transition border tracking-wide ${
-                (workout.workoutFocus || []).includes('Leg')
-                  ? 'bg-primary text-background-dark border-primary shadow-[0_0_15px_rgba(59,130,246,0.3)]'
-                  : 'bg-[#1C1C1E] border-white/5 text-gray-400 hover:bg-white/5 hover:text-white'
-              }`}
-            >
-              LEG
-            </button>
+        <div style={{ marginBottom: 18 }}>
+          <div style={{ display: 'flex', gap: 8 }}>
+            {FOCUS_LABELS.map((label) => (
+              <FilterChip key={label} label={label} active={(workout.workoutFocus || []).includes(label)} onClick={() => handleToggleFocus(label)} style={{ flex: 1, justifyContent: 'center' }} />
+            ))}
           </div>
-          <div className="mt-3 flex items-center justify-between gap-2">
-            <div className="text-xs text-gray-500 truncate">
-              {(workout.workoutFocus || []).length > 0
-                ? `2 önceki ${labelFromFocus(workout.workoutFocus)} egzersizlerini listeler`
-                : 'Tür seçilmedi'}
-            </div>
-            <button
-              type="button"
-              onClick={handleLoadTemplateFromHistory}
-              className="text-[11px] font-semibold text-gray-400 hover:text-white px-2 py-1 rounded-lg border border-white/10 bg-white/5 transition"
-            >
-              Geçmişten getir
-            </button>
+          <div style={{ marginTop: 10, display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 8 }}>
+            <span style={{ fontSize: 'var(--text-2xs)', color: 'var(--text-tertiary)', minWidth: 0, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+              {(workout.workoutFocus || []).length > 0 ? `Loads the 2nd-most-recent ${labelFromFocus(workout.workoutFocus)} exercises` : 'No focus selected'}
+            </span>
+            <Button variant="ghost" size="sm" icon={<History size={16} />} onClick={handleLoadTemplateFromHistory} style={{ color: 'var(--text-link)', flexShrink: 0 }}>Load from history</Button>
           </div>
         </div>
-        <div className="flex flex-col gap-4 md:gap-6">
+
+        <div style={{ display: 'flex', flexDirection: 'column', gap: 14 }}>
           {sortedItems.map(({ item, idx: exerciseIdx }, loopIdx) => {
             const itemKey = canonicalKeyFromParts(item.canonicalName, item.displayName || item.name);
             const libEntry = exerciseLibrary.find((e) => canonicalKeyFromParts(e.canonicalName, e.name) === itemKey);
             const weightStep = libEntry?.weightStep ?? 2.5;
             return (
-            <div key={exerciseIdx} className="rounded-3xl bg-[#1C1C1E] p-5 shadow-lg border border-white/5">
-              {/* Header */}
-              <div className="flex items-start justify-between mb-6">
-                <div>
-                  <p className="text-[11px] font-bold text-primary uppercase tracking-widest mb-1">
-                    EGZERSİZ {loopIdx + 1}
-                  </p>
-                  <div className="flex items-center gap-2">
-                    <h3 
-                      className="text-xl md:text-2xl font-bold text-white cursor-pointer hover:text-primary transition"
-                      onClick={() => {
-                        if (item.name) {
-                          navigate(`/exercise/${encodeURIComponent(item.name)}`);
-                        }
-                      }}
-                    >
-                      {item.name || 'İsimsiz Egzersiz'}
-                    </h3>
-                    <button
-                      type="button"
-                      onClick={() => openExerciseEditModal(exerciseIdx)}
-                      className="text-gray-500 hover:text-white transition"
-                    >
-                      <span className="material-symbols-outlined text-lg">edit</span>
-                    </button>
+              <Card key={exerciseIdx} pad="md" style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
+                <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', gap: 8 }}>
+                  <div style={{ minWidth: 0 }}>
+                    <div className="sd-eyebrow" style={{ color: 'var(--accent)', marginBottom: 3 }}>Exercise {loopIdx + 1}</div>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+                      <button type="button" onClick={() => { if (item.name) navigate(`/exercise/${encodeURIComponent(item.name)}`); }} style={{ border: 'none', background: 'none', padding: 0, cursor: 'pointer', fontFamily: 'var(--font-sans)', fontSize: 'var(--text-lg)', fontWeight: 800, letterSpacing: '-.01em', color: 'var(--text-primary)', textAlign: 'left' }}>
+                        {item.name || 'Untitled exercise'}
+                      </button>
+                      <IconButton ariaLabel="Edit exercise" variant="soft" size="sm" onClick={() => openExerciseEditModal(exerciseIdx)}><Pencil size={15} /></IconButton>
+                    </div>
                   </div>
+                  <IconButton ariaLabel="Delete exercise" variant="ghost" onClick={() => handleDeleteExercise(exerciseIdx)} style={{ color: 'var(--red-500)' }}><Trash2 size={18} /></IconButton>
                 </div>
-                <button
-                  onClick={() => handleDeleteExercise(exerciseIdx)}
-                  className="text-gray-500 hover:text-red-500 transition p-2 hover:bg-white/5 rounded-full"
-                >
-                  <span className="material-symbols-outlined text-xl">delete</span>
-                </button>
-              </div>
 
-              {/* Sets */}
-              <div className="space-y-2">
-                {item.sets.map((set, setIdx) => (
-                  <div key={setIdx} className="flex items-end gap-2">
-                    {/* Set Number & Duplicate */}
-                    <div className="flex flex-col items-center gap-1 pb-0.5 w-8 shrink-0">
-                      <span className="text-gray-500 font-bold text-xs">{setIdx + 1}</span>
-                      <button
-                        type="button"
-                        onClick={() => handleDuplicateSet(exerciseIdx, setIdx)}
-                        className="flex items-center justify-center size-7 rounded-md bg-white/5 text-primary hover:bg-primary/20 transition border border-white/5"
-                      >
-                        <span className="material-symbols-outlined text-base font-bold">add</span>
-                      </button>
-                    </div>
-
-                    {/* Weight */}
-                    <div className="flex-1">
-                      <label className="block text-center text-[9px] font-bold text-gray-500 mb-1 uppercase tracking-wide">kg</label>
-                      <div className="flex items-center gap-1">
-                        <button
-                          type="button"
-                          onClick={() => handleSetChange(exerciseIdx, setIdx, 'w', adjustWeight(set.w, -weightStep))}
-                          className="flex items-center justify-center w-7 h-8 rounded-md bg-white/5 text-gray-400 hover:text-white hover:bg-white/10 transition"
-                        >
-                          <span className="material-symbols-outlined text-base">remove</span>
-                        </button>
-                        <div className="flex-1 h-8 bg-black/40 flex items-center justify-center rounded-md border border-white/5">
-                          <input
-                            type="text"
-                            inputMode="decimal"
-                            value={set.w}
-                            onChange={(e) => handleSetChange(exerciseIdx, setIdx, 'w', e.target.value)}
-                            onBlur={(e) => { if (e.target.value.trim() === '0') handleSetChange(exerciseIdx, setIdx, 'w', 'bw'); }}
-                            className="w-full bg-transparent text-center text-white font-bold text-base focus:outline-none"
-                            placeholder="0"
-                            autoFocus={focusTarget?.exerciseIdx === exerciseIdx && focusTarget?.setIdx === setIdx && focusTarget?.field === 'w'}
-                            onFocus={(e) => e.target.select()}
-                          />
-                        </div>
-                        <button
-                          type="button"
-                          onClick={() => handleSetChange(exerciseIdx, setIdx, 'w', adjustWeight(set.w, weightStep))}
-                          className="flex items-center justify-center w-7 h-8 rounded-md bg-white/5 text-gray-400 hover:text-white hover:bg-white/10 transition"
-                        >
-                          <span className="material-symbols-outlined text-base">add</span>
-                        </button>
+                <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
+                  {item.sets.map((set, setIdx) => (
+                    <div key={setIdx} style={{ display: 'flex', alignItems: 'flex-end', gap: 8 }}>
+                      <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 4, paddingBottom: 1, width: 26, flexShrink: 0 }}>
+                        <span style={{ fontSize: 'var(--text-xs)', fontWeight: 700, color: 'var(--text-tertiary)' }}>{setIdx + 1}</span>
+                        <IconButton ariaLabel="Duplicate set" variant="soft" size="sm" onClick={() => handleDuplicateSet(exerciseIdx, setIdx)} style={{ color: 'var(--accent)' }}><Copy size={14} /></IconButton>
                       </div>
+                      <Stepper label="kg" value={set.w} onChange={(e) => handleSetChange(exerciseIdx, setIdx, 'w', e.target.value)} onDecrement={() => handleSetChange(exerciseIdx, setIdx, 'w', adjustWeight(set.w, -weightStep))} onIncrement={() => handleSetChange(exerciseIdx, setIdx, 'w', adjustWeight(set.w, weightStep))} />
+                      <Stepper label="Reps" value={set.r} onChange={(e) => handleSetChange(exerciseIdx, setIdx, 'r', e.target.value)} onDecrement={() => handleSetChange(exerciseIdx, setIdx, 'r', Math.max(0, Number(set.r || 0) - 1))} onIncrement={() => handleSetChange(exerciseIdx, setIdx, 'r', Number(set.r || 0) + 1)} />
+                      <IconButton ariaLabel="Delete set" variant="ghost" onClick={() => handleDeleteSet(exerciseIdx, setIdx)} style={{ color: 'var(--red-500)', marginBottom: 1 }}><Trash2 size={18} /></IconButton>
                     </div>
+                  ))}
+                </div>
 
-                    {/* Reps */}
-                    <div className="flex-1">
-                      <label className="block text-center text-[9px] font-bold text-gray-500 mb-1 uppercase tracking-wide">Tekrar</label>
-                      <div className="flex items-center gap-1">
-                        <button
-                          type="button"
-                          onClick={() => handleSetChange(exerciseIdx, setIdx, 'r', Math.max(0, Number(set.r || 0) - 1))}
-                          className="flex items-center justify-center w-7 h-8 rounded-md bg-white/5 text-gray-400 hover:text-white hover:bg-white/10 transition"
-                        >
-                          <span className="material-symbols-outlined text-base">remove</span>
-                        </button>
-                        <div className="flex-1 h-8 bg-black/40 flex items-center justify-center rounded-md border border-white/5">
-                          <input
-                            type="text"
-                            inputMode="numeric"
-                            value={set.r}
-                            onChange={(e) => handleSetChange(exerciseIdx, setIdx, 'r', e.target.value)}
-                            className="w-full bg-transparent text-center text-white font-bold text-base focus:outline-none"
-                            placeholder="0"
-                            onFocus={(e) => e.target.select()}
-                          />
-                        </div>
-                        <button
-                          type="button"
-                          onClick={() => handleSetChange(exerciseIdx, setIdx, 'r', Number(set.r || 0) + 1)}
-                          className="flex items-center justify-center w-7 h-8 rounded-md bg-white/5 text-gray-400 hover:text-white hover:bg-white/10 transition"
-                        >
-                          <span className="material-symbols-outlined text-base">add</span>
-                        </button>
-                      </div>
-                    </div>
-
-                    {/* Delete */}
-                    <div className="pb-0.5">
-                      <button
-                        onClick={() => handleDeleteSet(exerciseIdx, setIdx)}
-                        className="flex items-center justify-center size-8 rounded-md text-red-400/70 hover:text-red-400 hover:bg-red-500/10 transition"
-                      >
-                        <span className="material-symbols-outlined text-lg">delete</span>
-                      </button>
-                    </div>
-                  </div>
-                ))}
-              </div>
-
-              {/* Add Set Button */}
-              <button
-                onClick={() => handleAddSet(exerciseIdx)}
-                className="mt-4 w-full py-3 rounded-xl border border-dashed border-white/10 bg-transparent text-gray-500 font-bold hover:bg-white/5 hover:text-gray-300 hover:border-white/20 transition flex items-center justify-center gap-2 text-xs"
-              >
-                <span className="material-symbols-outlined text-base">add</span>
-                Yeni Set Ekle
-              </button>
-            </div>
+                <Button variant="ghost" fullWidth icon={<Plus size={16} />} onClick={() => handleAddSet(exerciseIdx)} style={{ border: '1px dashed var(--border-strong)', color: 'var(--text-secondary)' }}>Add set</Button>
+              </Card>
             );
           })}
         </div>
 
-        <div className="mt-4 mb-2">
-          <button
-            onClick={openExercisePicker}
-            className="w-full flex items-center justify-center gap-2 py-3 bg-primary text-background-dark rounded-xl font-bold hover:bg-primary/90 active:bg-primary/80 transition text-sm shadow-lg shadow-primary/20"
-          >
-            <span className="material-symbols-outlined text-lg">add</span>
-            Egzersiz Ekle
-          </button>
+        <div style={{ marginTop: 14 }}>
+          <Button variant="secondary" fullWidth size="lg" icon={<Plus size={18} />} onClick={openExercisePicker}>Add Exercise</Button>
         </div>
 
-        <div className="mt-8 space-y-6">
-          {/* Antrenman Yakıtı */}
-          <div className="rounded-3xl bg-[#1C1C1E] p-5 shadow-lg border border-white/5">
-            <label className="flex items-center gap-2 text-lg font-bold text-white mb-3">
-              <span className="text-primary">⚡</span>
-              Antrenman Yakıtı
-            </label>
-            <input
-              type="text"
-              value={workout.workoutFuel || ''}
-              onChange={(e) => setWorkout({ ...workout, workoutFuel: e.target.value })}
-              className="w-full p-4 bg-black/40 border border-white/5 rounded-2xl text-white text-base focus:ring-2 focus:ring-primary focus:border-transparent placeholder:text-gray-600"
-              placeholder="örn: 2 Yumurta, 1 Muz, Kafein (200mg)"
-            />
+        <div style={{ marginTop: 24, display: 'flex', flexDirection: 'column', gap: 14 }}>
+          <div>
+            <label style={{ display: 'flex', alignItems: 'center', gap: 6, fontSize: 'var(--text-2xs)', fontWeight: 700, color: 'var(--text-secondary)', marginBottom: 8, textTransform: 'uppercase', letterSpacing: '0.06em' }}>Pre-workout fuel</label>
+            <Input value={workout.workoutFuel || ''} onChange={(e) => setWorkout({ ...workout, workoutFuel: e.target.value })} placeholder="e.g. 2 eggs, 1 banana, caffeine (200mg)" />
           </div>
-
-          {/* Genel Notlar */}
-          <div className="rounded-3xl bg-[#1C1C1E] p-5 shadow-lg border border-white/5">
-            <label className="block text-lg font-bold text-white mb-3">
-              Antrenman Notları
-            </label>
-            <textarea
-              value={workout.notes || ''}
-              onChange={(e) => setWorkout({ ...workout, notes: e.target.value })}
-              className="w-full h-32 p-4 bg-black/40 text-white rounded-2xl border border-white/5 focus:ring-2 focus:ring-primary text-base resize-none placeholder:text-gray-600"
-              placeholder="Bugünkü antrenman nasıl geçti? Enerji seviyen, motivasyonun veya karşılaştığın zorluklar hakkında notlar al."
-            />
+          <div>
+            <label style={{ display: 'block', fontSize: 'var(--text-2xs)', fontWeight: 700, color: 'var(--text-secondary)', marginBottom: 8, textTransform: 'uppercase', letterSpacing: '0.06em' }}>Notes</label>
+            <textarea value={workout.notes || ''} onChange={(e) => setWorkout({ ...workout, notes: e.target.value })} rows={4} placeholder="How did today go? Note your energy, motivation, or anything you struggled with." style={{ width: '100%', resize: 'vertical', padding: '12px 14px', borderRadius: 'var(--radius-md)', border: '1px solid var(--border-subtle)', background: 'var(--surface-card)', fontFamily: 'var(--font-sans)', fontSize: 'var(--text-sm)', color: 'var(--text-primary)', boxShadow: 'var(--shadow-xs)', outline: 'none', boxSizing: 'border-box' }} />
           </div>
         </div>
       </main>
@@ -1161,99 +980,47 @@ export default function WorkoutDetailPage() {
         isSaving={isSavingExerciseEdit}
       />
 
-      {isPickerOpen && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 backdrop-blur-sm p-4">
-          <div className="w-full max-w-md bg-[#1C1C1E] border border-white/10 rounded-3xl shadow-2xl shadow-black/50 h-[80vh] flex flex-col overflow-hidden">
-            {/* Header */}
-            <div className="flex items-center justify-between px-5 pt-5 pb-3 border-b border-white/5">
-              <div>
-                <h3 className="text-white text-lg font-bold uppercase tracking-wide">EGZERSİZ SEÇ</h3>
-                <p className="text-gray-400 text-xs">Listeden seç veya yeni ekle</p>
-              </div>
-              <button
-                onClick={closeExercisePicker}
-                className="flex items-center justify-center size-8 rounded-full bg-white/10 text-gray-400 hover:text-white hover:bg-white/20 transition"
-                aria-label="Kapat"
-              >
-                <span className="material-symbols-outlined text-lg">close</span>
-              </button>
-            </div>
-
-            {/* Search */}
-            <div className="px-5 py-3 border-b border-white/5 bg-[#1C1C1E]">
-              <div className="relative">
-                <span className="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-gray-500 text-xl">search</span>
-                <input
-                  type="text"
-                  value={pickerSearch}
-                  onChange={(e) => setPickerSearch(e.target.value)}
-                  className="w-full pl-10 pr-4 py-3 bg-black/40 border border-white/10 rounded-xl text-white text-sm focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary placeholder:text-gray-600 transition"
-                  placeholder="Egzersiz ara..."
-                  autoFocus
-                />
-              </div>
-            </div>
-
-            {/* List */}
-            <div className="flex-1 overflow-y-auto custom-scrollbar">
-              {filteredLibrary.length === 0 ? (
-                <div className="p-8 text-center">
-                  <p className="text-gray-400 text-sm mb-4">Aradığın kriterlere uygun egzersiz bulunamadı.</p>
-                  <button
-                     onClick={handleManualAddExercise}
-                     className="text-primary text-sm font-bold hover:underline"
-                  >
-                    Manuel Ekle
-                  </button>
-                </div>
-              ) : (
-                <div className="divide-y divide-white/5">
-                  {filteredLibrary.map(({ displayName, canonical, info }) => (
-                    <button
-                      key={canonical}
-                      onClick={() => handleSelectExercise({ displayName, canonical })}
-                      className="w-full flex items-center justify-between px-5 py-4 hover:bg-white/5 transition text-left group"
-                    >
-                      <div className="flex flex-col gap-1">
-                        <span className="text-white text-base font-bold group-hover:text-primary transition">{displayName}</span>
-                        <div className="flex items-center gap-2 text-xs text-gray-500">
-                          <span className="uppercase font-bold tracking-wider">{info.category}</span>
-                          {info.muscleLabels.length > 0 && (
-                            <>
-                              <span className="size-1 rounded-full bg-gray-600"></span>
-                              <span>{info.muscleLabels.join(', ')}</span>
-                            </>
-                          )}
-                        </div>
-                      </div>
-                      <div className="flex items-center justify-center size-8 rounded-full border border-white/10 text-gray-400 group-hover:border-primary group-hover:text-primary transition">
-                        <span className="material-symbols-outlined text-xl">add</span>
-                      </div>
-                    </button>
-                  ))}
-                  
-                  {/* Manual Add Button at the end of list */}
-                   <button
-                    onClick={handleManualAddExercise}
-                    className="w-full flex items-center justify-center gap-2 px-5 py-4 text-primary hover:bg-white/5 transition font-semibold text-sm"
-                  >
-                    <span className="material-symbols-outlined">add</span>
-                    Yeni Egzersiz Ekle
-                  </button>
-                </div>
-              )}
-            </div>
-          </div>
+      <Modal
+        open={isPickerOpen}
+        onClose={closeExercisePicker}
+        variant="sheet"
+        contained={false}
+        title="Add Exercise"
+        subtitle="Pick from your library or add a new one"
+        headerRight={<IconButton ariaLabel="Close" variant="soft" onClick={closeExercisePicker}><X size={18} /></IconButton>}
+      >
+        <div style={{ paddingBottom: 12 }}>
+          <Input icon={<Search size={18} />} placeholder="Search exercises…" value={pickerSearch} onChange={(e) => setPickerSearch(e.target.value)} autoFocus />
         </div>
-      )}
+        <div style={{ display: 'flex', flexDirection: 'column' }}>
+          {filteredLibrary.length === 0 ? (
+            <div style={{ padding: '24px 8px', textAlign: 'center' }}>
+              <p style={{ fontSize: 'var(--text-sm)', color: 'var(--text-secondary)', marginBottom: 12 }}>No exercises match your search.</p>
+              <Button variant="secondary" icon={<Plus size={16} />} onClick={handleManualAddExercise}>New / manual exercise</Button>
+            </div>
+          ) : (
+            <>
+              {filteredLibrary.map(({ displayName, canonical, info }) => (
+                <button key={canonical} onClick={() => handleSelectExercise({ displayName, canonical })} style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 10, width: '100%', padding: '12px 4px', border: 'none', background: 'none', borderBottom: '1px solid var(--border-subtle)', cursor: 'pointer', textAlign: 'left' }}>
+                  <div style={{ display: 'flex', flexDirection: 'column', gap: 3, minWidth: 0 }}>
+                    <span style={{ fontSize: 'var(--text-sm)', fontWeight: 700, color: 'var(--text-primary)' }}>{displayName}</span>
+                    <span style={{ fontSize: 'var(--text-2xs)', color: 'var(--text-tertiary)' }}>{[info.category, info.muscleLabels.join(', ')].filter(Boolean).join(' · ')}</span>
+                  </div>
+                  <Plus size={18} style={{ color: 'var(--accent)', flexShrink: 0 }} />
+                </button>
+              ))}
+              <button onClick={handleManualAddExercise} style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 6, width: '100%', padding: '14px 4px', border: 'none', background: 'none', cursor: 'pointer', color: 'var(--text-link)', fontWeight: 700, fontSize: 'var(--text-sm)', fontFamily: 'var(--font-sans)' }}>
+                <Plus size={16} /> New / manual exercise
+              </button>
+            </>
+          )}
+        </div>
+      </Modal>
 
-      <div className="fixed bottom-0 left-0 right-0 p-4 bg-gradient-to-t from-background-dark via-background-dark to-transparent z-20">
-        <button
-          onClick={handleSave}
-          className="w-full max-w-4xl mx-auto py-4 bg-primary text-background-dark text-lg font-bold rounded-2xl shadow-lg shadow-primary/20 hover:bg-primary/90 active:bg-primary/80 transition"
-        >
-          Antrenmanı Kaydet
-        </button>
+      <div style={{ position: 'fixed', bottom: 0, left: 0, right: 0, padding: '12px 16px', background: 'linear-gradient(to top, var(--surface-page) 72%, transparent)', zIndex: 20 }}>
+        <div style={{ maxWidth: 560, margin: '0 auto' }}>
+          <Button variant="primary" fullWidth size="lg" icon={<Check size={18} />} onClick={handleSave}>Save Workout</Button>
+        </div>
       </div>
     </div>
   );

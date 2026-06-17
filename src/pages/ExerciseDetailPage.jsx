@@ -5,14 +5,26 @@ import {
   getExercises,
   saveExercises,
   renameExerciseEverywhere,
-  formatDateTRFull,
   fromISO,
   normalizeExerciseName,
   getBodyWeightCollection,
 } from '../utils/storage-client';
 import { getExerciseInfo, MUSCLE_OPTIONS } from '../utils/exerciseMetadata';
+import { WEEKDAYS_SHORT, MONTHS_SHORT } from '../utils/datetime';
 import { Area, AreaChart, CartesianGrid, Tooltip, ResponsiveContainer, XAxis, YAxis, ReferenceLine } from 'recharts';
 import ExerciseEditModal from '../components/ExerciseEditModal';
+import { ArrowLeft, Pencil, Trophy, TrendingUp } from 'lucide-react';
+import { IconButton } from '../ds/components/buttons/IconButton';
+import { StatCard } from '../ds/components/data-display/StatCard';
+import { SetChip } from '../ds/components/data-display/SetChip';
+import { AnimatedNumber } from '../ds/components/data-display/AnimatedNumber';
+import { SegmentedControl } from '../ds/components/forms/SegmentedControl';
+
+const METRIC_COLOR = { weight: '#3b82f6', oneRm: '#6366f1', volume: '#64748b' };
+const fmtHistoryDate = (iso) => {
+  const d = new Date(iso);
+  return `${WEEKDAYS_SHORT[d.getDay()]} ${d.getDate()} ${MONTHS_SHORT[d.getMonth()]}`;
+};
 
 const BODYWEIGHT_KEYWORDS = ['pull up', 'pull-up', 'chin up', 'chin-up', 'dip', 'dips', 'muscle up', 'muscle-up', 'barfix'];
 
@@ -449,8 +461,9 @@ export default function ExerciseDetailPage() {
 
   if (isLoading) {
     return (
-      <div className="flex h-screen w-full items-center justify-center bg-background-dark">
-        <div className="h-12 w-12 animate-spin rounded-full border-4 border-gray-700 border-t-yellow-400"></div>
+      <div style={{ minHeight: '100vh', background: 'var(--surface-page)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+        <div style={{ width: 40, height: 40, borderRadius: '50%', border: '3px solid var(--border-subtle)', borderTopColor: 'var(--accent)', animation: 'sd-spin 0.8s linear infinite' }} />
+        <style>{`@keyframes sd-spin { to { transform: rotate(360deg); } }`}</style>
       </div>
     );
   }
@@ -460,241 +473,134 @@ export default function ExerciseDetailPage() {
     return found ? found.label : m;
   }).join(', ');
 
-  return (
-    <div className="min-h-screen bg-background-dark text-white pb-10">
-      {/* 1. Header */}
-      <header className="sticky top-0 z-20 flex items-center justify-between bg-background-dark/95 px-4 py-4 backdrop-blur border-b border-white/5">
-        <button
-          onClick={() => navigate(-1)}
-          className="flex h-10 w-10 items-center justify-center rounded-full text-gray-400 hover:bg-white/10 hover:text-white transition"
-        >
-          <span className="material-symbols-outlined text-2xl">arrow_back</span>
-        </button>
-        
-        <div className="flex flex-col items-center">
-          <h1 className="text-lg font-bold text-white capitalize">{displayName}</h1>
-          {muscleLabels && (
-            <span className="text-[10px] font-bold uppercase tracking-widest text-gray-500">
-              {muscleLabels}
-            </span>
-          )}
-        </div>
+  const isBodyweightExercise = BODYWEIGHT_KEYWORDS.some((kw) => canonicalName.toLowerCase().includes(kw));
+  const metricColor = METRIC_COLOR[chartMetric];
 
-        <button
-          onClick={openEditModal}
-          className="flex h-10 w-10 items-center justify-center rounded-full text-gray-400 hover:bg-white/10 hover:text-white transition"
-        >
-          <span className="material-symbols-outlined text-xl">edit</span>
-        </button>
+  return (
+    <div style={{ minHeight: '100vh', background: 'var(--surface-page)', paddingBottom: 40 }}>
+      <header style={{ position: 'sticky', top: 0, zIndex: 20, display: 'flex', alignItems: 'center', gap: 8, padding: '10px 12px', background: 'rgba(247,248,250,0.92)', backdropFilter: 'blur(8px)', borderBottom: '1px solid var(--border-subtle)' }}>
+        <IconButton ariaLabel="Back" variant="ghost" onClick={() => navigate(-1)}><ArrowLeft size={20} /></IconButton>
+        <div style={{ flex: 1, textAlign: 'center', minWidth: 0 }}>
+          <div style={{ fontSize: 'var(--text-base)', fontWeight: 700, color: 'var(--text-primary)', textTransform: 'capitalize', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{displayName}</div>
+          {muscleLabels && <div className="sd-eyebrow" style={{ marginTop: 1 }}>{muscleLabels}</div>}
+        </div>
+        <IconButton ariaLabel="Edit exercise" variant="ghost" onClick={openEditModal}><Pencil size={18} /></IconButton>
       </header>
 
-      <main className="px-4 py-6 space-y-6">
-        {/* 2. Mini Stats Strip */}
-        <section className="grid grid-cols-2 gap-3">
-            {/* Max Weight Card */}
-            <div className="relative overflow-hidden rounded-2xl border border-yellow-500/20 bg-gradient-to-br from-yellow-500/10 to-transparent p-3">
-                 <div className="flex items-center gap-2">
-                    <span className="material-symbols-outlined text-yellow-400 text-lg">emoji_events</span>
-                    <span className="text-[10px] font-bold uppercase tracking-wider text-yellow-200/70">En İyi</span>
-                 </div>
-                 <p className="mt-1 text-xl font-bold text-yellow-400">{hallOfFame.maxWeight.value} kg</p>
-                 {hallOfFame.maxWeight.date && (
-                    <p className="text-[10px] text-yellow-500/50 mt-0.5">
-                        {hallOfFame.maxWeight.date.toLocaleDateString('tr-TR', { day: 'numeric', month: 'short', year: 'numeric' })}
-                    </p>
-                 )}
-            </div>
-            {/* OneRM Trend Card */}
-            <div className="relative overflow-hidden rounded-2xl border border-white/10 bg-white/5 p-3">
-                 <div className="flex items-center gap-2">
-                    <span className="material-symbols-outlined text-rose-400 text-lg">trending_up</span>
-                    <span className="text-[10px] font-bold uppercase tracking-wider text-gray-400">Güç Değişimi (1RM)</span>
-                 </div>
-                 {hallOfFame.oneRmTrend ? (
-                    <>
-                        <p className={`mt-1 text-xl font-bold ${hallOfFame.oneRmTrend.percent >= 0 ? 'text-blue-400' : 'text-red-400'}`}>
-                            {hallOfFame.oneRmTrend.percent > 0 ? '+' : ''}{hallOfFame.oneRmTrend.percent}%
-                        </p>
-                        <p className="text-[10px] text-gray-500 mt-0.5">Son 3 antrenman ort.</p>
-                    </>
-                 ) : (
-                    <p className="mt-1 text-sm text-gray-500">Yeterli veri yok</p>
-                 )}
-            </div>
-        </section>
+      <main style={{ padding: '16px 16px 32px', maxWidth: 560, margin: '0 auto', width: '100%', display: 'flex', flexDirection: 'column', gap: 16 }}>
+        {/* Stats */}
+        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12 }}>
+          <StatCard
+            tone="gold"
+            icon={<Trophy size={16} />}
+            label="Best"
+            value={<><AnimatedNumber value={hallOfFame.maxWeight.value} /> kg</>}
+            sub={hallOfFame.maxWeight.date ? `${hallOfFame.maxWeight.date.getDate()} ${MONTHS_SHORT[hallOfFame.maxWeight.date.getMonth()]} ${hallOfFame.maxWeight.date.getFullYear()}` : undefined}
+          />
+          <StatCard
+            icon={<TrendingUp size={16} />}
+            label="Strength change"
+            value={hallOfFame.oneRmTrend ? <><AnimatedNumber value={hallOfFame.oneRmTrend.percent} prefix={hallOfFame.oneRmTrend.percent > 0 ? '+' : ''} />%</> : '—'}
+            sub={hallOfFame.oneRmTrend ? 'vs last 3 sessions' : 'Not enough data'}
+            trend={hallOfFame.oneRmTrend ? (hallOfFame.oneRmTrend.percent >= 0 ? 'up' : 'down') : null}
+          />
+        </div>
 
-        {/* 3. Smart Chart */}
-        <section className="rounded-3xl border border-white/5 bg-[#161618] p-5 shadow-xl">
-          <div className="flex flex-col gap-4 mb-6">
-            <div className="flex items-center justify-between">
-                <h3 className="text-sm font-bold text-gray-300">İlerleme</h3>
-                 {/* Metric Toggle */}
-                <div className="flex flex-col items-end gap-1">
-                  <div className="flex bg-black/40 rounded-lg p-1 border border-white/5">
-                    <button 
-                      onClick={() => setChartMetric('weight')}
-                      className={`px-3 py-1 rounded-md text-xs font-bold transition ${chartMetric === 'weight' ? 'bg-yellow-400 text-black shadow-lg' : 'text-gray-500 hover:text-gray-300'}`}
-                    >
-                      Ağırlık
-                    </button>
-                    <button 
-                      onClick={() => setChartMetric('oneRm')}
-                      className={`px-3 py-1 rounded-md text-xs font-bold transition ${chartMetric === 'oneRm' ? 'bg-rose-500 text-white shadow-lg' : 'text-gray-500 hover:text-gray-300'}`}
-                    >
-                      1RM (Güç)
-                    </button>
-                    <button 
-                      onClick={() => setChartMetric('volume')}
-                      className={`px-3 py-1 rounded-md text-xs font-bold transition ${chartMetric === 'volume' ? 'bg-white text-black shadow-lg' : 'text-gray-500 hover:text-gray-300'}`}
-                    >
-                      Hacim
-                    </button>
-                  </div>
-                  {chartMetric === 'oneRm' && BODYWEIGHT_KEYWORDS.some(kw => canonicalName.toLowerCase().includes(kw)) && (
-                    <span className="text-[10px] text-gray-500 italic px-1">
-                      *Vücut ağırlığı dahil
-                    </span>
-                  )}
-                </div>
-            </div>
-            
-            {/* Time Range Tabs */}
-            <div className="flex bg-white/5 rounded-lg p-1 self-start">
-                {['weekly', 'monthly', 'yearly', 'all'].map(range => (
-                    <button
-                        key={range}
-                        onClick={() => setTimeRange(range)}
-                        className={`px-3 py-1 rounded-md text-[10px] font-bold uppercase transition ${timeRange === range ? 'bg-gray-700 text-white' : 'text-gray-500 hover:text-gray-300'}`}
-                    >
-                        {range === 'weekly' ? '1H' : range === 'monthly' ? '1A' : range === 'yearly' ? '1Y' : 'Tümü'}
-                    </button>
-                ))}
-            </div>
+        {/* Chart */}
+        <div style={{ background: 'var(--surface-card)', border: '1px solid var(--border-subtle)', borderRadius: 'var(--radius-2xl)', boxShadow: 'var(--shadow-sm)', padding: 20, display: 'flex', flexDirection: 'column', gap: 14 }}>
+          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 10, flexWrap: 'wrap' }}>
+            <span style={{ fontSize: 'var(--text-sm)', fontWeight: 700, color: 'var(--text-primary)' }}>Progress</span>
+            <SegmentedControl
+              size="sm"
+              fill={false}
+              accent={metricColor}
+              options={[{ value: 'weight', label: 'Weight' }, { value: 'oneRm', label: '1RM' }, { value: 'volume', label: 'Volume' }]}
+              value={chartMetric}
+              onChange={setChartMetric}
+            />
           </div>
-          
-          <div className="h-[200px] w-full">
+          {chartMetric === 'oneRm' && isBodyweightExercise && (
+            <span style={{ fontSize: 'var(--text-2xs)', color: 'var(--text-tertiary)', fontStyle: 'italic' }}>*Includes body weight</span>
+          )}
+
+          <div style={{ height: 200, width: '100%' }}>
             <ResponsiveContainer width="100%" height="100%">
               <AreaChart data={chartData}>
                 <defs>
                   <linearGradient id="colorMetric" x1="0" y1="0" x2="0" y2="1">
-                    <stop offset="5%" stopColor={chartMetric === 'weight' ? '#FACC15' : chartMetric === 'oneRm' ? '#F43F5E' : '#FFFFFF'} stopOpacity={0.3}/>
-                    <stop offset="95%" stopColor={chartMetric === 'weight' ? '#FACC15' : chartMetric === 'oneRm' ? '#F43F5E' : '#FFFFFF'} stopOpacity={0}/>
+                    <stop offset="5%" stopColor={metricColor} stopOpacity={0.22} />
+                    <stop offset="95%" stopColor={metricColor} stopOpacity={0} />
                   </linearGradient>
                 </defs>
-                <CartesianGrid strokeDasharray="3 3" stroke="#333" vertical={false} />
-                <XAxis 
-                  dataKey="label" 
-                  stroke="#666" 
-                  fontSize={10} 
+                <CartesianGrid strokeDasharray="3 3" stroke="#e5e7eb" vertical={false} />
+                <XAxis dataKey="label" stroke="#9ca3af" fontSize={10} tickLine={false} axisLine={false} minTickGap={20} />
+                <YAxis
+                  stroke="#9ca3af"
+                  fontSize={10}
                   tickLine={false}
                   axisLine={false}
-                  minTickGap={20}
+                  tickFormatter={(val) => (val >= 1000 ? `${(val / 1000).toFixed(1)}k` : val)}
+                  domain={[(dataMin) => (chartMetric === 'volume' ? 0 : Math.max(0, Math.floor(dataMin - 5))), 'auto']}
                 />
-                <YAxis 
-                  stroke="#666" 
-                  fontSize={10} 
-                  tickLine={false}
-                  axisLine={false}
-                  tickFormatter={(val) => val >= 1000 ? `${(val/1000).toFixed(1)}k` : val}
-                  domain={[
-                    (dataMin) => {
-                      // Hacim için 0'dan başlasın
-                      if (chartMetric === 'volume') return 0;
-                      // Ağırlık/1RM için en düşük değerin 5 birim altından başlasın
-                      // Bu sayede gelişim eğrisi daha belirgin olur
-                      return Math.max(0, Math.floor(dataMin - 5));
-                    }, 
-                    'auto'
-                  ]}
+                <Tooltip
+                  contentStyle={{ backgroundColor: 'var(--surface-card)', borderColor: 'var(--border-subtle)', borderRadius: 12, boxShadow: 'var(--shadow-lg)' }}
+                  itemStyle={{ color: 'var(--text-primary)', fontSize: 12, fontWeight: 'bold' }}
+                  labelStyle={{ color: 'var(--text-tertiary)', fontSize: 10, marginBottom: 4 }}
                 />
-                <Tooltip 
-                  contentStyle={{ backgroundColor: '#1C1C1E', borderColor: '#333', borderRadius: '12px' }}
-                  itemStyle={{ color: '#fff', fontSize: '12px', fontWeight: 'bold' }}
-                  labelStyle={{ color: '#888', fontSize: '10px', marginBottom: '4px' }}
-                />
-                <Area 
-                  type="monotone" 
-                  dataKey={chartMetric} 
-                  stroke={chartMetric === 'weight' ? '#FACC15' : chartMetric === 'oneRm' ? '#F43F5E' : '#FFFFFF'} 
-                  strokeWidth={3}
-                  fillOpacity={1} 
-                  fill="url(#colorMetric)" 
-                />
-                {/* Reference Lines */}
+                <Area type="monotone" dataKey={chartMetric} stroke={metricColor} strokeWidth={2.5} fillOpacity={1} fill="url(#colorMetric)" />
                 {currentViewMax > 0 && (
-                  <ReferenceLine 
-                    y={currentViewMax} 
-                    stroke={chartMetric === 'weight' ? '#FACC15' : chartMetric === 'oneRm' ? '#F43F5E' : '#FFFFFF'} 
-                    strokeDasharray="3 3" 
-                    label={{ 
-                      value: timeRange === 'all' ? 'Genel Max' : 'Dönem Max', 
-                      position: 'right', 
-                      fill: chartMetric === 'weight' ? '#FACC15' : chartMetric === 'oneRm' ? '#F43F5E' : '#FFFFFF', 
-                      fontSize: 10 
-                    }} 
+                  <ReferenceLine
+                    y={currentViewMax}
+                    stroke={metricColor}
+                    strokeDasharray="3 3"
+                    label={{ value: timeRange === 'all' ? 'All-time max' : 'Period max', position: 'right', fill: metricColor, fontSize: 10 }}
                   />
                 )}
               </AreaChart>
             </ResponsiveContainer>
           </div>
-        </section>
 
-        {/* 4. Logbook History */}
-        <section>
-          <h3 className="text-sm font-bold text-gray-400 mb-4 px-1 uppercase tracking-wider">Geçmiş Antrenmanlar</h3>
-          <div className="space-y-1">
+          {/* Time range */}
+          <SegmentedControl
+            size="sm"
+            options={[{ value: 'weekly', label: '1W' }, { value: 'monthly', label: '1M' }, { value: 'yearly', label: '1Y' }, { value: 'all', label: 'All' }]}
+            value={timeRange}
+            onChange={setTimeRange}
+          />
+        </div>
+
+        {/* History */}
+        <div>
+          <div className="sd-eyebrow" style={{ marginBottom: 10, paddingLeft: 2 }}>History</div>
+          <div style={{ display: 'flex', flexDirection: 'column' }}>
             {history.map((entry) => (
-              <div 
-                key={entry.iso} 
+              <button
+                key={entry.iso}
+                type="button"
                 onClick={() => navigate('/', { state: { date: entry.iso } })}
-                className="group relative flex flex-col py-3 border-b border-white/5 last:border-0 cursor-pointer hover:bg-white/5 transition px-2 rounded-lg"
+                style={{ display: 'flex', flexDirection: 'column', gap: 8, padding: '12px 8px', border: 'none', borderBottom: '1px solid var(--border-subtle)', background: 'none', cursor: 'pointer', textAlign: 'left' }}
               >
-                {/* Row Header: Date & Total Volume */}
-                <div className="flex items-center justify-between mb-1.5">
-                    <span className="text-xs font-bold text-gray-400 w-24 shrink-0">
-                        {new Date(entry.iso).toLocaleDateString('tr-TR', { day: 'numeric', month: 'short', weekday: 'short' })}
-                    </span>
-                    <div className="h-[1px] flex-1 bg-white/5 mx-3"></div>
-                    <span className="text-[10px] font-medium text-gray-600">Top: {Math.round(entry.totalVolume).toLocaleString()}kg</span>
+                <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+                  <span style={{ fontSize: 'var(--text-xs)', fontWeight: 700, color: 'var(--text-secondary)' }}>{fmtHistoryDate(entry.iso)}</span>
+                  <div style={{ flex: 1, height: 1, background: 'var(--border-subtle)' }} />
+                  <span className="sd-tnum" style={{ fontSize: 'var(--text-2xs)', color: 'var(--text-tertiary)' }}>Vol {Math.round(entry.totalVolume).toLocaleString()} kg</span>
                 </div>
-
-                {/* Sets Row */}
-                <div className="flex flex-wrap items-center justify-end gap-x-3 gap-y-1 pl-8">
-                    {entry.sets.map((set, sIdx) => {
-                        const isMaxSet = set.weight === entry.maxWeight;
-                        let textColor = 'text-white';
-                        let iconColor = '';
-                        
-                        if (isMaxSet) {
-                            if (entry.prStatus === 'new') {
-                                textColor = 'text-yellow-400';
-                                iconColor = 'text-yellow-500';
-                            } else if (entry.prStatus === 'equal') {
-                                textColor = 'text-cyan-400';
-                                iconColor = 'text-cyan-500';
-                            }
-                        }
-
-                        return (
-                            <div key={sIdx} className="flex items-baseline gap-1">
-                                <span className={`text-sm font-bold ${textColor}`}>{set.weight}</span>
-                                <span className="text-xs font-medium text-gray-400">x{set.reps}</span>
-                                {isMaxSet && entry.prStatus !== 'none' && <span className={`material-symbols-outlined text-[10px] ${iconColor}`}>trophy</span>}
-                                {sIdx < entry.sets.length - 1 && <span className="text-gray-700 text-xs mx-1">/</span>}
-                            </div>
-                        );
-                    })}
+                <div style={{ display: 'flex', flexWrap: 'wrap', gap: 6 }}>
+                  {entry.sets.map((set, sIdx) => {
+                    const isMaxSet = set.weight === entry.maxWeight;
+                    const pr = isMaxSet && entry.prStatus === 'new' ? 'new' : isMaxSet && entry.prStatus === 'equal' ? 'tied' : 'none';
+                    return <SetChip key={sIdx} reps={set.reps} weight={set.weight} pr={pr} trophy={pr !== 'none' ? <Trophy size={11} /> : null} />;
+                  })}
                 </div>
-              </div>
+              </button>
             ))}
           </div>
-        </section>
+        </div>
       </main>
 
-      {/* Edit Modal */}
       <ExerciseEditModal
         isOpen={editModalState.isOpen}
-        title={editModalState.isNew ? 'Yeni Egzersiz' : 'Egzersizi Düzenle'}
+        title={editModalState.isNew ? 'New exercise' : 'Edit exercise'}
         form={editForm}
         onChange={(partial) => setEditForm((prev) => ({ ...prev, ...partial }))}
         onClose={closeEditModal}

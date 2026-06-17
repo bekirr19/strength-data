@@ -1,0 +1,58 @@
+<!-- @dsCard group="Components" viewport="700x250" name="Card & Avatar" subtitle="Rounded white surfaces · tints · avatars" -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<link rel="stylesheet" href="../../styles.css" />
+<style>
+  body { margin: 0; padding: 24px; background: var(--surface-page); }
+  .label { font-size: var(--text-3xs); font-weight: 700; text-transform: uppercase; letter-spacing: .12em; color: var(--text-tertiary); margin-bottom: 8px; }
+  .grid { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 14px; margin-bottom: 18px; }
+  h4 { margin: 0 0 4px; font-size: var(--text-sm); font-weight: 700; color: var(--text-primary); }
+  p { margin: 0; font-size: var(--text-xs); color: var(--text-secondary); }
+</style>
+</head>
+<body>
+<div id="root"></div>
+<script src="https://unpkg.com/react@18.3.1/umd/react.production.min.js"></script>
+<script src="https://unpkg.com/react-dom@18.3.1/umd/react-dom.production.min.js"></script>
+<script src="https://unpkg.com/@babel/standalone@7.29.0/babel.min.js"></script>
+<script src="https://unpkg.com/lucide@0.460.0/dist/umd/lucide.min.js"></script>
+<script src="../../_ds_bundle.js"></script>
+<script type="text/babel" data-presets="react">
+  const { Card, Avatar } = window.StrengthDataDesignSystem_5c629b;
+  const I = (name, size = 20) => {
+    const n = lucide[name];
+    let svg = '';
+    if (n && Array.isArray(n)) {
+      const a = { ...n[1], width: size, height: size, 'stroke-width': 2 };
+      const at = Object.entries(a).map(([k, v]) => k + '="' + v + '"').join(' ');
+      const kids = (n[2] || []).map(c => '<' + c[0] + ' ' + Object.entries(c[1]).map(([k, v]) => k + '="' + v + '"').join(' ') + '/>').join('');
+      svg = '<svg ' + at + '>' + kids + '</svg>';
+    }
+    return <span dangerouslySetInnerHTML={{ __html: svg }} style={{ display: 'inline-flex' }} />;
+  };
+  function Demo() {
+    return (
+      <div>
+        <div className="label">Cards</div>
+        <div className="grid">
+          <Card pad="md"><h4>Default</h4><p>White surface, soft shadow, hairline border.</p></Card>
+          <Card pad="md" interactive><h4>Interactive</h4><p>Hover lifts the row for tappable cards.</p></Card>
+          <Card pad="md" tint="accent"><h4 style={{color:'var(--blue-700)'}}>Accent tint</h4><p style={{color:'var(--blue-700)'}}>For fuel / highlight panels.</p></Card>
+        </div>
+        <div className="label">Avatars</div>
+        <div style={{ display: 'flex', alignItems: 'center', gap: 14 }}>
+          <Avatar name="Ahmet" size={48} />
+          <Avatar name="Sara" size={40} />
+          <Avatar icon={I('User')} size={40} />
+          <Avatar src="https://i.pravatar.cc/96?img=12" name="Photo" size={48} />
+        </div>
+      </div>
+    );
+  }
+  ReactDOM.createRoot(document.getElementById('root')).render(<Demo />);
+</script>
+</body>
+</html>

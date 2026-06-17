@@ -65,7 +65,7 @@ function LoginScreen({ nav }) {
 
 // ============================ TODAY ============================
 function TodayScreen({ nav }) {
-  const { Card, CategoryBadge, Badge, SetChip, IconButton, Avatar, BottomNav, WeekDay } = DS;
+  const { Card, CategoryBadge, Badge, SetChip, IconButton, Avatar, BottomNav, WeekStrip } = DS;
   const w = TODAY_WORKOUT;
   const [selected, setSelected] = React.useState('2026-06-15');
   const [menuOpen, setMenuOpen] = React.useState(false);
@@ -104,13 +104,8 @@ function TodayScreen({ nav }) {
       </header>
 
       {/* Week strip */}
-      <div style={{ position: 'sticky', top: 67, zIndex: 10, background: 'rgba(247,248,250,0.9)', backdropFilter: 'blur(8px)', borderBottom: '1px solid var(--border-subtle)', padding: '10px 0' }}>
-        <div className="sd-no-scrollbar" style={{ display: 'flex', gap: 8, overflowX: 'auto', padding: '0 16px' }}>
-          {WEEK.map((day) => (
-            <WeekDay key={day.iso} weekday={day.wd} day={day.d} category={day.category} caption={day.caption}
-              selected={selected === day.iso} onClick={() => setSelected(day.iso)} />
-          ))}
-        </div>
+      <div style={{ position: 'sticky', top: 67, zIndex: 10, background: 'rgba(247,248,250,0.9)', backdropFilter: 'blur(8px)', borderBottom: '1px solid var(--border-subtle)', padding: '10px 16px' }}>
+        <WeekStrip days={WEEK} selectedISO={selected} onSelect={setSelected} />
       </div>
 
       {/* Main */}

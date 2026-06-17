@@ -1,0 +1,68 @@
+<!-- @dsCard group="Components" viewport="700x230" name="Badges, Chips & Stats" subtitle="Category tints · set chips with PR · stat tiles" -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<link rel="stylesheet" href="../../styles.css" />
+<style>
+  body { margin: 0; padding: 24px; background: var(--surface-page); }
+  .label { font-size: var(--text-3xs); font-weight: 700; text-transform: uppercase; letter-spacing: .12em; color: var(--text-tertiary); margin-bottom: 8px; }
+  .row { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; margin-bottom: 18px; }
+  .stats { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+</style>
+</head>
+<body>
+<div id="root"></div>
+<script src="https://unpkg.com/react@18.3.1/umd/react.production.min.js"></script>
+<script src="https://unpkg.com/react-dom@18.3.1/umd/react-dom.production.min.js"></script>
+<script src="https://unpkg.com/@babel/standalone@7.29.0/babel.min.js"></script>
+<script src="https://unpkg.com/lucide@0.460.0/dist/umd/lucide.min.js"></script>
+<script src="../../_ds_bundle.js"></script>
+<script type="text/babel" data-presets="react">
+  const { Badge, CategoryBadge, SetChip, StatCard } = window.StrengthDataDesignSystem_5c629b;
+  const I = (name, size = 14) => {
+    const n = lucide[name];
+    let svg = '';
+    if (n && Array.isArray(n)) {
+      const a = { ...n[1], width: size, height: size, 'stroke-width': 2 };
+      const at = Object.entries(a).map(([k, v]) => k + '="' + v + '"').join(' ');
+      const kids = (n[2] || []).map(c => '<' + c[0] + ' ' + Object.entries(c[1]).map(([k, v]) => k + '="' + v + '"').join(' ') + '/>').join('');
+      svg = '<svg ' + at + '>' + kids + '</svg>';
+    }
+    return <span dangerouslySetInnerHTML={{ __html: svg }} style={{ display: 'inline-flex' }} />;
+  };
+  function Demo() {
+    return (
+      <div>
+        <div className="label">Category badges</div>
+        <div className="row">
+          <CategoryBadge category="push" />
+          <CategoryBadge category="pull" dot />
+          <CategoryBadge category="leg" dot />
+          <CategoryBadge category="other" />
+          <CategoryBadge category="pull" label="Upper" />
+          <Badge tone="blue">Synced</Badge>
+          <Badge tone="gold" icon={I('Trophy', 12)}>New PR</Badge>
+          <Badge tone="cyan" icon={I('Trophy', 12)}>Tied PR</Badge>
+        </div>
+        <div className="label">Set chips</div>
+        <div className="row">
+          <SetChip reps={12} weight={60} />
+          <SetChip reps={8} weight={80} />
+          <SetChip reps={5} weight="BW+10" />
+          <SetChip reps={6} weight={100} pr="new" trophy={I('Trophy', 11)} />
+          <SetChip reps={6} weight={100} pr="tied" trophy={I('Trophy', 11)} />
+        </div>
+        <div className="label">Stat tiles</div>
+        <div className="stats">
+          <StatCard tone="gold" icon={I('Trophy', 16)} label="Best" value="100 kg" sub="12 Nov 2025" />
+          <StatCard icon={I('TrendingUp', 16)} label="Strength change" value="+4%" sub="vs last 3 sessions" trend="up" />
+        </div>
+      </div>
+    );
+  }
+  ReactDOM.createRoot(document.getElementById('root')).render(<Demo />);
+</script>
+</body>
+</html>

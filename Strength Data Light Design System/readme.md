@@ -89,7 +89,7 @@ This system is a **visual redesign** of the existing app. The data model, featur
 - `forms/` — **Input**, **SegmentedControl**, **Stepper**
 - `data-display/` — **Badge**, **CategoryBadge** (+ `CATEGORY_COLORS`), **SetChip**, **StatCard**
 - `layout/` — **Card**, **Avatar**
-- `navigation/` — **BottomNav**, **WeekDay**
+- `navigation/` — **BottomNav** (floating pill with a central circular FAB), **WeekStrip** (swipeable strip with a sliding accent pill), **WeekDay** (single day cell)
 
 **Foundation cards** (`guidelines/`) — Colors (primary, neutrals, categories, status), Type (headings, body, numeric), Spacing (radii, shadows, scale), Brand (logo).
 

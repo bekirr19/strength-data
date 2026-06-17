@@ -1,0 +1,36 @@
+<!-- @dsCard group="Colors" viewport="700x170" name="Category Tints" subtitle="Push=orange, Pull=blue, Leg=indigo, Other=gray — subtle tint + colored text" -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<link rel="stylesheet" href="../styles.css" />
+<style>
+  body { margin: 0; padding: 20px; background: var(--surface-card); font-family: var(--font-sans); }
+  .row { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; }
+  .cat { border-radius: var(--radius-lg); padding: 14px; border: 1px solid var(--border-subtle); }
+  .pill { display: inline-flex; align-items: center; gap: 5px; height: 24px; padding: 0 11px; border-radius: var(--radius-full); font-size: var(--text-2xs); font-weight: 700; text-transform: uppercase; letter-spacing: .04em; }
+  .dot { width: 6px; height: 6px; border-radius: 50%; }
+  .hex { font-size: 0.625rem; color: var(--text-secondary); font-variant-numeric: tabular-nums; text-transform: uppercase; margin-top: 12px; line-height: 1.6; }
+</style>
+</head>
+<body>
+  <div class="row">
+    <div class="cat" style="background:var(--push-tint)">
+      <span class="pill" style="background:#fff;color:var(--push-700)"><span class="dot" style="background:var(--push-500)"></span>Push</span>
+      <div class="hex" style="color:var(--push-700)">tint #FFF3EB<br>text #C2410B<br>dot&nbsp; #F97316</div>
+    </div>
+    <div class="cat" style="background:var(--pull-tint)">
+      <span class="pill" style="background:#fff;color:var(--pull-700)"><span class="dot" style="background:var(--pull-500)"></span>Pull</span>
+      <div class="hex" style="color:var(--pull-700)">tint #EFF6FF<br>text #1D4ED8<br>dot&nbsp; #3B82F6</div>
+    </div>
+    <div class="cat" style="background:var(--leg-tint)">
+      <span class="pill" style="background:#fff;color:var(--leg-700)"><span class="dot" style="background:var(--leg-500)"></span>Leg</span>
+      <div class="hex" style="color:var(--leg-700)">tint #EEF0FF<br>text #4338CA<br>dot&nbsp; #6366F1</div>
+    </div>
+    <div class="cat" style="background:var(--other-tint)">
+      <span class="pill" style="background:#fff;color:var(--other-700)"><span class="dot" style="background:var(--other-500)"></span>Other</span>
+      <div class="hex" style="color:var(--other-700)">tint #F3F4F6<br>text #4B5563<br>dot&nbsp; #9CA3AF</div>
+    </div>
+  </div>
+</body>
+</html>

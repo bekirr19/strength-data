@@ -2,6 +2,9 @@ import React, { useState } from 'react';
 import { useAuth } from '../contexts/AuthContext';
 import { useNavigate } from 'react-router-dom';
 import { Mail, Lock, User, ArrowRight, Eye, EyeOff } from 'lucide-react';
+import { Button } from '../ds/components/buttons/Button';
+import { IconButton } from '../ds/components/buttons/IconButton';
+import { Input } from '../ds/components/forms/Input';
 
 export default function LoginPage() {
   const { loginWithGoogle, signup, login } = useAuth();
@@ -11,7 +14,6 @@ export default function LoginPage() {
   const [isLogin, setIsLogin] = useState(true);
   const [showPassword, setShowPassword] = useState(false);
 
-  // Form states
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [name, setName] = useState('');
@@ -23,8 +25,8 @@ export default function LoginPage() {
       await loginWithGoogle();
       navigate('/', { state: { loginSuccess: true } });
     } catch (err) {
-      console.error("Google Login error:", err);
-      setError('Google ile giriş yapılırken bir hata oluştu.');
+      console.error('Google Login error:', err);
+      setError('Something went wrong signing in with Google.');
     } finally {
       setLoading(false);
     }
@@ -32,17 +34,15 @@ export default function LoginPage() {
 
   async function handleSubmit(e) {
     e.preventDefault();
-    
+
     if (!email || !password) {
-      return setError('Lütfen tüm alanları doldurun.');
+      return setError('Please fill in all fields.');
     }
-
     if (!isLogin && !name) {
-      return setError('Lütfen isminizi girin.');
+      return setError('Please enter your name.');
     }
-
     if (password.length < 6) {
-      return setError('Şifre en az 6 karakter olmalıdır.');
+      return setError('Password must be at least 6 characters.');
     }
 
     try {
@@ -55,143 +55,107 @@ export default function LoginPage() {
       }
       navigate('/', { state: { loginSuccess: true } });
     } catch (err) {
-      console.error("Auth error:", err);
-      let msg = 'Bir hata oluştu.';
-      if (err.code === 'auth/email-already-in-use') msg = 'Bu e-posta adresi zaten kullanımda.';
-      if (err.code === 'auth/invalid-email') msg = 'Geçersiz e-posta adresi.';
-      if (err.code === 'auth/weak-password') msg = 'Şifre çok zayıf.';
+      console.error('Auth error:', err);
+      let msg = 'Something went wrong.';
+      if (err.code === 'auth/email-already-in-use') msg = 'This email is already in use.';
+      if (err.code === 'auth/invalid-email') msg = 'Invalid email address.';
+      if (err.code === 'auth/weak-password') msg = 'Password is too weak.';
       if (err.code === 'auth/user-not-found' || err.code === 'auth/wrong-password' || err.code === 'auth/invalid-credential') {
-        msg = 'E-posta veya şifre hatalı.';
+        msg = 'Wrong email or password.';
       }
-      setError(`${msg} (${err.code})`);
+      setError(`${msg}`);
     } finally {
       setLoading(false);
     }
   }
 
   return (
-    <div className="flex min-h-screen flex-col items-center justify-center bg-background-dark p-4 text-white bg-[radial-gradient(ellipse_80%_80%_at_50%_-20%,rgba(59,130,246,0.15),rgba(11,17,33,0))]">
-      <div className="w-full max-w-md space-y-8 rounded-3xl border border-white/10 bg-[#1C1C1E]/80 p-8 shadow-2xl backdrop-blur-xl">
-        <div className="text-center">
-          <img
-            src="/logo-blue.svg"
-            alt="Strength Data"
-            className="mx-auto h-16 w-16 rounded-2xl shadow-lg mb-4"
-          />
-          <h2 className="text-2xl font-bold tracking-tight text-white">
-            {isLogin ? 'Tekrar Hoş Geldiniz' : 'Hesap Oluşturun'}
-          </h2>
-          <p className="mt-2 text-sm text-gray-400">
-            {isLogin ? 'Antrenmanlarınıza kaldığınız yerden devam edin' : 'Gelişiminizi takip etmeye hemen başlayın'}
+    <div
+      style={{
+        minHeight: '100vh',
+        display: 'flex',
+        flexDirection: 'column',
+        justifyContent: 'center',
+        alignItems: 'center',
+        padding: '24px 20px',
+        background: 'var(--surface-page)',
+      }}
+    >
+      <div className="sd-slide-in" style={{ width: '100%', maxWidth: 400 }}>
+        <div style={{ textAlign: 'center', marginBottom: 26 }}>
+          <img src="/logo-blue.svg" width="60" height="60" style={{ borderRadius: 18, boxShadow: 'var(--shadow-md)' }} alt="Strength Data" />
+          <h1 style={{ margin: '16px 0 6px', fontSize: 'var(--text-2xl)', fontWeight: 800, letterSpacing: '-.02em', color: 'var(--text-primary)' }}>
+            {isLogin ? 'Welcome back' : 'Create your account'}
+          </h1>
+          <p style={{ margin: 0, fontSize: 'var(--text-sm)', color: 'var(--text-secondary)', fontWeight: 500 }}>
+            {isLogin ? 'Pick up your training right where you left off' : 'Start tracking your progress today'}
           </p>
         </div>
 
         {error && (
-          <div className="rounded-xl bg-red-500/10 p-4 text-sm text-red-400 border border-red-500/20 flex items-center gap-2 animate-in fade-in slide-in-from-top-2">
-            <span className="material-symbols-outlined text-lg">error</span>
+          <div
+            className="sd-slide-in"
+            style={{
+              display: 'flex', alignItems: 'center', gap: 8,
+              padding: '12px 14px', marginBottom: 14,
+              background: 'var(--red-tint)', color: 'var(--red-600)',
+              border: '1px solid var(--red-500)', borderRadius: 'var(--radius-md)',
+              fontSize: 'var(--text-xs)', fontWeight: 600,
+            }}
+          >
             {error}
           </div>
         )}
 
-        <form onSubmit={handleSubmit} className="space-y-4 mt-6">
+        <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
           {!isLogin && (
-            <div className="relative">
-              <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                <User className="h-5 w-5 text-gray-500" />
-              </div>
-              <input
-                type="text"
-                value={name}
-                onChange={(e) => setName(e.target.value)}
-                className="block w-full rounded-xl border border-white/10 bg-black/20 py-3 pl-10 pr-3 text-white placeholder-gray-500 focus:border-primary focus:ring-1 focus:ring-primary sm:text-sm transition"
-                placeholder="Adınız Soyadınız"
-              />
-            </div>
+            <Input icon={<User size={18} />} placeholder="Full name" value={name} onChange={(e) => setName(e.target.value)} />
           )}
-
-          <div className="relative">
-            <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-              <Mail className="h-5 w-5 text-gray-500" />
-            </div>
-            <input
-              type="email"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              className="block w-full rounded-xl border border-white/10 bg-black/20 py-3 pl-10 pr-3 text-white placeholder-gray-500 focus:border-primary focus:ring-1 focus:ring-primary sm:text-sm transition"
-              placeholder="E-posta adresi"
-            />
-          </div>
-
-          <div className="relative">
-            <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-              <Lock className="h-5 w-5 text-gray-500" />
-            </div>
-            <input
-              type={showPassword ? "text" : "password"}
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-              className="block w-full rounded-xl border border-white/10 bg-black/20 py-3 pl-10 pr-10 text-white placeholder-gray-500 focus:border-primary focus:ring-1 focus:ring-primary sm:text-sm transition"
-              placeholder="Şifre"
-            />
-            <button
-              type="button"
-              onClick={() => setShowPassword(!showPassword)}
-              className="absolute inset-y-0 right-0 pr-3 flex items-center text-gray-500 hover:text-white transition"
-            >
-              {showPassword ? <EyeOff className="h-5 w-5" /> : <Eye className="h-5 w-5" />}
-            </button>
-          </div>
-
-          <button
-            type="submit"
-            disabled={loading}
-            className="flex w-full items-center justify-center gap-2 rounded-xl bg-primary py-3.5 text-sm font-bold text-background-dark transition hover:bg-primary/90 disabled:opacity-50 disabled:cursor-not-allowed shadow-lg shadow-primary/20 mt-2"
-          >
-            {loading ? (
-              <span className="h-5 w-5 animate-spin rounded-full border-2 border-background-dark border-t-transparent" />
-            ) : (
-              <>
-                {isLogin ? 'Giriş Yap' : 'Kayıt Ol'}
-                <ArrowRight className="h-4 w-4" />
-              </>
-            )}
-          </button>
+          <Input icon={<Mail size={18} />} type="email" placeholder="Email address" value={email} onChange={(e) => setEmail(e.target.value)} />
+          <Input
+            type={showPassword ? 'text' : 'password'}
+            icon={<Lock size={18} />}
+            placeholder="Password"
+            value={password}
+            onChange={(e) => setPassword(e.target.value)}
+            trailing={
+              <IconButton ariaLabel="Toggle password" variant="ghost" size="sm" onClick={() => setShowPassword((s) => !s)}>
+                {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
+              </IconButton>
+            }
+          />
+          <Button type="submit" variant="primary" fullWidth size="lg" disabled={loading} trailingIcon={!loading ? <ArrowRight size={16} /> : null} style={{ marginTop: 4 }}>
+            {loading ? '…' : isLogin ? 'Sign in' : 'Create account'}
+          </Button>
         </form>
 
-        <div className="relative my-6">
-          <div className="absolute inset-0 flex items-center">
-            <div className="w-full border-t border-white/10"></div>
-          </div>
-          <div className="relative flex justify-center text-sm">
-            <span className="bg-[#1C1C1E] px-2 text-gray-500">veya</span>
-          </div>
+        <div style={{ display: 'flex', alignItems: 'center', gap: 12, margin: '20px 0' }}>
+          <div style={{ flex: 1, height: 1, background: 'var(--border-subtle)' }} />
+          <span style={{ fontSize: 'var(--text-xs)', color: 'var(--text-tertiary)', fontWeight: 600 }}>or</span>
+          <div style={{ flex: 1, height: 1, background: 'var(--border-subtle)' }} />
         </div>
 
-        <button
-          onClick={handleGoogleLogin}
+        <Button
+          variant="secondary"
+          fullWidth
+          size="lg"
           disabled={loading}
-          className="flex w-full items-center justify-center gap-3 rounded-xl bg-white py-3.5 text-sm font-bold text-black transition hover:bg-gray-200 disabled:opacity-50 disabled:cursor-not-allowed"
+          onClick={handleGoogleLogin}
+          icon={<img src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg" width="18" height="18" alt="" />}
         >
-          <img src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg" alt="Google" className="h-5 w-5" />
-          Google ile Devam Et
-        </button>
-        
-        <div className="mt-6 text-center">
+          Continue with Google
+        </Button>
+
+        <p style={{ textAlign: 'center', marginTop: 22, fontSize: 'var(--text-sm)', color: 'var(--text-secondary)', fontWeight: 500 }}>
+          {isLogin ? "Don't have an account? " : 'Already have an account? '}
           <button
             type="button"
-            onClick={() => {
-              setIsLogin(!isLogin);
-              setError('');
-            }}
-            className="text-sm text-gray-400 hover:text-white transition"
+            onClick={() => { setIsLogin((v) => !v); setError(''); }}
+            style={{ border: 'none', background: 'none', padding: 0, cursor: 'pointer', color: 'var(--text-link)', fontWeight: 700, fontFamily: 'var(--font-sans)', fontSize: 'inherit' }}
           >
-            {isLogin ? (
-              <>Hesabınız yok mu? <span className="text-primary font-bold">Kayıt Olun</span></>
-            ) : (
-              <>Zaten hesabınız var mı? <span className="text-primary font-bold">Giriş Yapın</span></>
-            )}
+            {isLogin ? 'Sign up' : 'Sign in'}
           </button>
-        </div>
+        </p>
       </div>
     </div>
   );
