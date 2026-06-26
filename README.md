@@ -1,149 +1,155 @@
-# Gym Tracker
+# Strength Data — Workout Tracker
 
-Kişisel antrenman geçmişini kaydetmek, takip etmek ve analiz etmek için geliştirilmiş bir web uygulaması. Push/Pull/Leg ayrımıyla antrenman tipi tespiti, egzersiz bazında ilerleme grafikleri ve yıllık özet gibi özellikler sunar.
+A clean, mobile-first web app to log your workouts, track personal records, and visualize your progress over time.
 
----
-
-## Ne yapar?
-
-Her gün yaptığın antrenmanı kaydedersin: hangi egzersizleri yaptığını, kaç set, kaç tekrar, ne kadar ağırlık kullandığını. Uygulama bu verileri Firebase'de saklar ve sana şunları gösterir:
-
-- Her egzersizde en son kırdığın PR (Personal Record)
-- Toplam kaldırılan tonaj (volume)
-- Zaman içindeki ilerleme grafiği
-- Hangi günlerde hangi tip antrenman yaptığın (Push / Pull / Leg / Full Body vb.)
-- Yıllık antrenman özeti (Wrapped)
+**[→ Try it live](https://workout-firebase-efeb3.web.app)**
 
 ---
 
-## Özellikler
+## What it does
 
-**Antrenman Kaydı**
-- Günlük antrenman oluştur, egzersiz ekle, set/tekrar/ağırlık gir
-- Antrenman tipini otomatik tespit eder (Push, Pull, Leg, Upper Body, Full Body)
-- Vücut ağırlığı takibi (Pull-up, Dip gibi vücut ağırlığıyla yapılan hareketlerde otomatik hesaplar)
-- Geçmiş antrenmanı başka bir güne kopyalayarak import et
+Log every workout session — exercises, sets, reps, and weight. The app automatically classifies your session (Push / Pull / Leg / Upper / Full Body), tracks your PRs, calculates total volume, and gives you charts showing how you've progressed over time.
 
-**Takvim & Navigasyon**
-- Haftalık şerit görünümü — sağa/sola kaydırarak haftalar arası geçiş
-- Aylık takvim modalı — antrenman yapılan günleri renkli noktalarla gösterir
-- Son seçilen gün oturum boyunca hatırlanır
-
-**Egzersiz Kütüphanesi**
-- Varsayılan egzersiz listesi + kendi egzersizlerini ekle
-- Egzersizlere kas grubu, kategori (Compound/Isolation) ve ağırlık tipi ata
-- Egzersiz adını tüm geçmiş kayıtlarda aynı anda yeniden adlandır
-
-**İlerleme & Analiz**
-- Egzersiz detay sayfasında zaman serisi grafik (Recharts ile)
-- PR ve toplam tonaj metrikleri
-- Wrapped: yıl sonu özeti — toplam antrenman sayısı, en çok yapılan egzersizler, en yoğun aylar
-
-**Hesap & Veri**
-- Google hesabıyla giriş (Firebase Auth)
-- Veriler Firebase Realtime Database'de saklanır — cihazlar arası senkronizasyon
-- Admin paneli: kullanıcı verilerini yönetme
-- Geri bildirim sayfası: uygulama içinden geri bildirim gönder
+At the end of the year, a **Year in Review** summary shows your biggest lifts, most active months, and overall stats.
 
 ---
 
-## Teknoloji Stack'i
+## Features
 
-| Katman | Teknoloji |
+**Workout Logging**
+- Add exercises, sets, reps, and weight to any day
+- Bodyweight exercise support (`BW` or `BW+X` notation for pull-ups, dips, etc.)
+- Copy a past workout to a new day
+- Automatic workout type detection (Push / Pull / Leg / Upper / Full Body)
+
+**Progress Tracking**
+- Personal record highlights — gold for new PRs, cyan for ties
+- Exercise detail page with time-series charts (weight, volume, estimated 1RM)
+- Filter by week / month / year / all time
+
+**Calendar & Navigation**
+- Weekly strip view — swipe left/right to move between weeks
+- Monthly calendar with color-coded workout indicators
+- Remembers your last selected date across sessions
+
+**Exercise Library**
+- 50+ built-in exercises with muscle group & category metadata
+- Add your own custom exercises
+- Rename an exercise and it updates across all historical records
+
+**Account & Data**
+- Sign in with Google (or email/password)
+- Cloud sync via Firebase — access your data on any device
+- Export your full workout history as JSON
+- Import a JSON backup
+
+---
+
+## Tech Stack
+
+| Layer | Technology |
 |---|---|
 | UI | React 18, Tailwind CSS |
-| Animasyon | Framer Motion |
-| Grafikler | Recharts |
 | Routing | React Router v6 |
-| Auth & DB | Firebase (Auth + Realtime Database) |
-| İkonlar | Lucide React |
+| Animations | Framer Motion |
+| Charts | Recharts |
+| Icons | Lucide React |
+| Auth & Database | Firebase (Auth + Realtime Database) |
 | Build | Vite |
 
 ---
 
-## Kurulum
+## Getting Started (Self-Hosted)
 
-**Gereksinimler:** Node.js 18+, bir Firebase projesi
+To run your own instance you need Node.js 18+ and a Firebase project.
 
-### 1. Repoyu klonla
+### 1. Clone and install
 
 ```bash
-git clone <repo-url>
+git clone https://github.com/your-username/workout-trackerr.git
 cd workout-trackerr
 npm install
 ```
 
-### 2. Firebase yapılandırması
+### 2. Set up Firebase
 
-[Firebase Console](https://console.firebase.google.com)'dan yeni bir proje oluştur. Realtime Database ve Authentication (Google provider) servislerini etkinleştir.
+1. Go to [Firebase Console](https://console.firebase.google.com) and create a new project
+2. Enable **Authentication** (Google provider + Email/Password)
+3. Enable **Realtime Database** and set up rules (see `database.rules.json`)
+4. Copy your web app config values
 
-Proje kök dizininde `.env` dosyası oluştur:
+Create a `.env` file in the project root:
 
 ```env
-VITE_FIREBASE_API_KEY=...
-VITE_FIREBASE_AUTH_DOMAIN=...
-VITE_FIREBASE_DATABASE_URL=...
-VITE_FIREBASE_PROJECT_ID=...
-VITE_FIREBASE_STORAGE_BUCKET=...
-VITE_FIREBASE_MESSAGING_SENDER_ID=...
-VITE_FIREBASE_APP_ID=...
+VITE_FIREBASE_API_KEY=your_api_key
+VITE_FIREBASE_AUTH_DOMAIN=your_project.firebaseapp.com
+VITE_FIREBASE_DATABASE_URL=https://your_project-default-rtdb.firebaseio.com
+VITE_FIREBASE_PROJECT_ID=your_project_id
+VITE_FIREBASE_STORAGE_BUCKET=your_project.appspot.com
+VITE_FIREBASE_MESSAGING_SENDER_ID=your_sender_id
+VITE_FIREBASE_APP_ID=your_app_id
 ```
 
-Bu değerleri Firebase Console → Proje Ayarları → Genel → Web uygulaması bölümünden alabilirsin.
-
-### 3. Çalıştır
+### 3. Run
 
 ```bash
-# Geliştirme sunucusu
+# Development server (http://localhost:3000)
 npm run dev
 
 # Production build
 npm run build
 
-# Build önizlemesi
+# Preview the production build
 npm run preview
 ```
 
 ---
 
-## Proje Yapısı
+## Project Structure
 
 ```
 src/
 ├── pages/
-│   ├── MainPage.jsx          # Ana sayfa — haftalık görünüm, antrenman girişi
-│   ├── ExercisesPage.jsx     # Egzersiz kütüphanesi
-│   ├── ExerciseDetailPage.jsx # Egzersiz ilerleme grafiği ve PR'lar
-│   ├── WorkoutDetailPage.jsx  # Belirli bir günün antrenman detayı
-│   ├── GelistirmelerPage.jsx  # Geri bildirim sayfası
-│   ├── ProfilePage.jsx        # Kullanıcı profili
-│   ├── LoginPage.jsx          # Google ile giriş
-│   └── AdminPanelPage.jsx     # Admin yönetim paneli
-├── components/
-│   ├── WeekStrip.jsx          # Haftalık tarih seçici
-│   ├── CalendarModal.jsx      # Aylık takvim
-│   ├── BodyWeightModal.jsx    # Vücut ağırlığı girişi
-│   ├── ImportWorkoutModal.jsx # Geçmiş antrenman kopyalama
-│   └── Wrapped2025Modal.jsx   # Yıllık özet
+│   ├── MainPage.jsx            # Home — weekly view, workout entry
+│   ├── ExercisesPage.jsx       # Exercise library
+│   ├── ExerciseDetailPage.jsx  # Progress charts & PR history
+│   ├── WorkoutDetailPage.jsx   # Single session details
+│   ├── ProfilePage.jsx         # Account, export/import
+│   └── LoginPage.jsx           # Authentication
+├── components/                 # Reusable UI components
 ├── utils/
-│   ├── storage-client.js      # Tüm veri okuma/yazma işlemleri
-│   ├── storage-firebase.js    # Firebase Realtime DB adaptörü
-│   ├── workoutTypes.js        # Push/Pull/Leg tipi tespiti
-│   └── exerciseMetadata.js    # Egzersiz kas grubu bilgileri
+│   ├── storage-client.js       # Unified data read/write layer
+│   ├── storage-firebase.js     # Firebase Realtime DB adapter
+│   ├── workoutTypes.js         # Push/Pull/Leg classification logic
+│   └── exerciseMetadata.js     # Exercise library & muscle groups
 └── contexts/
-    └── AuthContext.jsx        # Firebase Auth context
+    └── AuthContext.jsx         # Firebase Auth context
 ```
 
 ---
 
-## Nasıl Kullanılır?
+## Deployment
 
-1. **Giriş** — Google hesabınla oturum aç
-2. **Antrenman Ekle** — Ana sayfada bugünün tarihini seçip egzersiz ekle
-3. **Set Kaydet** — Her egzersiz için set, tekrar ve ağırlık gir
-4. **İlerleme Gör** — Egzersizler sayfasından herhangi bir harekete tıkla; PR geçmişini ve grafiğini gör
-5. **Geçmiş Tara** — Haftalık şeridi kaydırarak geçmiş günlere bak veya takvim ikonuna tıkla
+The app is ready to deploy to **Firebase Hosting** or **Netlify**.
+
+**Firebase Hosting:**
+```bash
+npm run build
+firebase deploy
+```
+
+**Netlify:** Connect the repo — build command is `npm run build`, publish directory is `dist`. Redirects are configured in `netlify.toml`.
 
 ---
 
-Developed with ❤️
+## How to Use
+
+1. **Sign in** with your Google account
+2. **Select a date** on the weekly strip at the top
+3. **Add a workout** — tap the + button and add exercises with sets, reps, and weight
+4. **View progress** — go to the Exercises tab and tap any exercise to see your PR history and chart
+5. **Browse history** — swipe the weekly strip or open the calendar to jump to any past date
+
+---
+
+Developed with ❤️ by [Bekir Goktepe](https://github.com/bekirgoktpe)
